@@ -1,0 +1,19 @@
+set write, "Enter the base: "
+set 0, read
+jumpt 18, D[0] < 0
+set write, "Enter the power: "
+set 1, read
+jumpt 18, D[1] < 0		# input error 	
+jumpt 15, D[1] = 0		# if the power is 0 the result is 1 
+set 2, D[0]			# set D[2] to the base (D[0])
+jumpt 13, D[1] = 1 
+set 2, D[2] * D[0]
+set 1, D[1] - 1
+jump 9
+set writeln, D[2]
+halt
+set 3, 1 
+set writeln, D[3]		# output 1
+halt
+set writeln, "input error"
+halt

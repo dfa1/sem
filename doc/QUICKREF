@@ -1,0 +1,41 @@
+SIMPLESEM QUICK-REFERENCE
+=========================
+
+Basics
+------
+
+instruction pointer (ip) -- which keeps track of /the/ next instruction
+memory D[]: data memory 
+memory C[]: code memory, -- all instruction fit in one element and ip is and 
+                            index into C
+read = input register
+write = output register
+writeln = output register that insert a newline at the end of each write
+
+# begin an inline comment
+
+
+Instructions
+------------
+
+set target, source
+
+Examples 
+set 10, D[20] # D[10] = D[20]
+set 30, read  # reads value into D[30]
+set writeln, D[5] + D[6] # prints sum
+
+jump address
+
+Examples
+jump 10	# next instruction at C[10]
+jump ip + 4 # next instruction at C[ip + 4]
+
+jumpt address, condition
+
+Example
+jumpt 40, D[20] < 100
+
+indirect addressing (references)
+set D[10], 0	# D[D[10]] = 0
+jump D[10]	# ip = D[10]

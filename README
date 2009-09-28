@@ -1,0 +1,138 @@
+Sem, an abstract semantic processor
+===================================
+
+This is sem 2.1. Enjoy it! :)
+
+
+Copyright notice
+----------------
+
+Copyright (C) 2004-2009 Davide Angelocola <davide.angelocola@gmail.com>
+ 
+
+License information
+-------------------
+
+This program is free software, released under the GNU Public License, which 
+gives you, from the user point of view, a great degree of liberty, which 
+proprietary software just doesn't.
+
+Follows a little list of the advantages free software has:
+  o  it's free!
+  o  the complete source code is available
+  o  you are allowed to copy, modify and redistribute. For more info
+     about this subject refer to the LICENSE
+
+
+What's news in this version?
+----------------------------
+
+See the CHANGES for information on new features and other user 
+visible/invisible changes.
+
+
+Install instructions
+--------------------
+
+To start building right away type `make' in the current directory.  This 
+creates an executable `sem'; to install in /usr/local/bin, first do 
+`su root' and then `make install':
+
+  % ./configure
+
+  % make                                # build sem 
+
+  [ Become root if necessary ]
+  % make install                        # install sem and misc/semd 
+
+  [ Become root if necessary ]
+  % make uninstall                      # remove sem and semd 
+
+
+What's sem anyway?
+------------------
+
+Sem is an interpreter and a debugger for the SIMPLESEM language.   
+
+"We said that in this book we will use an operational approach to semantics.
+To do so, we introduce a simple abstract processor called SIMPLESEM, and we
+show constructs can be executed by sequences of operations of the abstract
+processor."
+
+ 			  PP. 69, "An abstract semantic processor"
+                           Programming language concepts, Third Edition
+                            Carlo Ghezzi, Politecnico di Milano
+                             Mehdi Jazayeri, Technische Universitat Wien
+                              John Wiley & Sons                  
+
+
+How to use misc/sem.vim? 
+------------------------
+
+The file sem.vim is a Vim syntax file. It enables Vim to show parts of 
+the text in another font or color for your .sem files.
+
+Copy the sem.vim in /usr/share/vim/vim{version}/syntax. Then edit your
+/usr/share/vim/vim{version}/filetype.vim and add the following lines:
+
+" SIMPLESEM 
+au BufNewFile,BufRead *.sem                     setf sem
+
+
+Distribution structure
+----------------------
+
+ChangeLog		History of changes
+COPYING			Licensing information
+README			The file you're reading now
+THANKS			Acknowledgments
+TODO	          	To-do list, ideas, bugs
+examples/comp.sem	Compare two numbers
+examples/fact.sem	The factorial
+examples/gcd.sem	Greatest Common Divisor
+examples/hello.sem	Hello World, in SIMPLESEM this time
+examples/pow.sem	The power
+examples/rfact.sem	Recursive version of fact.sem
+examples/sum.sem	Sum two numbers
+misc/semd		Just an handy wrapper for sem -d
+misc/sem.vim            VIM syntax file
+src/compile.y		The compiler (GNU bison input)
+src/compile.c		The compiler (generated from compile.y)		
+src/debug.c		The debugger 
+src/eval.c		The interpreter
+src/main.c		The main() and other stuff
+src/scan.c		The lexical scanner (generated from scan.l)
+src/scan.l		The lexical scanner (GNU flex input)
+src/sem.h		Just an handy header 	
+src/compile.h		Tokens 
+gnulib/*                gnulib sources
+m4/*                    ditto
+
+skip autoconf/automake/libtool/gnulib build files
+
+
+Author
+------
+
+Sem was originally written by Davide Angelocola. See also THANKS for a 
+list of contributors.
+
+
+Contact Information
+-------------------
+
+Snail-mail:
+  Davide Angelocola
+  Via Sandro Pertini, 4
+  Cave (Roma), CAP 00033
+  Italia
+
+Email:
+  davide.angelocola@gmail.com
+
+URL:
+  http://www.humaorie.com
+
+That's all folks!
+-- Davide
+

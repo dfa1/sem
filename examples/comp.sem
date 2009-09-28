@@ -1,0 +1,13 @@
+set write, "Enter a value: "	
+set 0, read
+set write, "Enter a value: "
+set 1, read
+jumpt 8, D[0] = D[1]
+jumpt 10, D[0] > D[1]
+jump 12
+set writeln, "They are equal!"
+jump 13
+set writeln, "The first is greater than the second!"
+jump 13
+set writeln, "The second is greater than the first!"
+halt

@@ -1,0 +1,12 @@
+set write, "Enter a value: "
+set 0, read
+jumpt 12, D[0] < 0 
+set 1, 1	
+set 2, 1
+jumpt 10, D[1] > D[0]		# loop
+set 2, D[2] * D[1]		 
+set 1, D[1] + 1
+jump 6
+set writeln, D[2]		# out the factorial
+halt
+set writeln, "input error"	# the input is less than zero

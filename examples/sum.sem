@@ -1,0 +1,8 @@
+set write, "Enter a value: "
+set 0, read
+set write, "Enter a value: "
+set 1, read
+set 2, D[0] + D[1]
+set write, "The sum is "
+set writeln, D[2] 
+halt

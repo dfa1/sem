@@ -1,0 +1,15 @@
+
+- BUG: integer overflow checking doesn't works
+- update copyright and email address
+- debugger commands: trace and break
+- strtol and strtod checks are weak
+- improve error messages
+- use boehm-gc? 
+- use GNU gperf for keywords?
+- a script that autogerates opstr in debug.c 
+- autotest 
+- emacs mode
+- more examples
+- man page
+- some other cool features. Do you have any ideas on how to 
+  improve this program?

@@ -1,0 +1,28 @@
+set 1, 3			# initialize FREE; location 2 is used for n
+set 2, read			# reads the value of n
+jumpt 12, D[2] < 0		# tests the value of n
+set 1, D[1] + 1			# space for the result is saved
+set D[1], ip + 4		# set return pointer
+set D[1] + 1, D[0]		# set dynamic link
+set 0, D[1]			# set CURRENT
+set 1, D[1] + 3			# set FREE (3 is the size of fact's AR) 
+jump 14				# 14 is the starting address of fact's code
+set writeln, D[D[1] - 1]	# store the result of the call to fact 
+jump 13
+set writeln, "input error"	
+halt				# this is the end of the code of main
+jumpt 25, D[2] <= 1		# fact; tests the value of n
+set D[0] + 2, D[2]		# assigns n to loc
+set 2, D[2] - 1			# decrements n
+set 1, D[1] + 1			# space for the result is saved
+set D[1], ip + 4		# set return pointer
+set D[1] + 1, D[0]		# set dynamic lynk
+set 0, D[1]			# set CURRENT
+set 1, D[1] + 3 		# set FREE
+jump 14
+set D[0] - 1, D[D[0] + 2] * D[D[1] - 1]	# store returned value
+jump 26
+set D[0] - 1, 1			# return 1
+set 1, D[0]			# return from the routine 
+set 0, D[D[0] + 1]		# ...
+jump D[D[1]] 			# ...

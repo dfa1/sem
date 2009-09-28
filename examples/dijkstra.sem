@@ -1,0 +1,6 @@
+set writeln, "It is practically impossible to teach good programming style to"
+set writeln, "students that have had prior exposure to BASIC: as potential"
+set writeln, "programmers they are mentally mutilated beyond hope of"
+set writeln, "regeneration."
+set writeln, ""
+set writeln, "		-- Dijkstra"

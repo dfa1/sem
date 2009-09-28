@@ -1,0 +1,10 @@
+set 0, read
+set 1, read
+jumpt 9, D[0] = D[1]
+jumpt 7, D[0] <= D[1]
+set 0, D[0] - D[1]
+jump 8
+set 1, D[1] - D[0]
+jump 3
+set writeln, D[0]
+halt
