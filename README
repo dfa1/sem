@@ -7,7 +7,7 @@ This is sem 2.1. Enjoy it! :)
 Copyright notice
 ----------------
 
-Copyright (C) 2004-2009 Davide Angelocola <davide.angelocola@gmail.com>
+Copyright (C) 2004-2010 Davide Angelocola <davide.angelocola@gmail.com>
  
 
 License information
@@ -34,16 +34,32 @@ visible/invisible changes.
 Install instructions
 --------------------
 
-To start building right away type `make' in the current directory.  This 
-creates an executable `sem'; to install in /usr/local/bin, first do 
-`su root' and then `make install':
+Requirements:
 
-  % ./configure
+- gcc
+- bison
+- flex
+- make
+- autoconf
+- automake
+- libtool
+- gnulib
 
-  % make                                # build sem 
+To start building type the following commands:
 
-  [ Become root if necessary ]
-  % make install                        # install sem and misc/semd 
+  $ gnulib-tool --update
+
+  $ autoreconf
+  
+  $ ./configure
+
+  $ make                                # build sem 
+
+This creates an executable `sem'; to install in `/usr/local/bin', first
+become root and then `make install' 
+
+[ Become root if necessary ] %
+make install # install sem and misc/semd
 
   [ Become root if necessary ]
   % make uninstall                      # remove sem and semd 
@@ -120,12 +136,6 @@ list of contributors.
 
 Contact Information
 -------------------
-
-Snail-mail:
-  Davide Angelocola
-  Via Sandro Pertini, 4
-  Cave (Roma), CAP 00033
-  Italia
 
 Email:
   davide.angelocola@gmail.com
