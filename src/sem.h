@@ -1,7 +1,7 @@
 /*
  * sem.h -- Just an handy header
  *
- * Copyright (C) 2004-2010 Davide Angelocola <davide.angelocola@gmail.com>
+ * Copyright (C) 2003-2011 Davide Angelocola <davide.angelocola@gmail.com>
  *
  * Sem is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
