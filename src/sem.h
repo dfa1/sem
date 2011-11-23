@@ -147,15 +147,11 @@ struct Parsing
 /* struct Parsing access macros. */
 #define PFL(p)	((p)->filename)
 #define PFP(p)	((p)->fp)
-#define PLI(p)	((p)->lines)
 #define PTK(p)	((p)->token)
 #define PLN(p)	((p)->lineno)
 #define POF(p)	((p)->offset)
 #define PST(p)	((p)->string)
 #define PSP(p)	((p)->string_p)
-
-/* Global parsing structure. */
-IMPORT struct Parsing *Parsing;
 
 /* Init/Fini the compiler. */
 IMPORT int initCompiler(const char *);

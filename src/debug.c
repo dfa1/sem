@@ -379,7 +379,7 @@ quitCmd(struct VM *v)
     else
 	goto cleanup_and_exit;
 
-  cleanup_and_exit:
+ cleanup_and_exit: // TODO: really useful?
     do {
 	register char **p;
 
@@ -501,8 +501,13 @@ runCommand(const char *p, struct VM *v)
     return sts;
 }
 
-PUBLIC int
-debugCode(struct VM *v)
+struct CodeInfo {
+  FILE *fp;
+  char **lines;
+};
+
+int
+debugCode(struct VM *vm, FILE *fp)
 {
     /* TODO: gperf */
     static struct Cmd cmds[] = {	
@@ -525,7 +530,7 @@ debugCode(struct VM *v)
     };
     
     Cmds = cmds;
-    PLI(Parsing) = file2lines(PFP(Parsing), CSZ(VCD(v)));
+    char**lines = file2lines(fp, CSZ(VCD(vm)));
     char s[20];
     for (fprintf(stdout, "Type `help' to get help.\n");;) {
 

@@ -24,40 +24,18 @@
  */
 
 #include "sem.h"
-#include "compile.h"
+#include "tokens.h"
 
-/*
- *       THE LESSER-KNOWN PROGRAMMING LANGUAGES #12: LITHP
- *
- * This otherwise unremarkable language is distinguished by the absence of
- * an "S" in its character set; users must substitute "TH".  LITHP is said
- * to be useful in protheththing lithtth.
- */
-
+#define YY_DECL int yylex (struct Parsing *parsing)
 #define YY_USER_INIT		/* void */
-#define YY_USER_ACTION  upd();	/* update the Parsing structure */
-
-/* Keep me public! */
-PUBLIC struct Parsing *Parsing;
-
-/* Private stuff. */
-PRIVATE struct Parsing p = {
-    NULL,		/* filename     */
-    NULL,		/* fp           */
-    NULL,		/* lines        */
-    NULL,		/* tok          */
-    1,			/* lineno       */
-    0,			/* offset       */
-    "",			/* strtok       */
-    NULL		/* strtok_p     */
-};
-
-/* Update the Parsing struct (via Parsing pointer). */
-PRIVATE void upd(void);
+#define YY_USER_ACTION  upd(parsing);	/* update the Parsing structure */
+static void upd(struct Parsing *parsing);
 
 /* *INDENT-OFF* */
 %}
-	/* GNU Flex options. */
+/* TODO: pure tokenizer */
+/* %option bison-bridge */
+/* %option reentrant */
 %option never-interactive 
 %option noyywrap 
 
@@ -90,23 +68,23 @@ D               [0-9]
 	/* Strings. */ 
 "\"" {
     BEGIN STRING;
-    PSP(Parsing) = PST(Parsing);
+    parsing->string_p = parsing->string;
 }
 
 <STRING>"\"" {
     BEGIN INITIAL;
-    *PSP(Parsing) = '\0';
+    *parsing->string_p = '\0';
     return tSTRING;
  }
 
-<STRING>\\n   		*PSP(Parsing)++ = '\n';
-<STRING>\\r   		*PSP(Parsing)++ = '\r';
-<STRING>\\t   		*PSP(Parsing)++ = '\t';
-<STRING>\\v   		*PSP(Parsing)++ = '\v';
-<STRING>\\f   		*PSP(Parsing)++ = '\f';
-<STRING>\\b   		*PSP(Parsing)++ = '\b';
-<STRING>\\a   		*PSP(Parsing)++ = '\a';
-<STRING>.     		*PSP(Parsing)++ = *yytext;
+<STRING>\\n   		*parsing->string_p++ = '\n';
+<STRING>\\r   		*parsing->string_p++ = '\r';
+<STRING>\\t   		*parsing->string_p++ = '\t';
+<STRING>\\v   		*parsing->string_p++ = '\v';
+<STRING>\\f   		*parsing->string_p++ = '\f';
+<STRING>\\b   		*parsing->string_p++ = '\b';
+<STRING>\\a   		*parsing->string_p++ = '\a';
+<STRING>.     		*parsing->string_p++ = *yytext;
 
 	/* Operators. */
 "+"			return '+';
@@ -140,63 +118,52 @@ D               [0-9]
 %%
 
 /* *INDENT-ON* */
-PRIVATE void
-upd(void)
+static void
+upd(struct Parsing *parsing)
 {
     register int i;
 
     if (yytext != NULL && yytext[0] != '\n')
-	PTK(Parsing) = yytext;
+	parsing->token = yytext;
     else
-	PTK(Parsing) = NULL;
+	parsing->token = NULL;
 
     for (i = 0; yytext[i] != '\0'; i++) {
 	switch (yytext[i]) {
 	case '\n':
-	    PLN(Parsing)++;
+	    PLN(parsing)++;
 	    break;
 	    
 	case '\t':
-	    POF(Parsing) += 8 - (POF(Parsing) % 8);
+	    POF(parsing) += 8 - (POF(parsing) % 8);
 	    break;
 
 	default:
-	    POF(Parsing)++;
+	    POF(parsing)++;
 	}
     }
 }
 
-/* Initialize the compiler. */
-PUBLIC int
+int
 initCompiler(const char *filename)
 {
-    /* Initialize the (global) Parsing structure. */
-    Parsing = &p;
-
-    /* Initialize yyin. */
     if ((yyin = fopen(filename, "r")) == NULL) {
 	fprintf(stderr, "sem: cannot open `%s'\n", filename);
 	return 1;
     }
-    else {
-	PFL(Parsing) = xstrdup(filename);
-	PFP(Parsing) = yyin;
-	return 0;
-    }
+
+    /* PFL(Parsing) = xstrdup(filename); */
+    /* PFP(Parsing) = yyin; */
+    return 0;
 }
 
-/* Finalize the compiler. */
-PUBLIC void
+void
 finiCompiler(struct Code *c)
 {
-    register struct Op *o = CHD(c);
-    register struct Op *t;
+  struct Op *o = CHD(c);
+  struct Op *t;
 
-    /*
-     * Anything free is worth what you pay for it.
-     *      -- Anonymous
-     */
-
+  
     o = ONX(o);		/* XXX: skip START */
 
     for (;;) {
@@ -217,14 +184,5 @@ finiCompiler(struct Code *c)
 
     free(CJM(c));
     free(c);
-
-    /* Free other stuff. */
-    free(PFL(Parsing));
     fclose(yyin);
-
-    /* This fix compile warning "yyunput unused" (gcc). */
-    unput(0);
-
-    /* Free the current scanner's buffer and close the input stream. */
-    yy_delete_buffer(YY_CURRENT_BUFFER);
 }

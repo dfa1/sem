@@ -44,26 +44,30 @@
 #endif
 
 #define YYSTYPE 	struct op *
-#define YYPARSE_PARAM	c
-extern int yylex(void);
+extern int yylex();
 
 /* 
  * The GNU bison parser detects a "syntax error" or "parse error" whenever
  * it reads a token which cannot satisfy any syntax rule. This function
  * is called whenever a syntax error occurs. 
  */
-PRIVATE void yyerror(const char *);
+ static void yyerror(struct Code* code, struct Parsing *parsing, const char *); 
+
+#define error(msg) yyerror(code, parsing, (msg))
 
 /* Handy macros. */
-#define addOp(op)            addOp4(c, (op), -1, NULL)
-#define addOpIV(op, iv)      addOp4(c, (op), (iv), NULL);
-#define addOpSV(op, sv)      addOp4(c, (op), -1, (sv))
+#define addOp(op)            addOp4(code, (op), -1, NULL)
+#define addOpIV(op, iv)      addOp4(code, (op), (iv), NULL);
+#define addOpSV(op, sv)      addOp4(code, (op), -1, (sv))
 
 /* Append an opcode to the list (see Code). */
-PRIVATE void addOp4(struct Code *, int, int, char *);
+static void addOp4(struct Code *, int, int, char *);
 
 /* *INDENT-OFF* */
 %}
+%define api.pure
+%parse-param {struct Code *code}
+%parse-param {struct Parsing *parsing}
 
 /* Keywords. */
 %token kSET
@@ -103,7 +107,7 @@ PRIVATE void addOp4(struct Code *, int, int, char *);
 
 input
 : none {
-    fprintf(stderr, "%s: empty source\n", PFL(Parsing));
+    fprintf(stderr, "%s: empty source\n", PFL(parsing));
     YYABORT;
  }
 | stmts
@@ -119,8 +123,8 @@ stmts
 ;
 
 stmt    
-: { addOpIV(SETLINENO, PLN(Parsing)); } tNEWLINE
-| { addOpIV(SETLINENO, PLN(Parsing)); } simple_stmt tNEWLINE
+: { addOpIV(SETLINENO, PLN(parsing)); } tNEWLINE
+| { addOpIV(SETLINENO, PLN(parsing)); } simple_stmt tNEWLINE
 | error { YYABORT; }
 ;
 
@@ -153,13 +157,13 @@ set_stmt
     addOp(WRITE_INT);
 }
 | kSET rWRITE ',' tSTRING {
-    addOpSV(WRITE_STR, PST(Parsing));
+    addOpSV(WRITE_STR, PST(parsing));
 }
 | kSET rWRITELN ',' expr {	/* this is an extension */
     addOp(WRITELN_INT);
 }
 | kSET rWRITELN ',' tSTRING {	/* this is an extension */
-    addOpSV(WRITELN_STR, PST(Parsing));
+    addOpSV(WRITELN_STR, PST(parsing));
 }
 | kSET expr ',' rREAD {
     addOp(READ);
@@ -230,15 +234,15 @@ literal
     char *ep;
 
     errno = 0;
-    value = strtol(PTK(Parsing), &ep, 10);
+    value = strtol(PTK(parsing), &ep, 10);
 
     if (errno == ERANGE) {
-	yyerror("integer literal too large");
+	error("integer literal too large");
 	YYABORT;
     }
 
     if (*ep != '\0') {
-	yyerror("invalid integer literal");
+	error("invalid integer literal");
 	YYABORT;
     }
 
@@ -260,13 +264,14 @@ aip
 %%
   /* *INDENT-ON* */
 
-PRIVATE void
-yyerror(const char *msg)
+void
+yyerror(struct Code* code, struct Parsing * parsing, const char *msg)
 {
-    fprintf(stderr, "%s: %s at line %d", PFL(Parsing), msg, PLN(Parsing));
+    fprintf(stderr, "%s: %s at line %d", PFL(parsing), msg, PLN(parsing));
 
-    if (PTK(Parsing) != NULL && *PTK(Parsing) != '\0')
-	fprintf(stderr, ", near token '%s'", PTK(Parsing));
+    if (PTK(parsing) != NULL && *PTK(parsing) != '\0') {
+	fprintf(stderr, ", near token '%s'", PTK(parsing));
+    }
 
     fprintf(stderr, "\n");
 }
@@ -295,35 +300,41 @@ addOp4(struct Code *c, int op, int iv, char *sv)
 }
 
 /* This opcode is *always* the first. */
-PRIVATE struct Op o = {
+struct Op o = {
     START,		/* opcode       */
     -1,			/* intv         */
     NULL,		/* strv         */
     NULL		/* next         */
 };
 
-PUBLIC struct Code *
+struct Code *
 compileSource(void)
 {
-    register struct Code *c;
+    struct Code *code = xmalloc(sizeof(struct Code));
+    struct Parsing parsing = {
+      NULL,		/* filename     */
+      NULL,		/* fp           */
+      NULL,		/* lines        */
+      NULL,		/* tok          */
+      1,			/* lineno       */
+      0,			/* offset       */
+      "",			/* strtok       */
+      NULL		/* strtok_p     */
+    };
 
 #if defined(WITH_PARSER_DEBUG)
     yydebug = 1;
 #endif
-
-    /* Create a new Code structure... */
-    c = xmalloc(sizeof(struct Code));
+    code->size = 1;
+    code->jumps = NULL;
+    code->head = &o; // TODO: really necessary?
+    code->code = &o; 
     
-    CSZ(c) = 1;
-    CJM(c) = NULL;
-    CCD(c) = CHD(c) = &o;
-    
-    if (yyparse(c) == 0) {
-	register int j;
-	register struct Op *i;
+    if (yyparse(code, &parsing) == 0) {
+	int j;
+	struct Op *i;
 
-	CJM(c) = (struct Op **) xmalloc((CSZ(c) - 1) *
-					sizeof(struct Op *));
+	code->jumps = (struct Op **) xmalloc(code->size - 1 * sizeof(void *));  
 
 	/*
 	 * Jump-table generation. It maps the source's lines with
@@ -346,17 +357,17 @@ compileSource(void)
 	 * In such case the nth SETLINENO opcode (i) will be mapped in
 	 * c->jumps[18], i.e. *(CJM(c) + 18) = i.
 	 */
-	for (j = 0, i = CHD(c); i != NULL; i = ONX(i))
+	for (j = 0, i = code->head; i != NULL; i = ONX(i))
 	    if (OOP(i) == SETLINENO)
-		*(CJM(c) + j++) = i;
+		*(CJM(code) + j++) = i;
 
 	/* Add, if needed, a trailing HALT opcode. */
-	if (OOP(CCD(c)) != HALT)
-	    if (OOP(CCD(c)) != JUMP)
-		if (OOP(CCD(c)) != JUMPT)
+	if (OOP(CCD(code)) != HALT)
+	    if (OOP(CCD(code)) != JUMP)
+		if (OOP(CCD(code)) != JUMPT)
 		    addOp(HALT);
 
-	return c;
+	return code;
     }
     else
 	return NULL;

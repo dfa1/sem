@@ -52,7 +52,7 @@
 #define YYSKELETON_NAME "yacc.c"
 
 /* Pure parsers.  */
-#define YYPURE 0
+#define YYPURE 1
 
 /* Push parsers.  */
 #define YYPUSH 0
@@ -114,28 +114,30 @@
 #endif
 
 #define YYSTYPE 	struct op *
-#define YYPARSE_PARAM	c
+extern int yylex();
 
 /* 
  * The GNU bison parser detects a "syntax error" or "parse error" whenever
  * it reads a token which cannot satisfy any syntax rule. This function
  * is called whenever a syntax error occurs. 
  */
-PRIVATE void yyerror(const char *);
+ static void yyerror(struct Code* code, struct Parsing *parsing, const char *); 
+
+#define error(msg) yyerror(code, parsing, (msg))
 
 /* Handy macros. */
-#define addOp(op)            addOp4(c, (op), -1, NULL)
-#define addOpIV(op, iv)      addOp4(c, (op), (iv), NULL);
-#define addOpSV(op, sv)      addOp4(c, (op), -1, (sv))
+#define addOp(op)            addOp4(code, (op), -1, NULL)
+#define addOpIV(op, iv)      addOp4(code, (op), (iv), NULL);
+#define addOpSV(op, sv)      addOp4(code, (op), -1, (sv))
 
 /* Append an opcode to the list (see Code). */
-PRIVATE void addOp4(struct Code *, int, int, char *);
+static void addOp4(struct Code *, int, int, char *);
 
 /* *INDENT-OFF* */
 
 
 /* Line 189 of yacc.c  */
-#line 139 "compile.c"
+#line 141 "compile.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -198,7 +200,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 202 "compile.c"
+#line 204 "compile.c"
 
 #ifdef short
 # undef short
@@ -496,13 +498,13 @@ static const yytype_int8 yyrhs[] =
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_uint16 yyrline[] =
 {
-       0,   104,   104,   108,   111,   116,   117,   121,   121,   122,
-     122,   123,   127,   128,   129,   133,   139,   142,   148,   151,
-     154,   157,   160,   163,   169,   173,   176,   179,   182,   185,
-     188,   194,   198,   199,   202,   208,   209,   212,   215,   221,
-     222,   223,   227,   249,   255
+       0,   109,   109,   113,   116,   121,   122,   126,   126,   127,
+     127,   128,   132,   133,   134,   138,   144,   147,   153,   156,
+     159,   162,   165,   168,   174,   178,   181,   184,   187,   190,
+     193,   199,   203,   204,   207,   213,   214,   217,   220,   226,
+     227,   228,   232,   254,   260
 };
 #endif
 
@@ -669,7 +671,7 @@ do								\
     }								\
   else								\
     {								\
-      yyerror (YY_("syntax error: cannot back up")); \
+      yyerror (code, parsing, YY_("syntax error: cannot back up")); \
       YYERROR;							\
     }								\
 while (YYID (0))
@@ -724,9 +726,9 @@ while (YYID (0))
 /* YYLEX -- calling `yylex' with the right arguments.  */
 
 #ifdef YYLEX_PARAM
-# define YYLEX yylex (YYLEX_PARAM)
+# define YYLEX yylex (&yylval, YYLEX_PARAM)
 #else
-# define YYLEX yylex ()
+# define YYLEX yylex (&yylval)
 #endif
 
 /* Enable debugging if requested.  */
@@ -749,7 +751,7 @@ do {									  \
     {									  \
       YYFPRINTF (stderr, "%s ", Title);					  \
       yy_symbol_print (stderr,						  \
-		  Type, Value); \
+		  Type, Value, code, parsing); \
       YYFPRINTF (stderr, "\n");						  \
     }									  \
 } while (YYID (0))
@@ -763,17 +765,21 @@ do {									  \
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, struct Code *code, struct Parsing *parsing)
 #else
 static void
-yy_symbol_value_print (yyoutput, yytype, yyvaluep)
+yy_symbol_value_print (yyoutput, yytype, yyvaluep, code, parsing)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
+    struct Code *code;
+    struct Parsing *parsing;
 #endif
 {
   if (!yyvaluep)
     return;
+  YYUSE (code);
+  YYUSE (parsing);
 # ifdef YYPRINT
   if (yytype < YYNTOKENS)
     YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
@@ -795,13 +801,15 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, struct Code *code, struct Parsing *parsing)
 #else
 static void
-yy_symbol_print (yyoutput, yytype, yyvaluep)
+yy_symbol_print (yyoutput, yytype, yyvaluep, code, parsing)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
+    struct Code *code;
+    struct Parsing *parsing;
 #endif
 {
   if (yytype < YYNTOKENS)
@@ -809,7 +817,7 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
   else
     YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
 
-  yy_symbol_value_print (yyoutput, yytype, yyvaluep);
+  yy_symbol_value_print (yyoutput, yytype, yyvaluep, code, parsing);
   YYFPRINTF (yyoutput, ")");
 }
 
@@ -852,12 +860,14 @@ do {								\
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, int yyrule)
+yy_reduce_print (YYSTYPE *yyvsp, int yyrule, struct Code *code, struct Parsing *parsing)
 #else
 static void
-yy_reduce_print (yyvsp, yyrule)
+yy_reduce_print (yyvsp, yyrule, code, parsing)
     YYSTYPE *yyvsp;
     int yyrule;
+    struct Code *code;
+    struct Parsing *parsing;
 #endif
 {
   int yynrhs = yyr2[yyrule];
@@ -871,7 +881,7 @@ yy_reduce_print (yyvsp, yyrule)
       YYFPRINTF (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
-		       		       );
+		       		       , code, parsing);
       YYFPRINTF (stderr, "\n");
     }
 }
@@ -879,7 +889,7 @@ yy_reduce_print (yyvsp, yyrule)
 # define YY_REDUCE_PRINT(Rule)		\
 do {					\
   if (yydebug)				\
-    yy_reduce_print (yyvsp, Rule); \
+    yy_reduce_print (yyvsp, Rule, code, parsing); \
 } while (YYID (0))
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -1130,16 +1140,20 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, struct Code *code, struct Parsing *parsing)
 #else
 static void
-yydestruct (yymsg, yytype, yyvaluep)
+yydestruct (yymsg, yytype, yyvaluep, code, parsing)
     const char *yymsg;
     int yytype;
     YYSTYPE *yyvaluep;
+    struct Code *code;
+    struct Parsing *parsing;
 #endif
 {
   YYUSE (yyvaluep);
+  YYUSE (code);
+  YYUSE (parsing);
 
   if (!yymsg)
     yymsg = "Deleting";
@@ -1162,21 +1176,13 @@ int yyparse ();
 #endif
 #else /* ! YYPARSE_PARAM */
 #if defined __STDC__ || defined __cplusplus
-int yyparse (void);
+int yyparse (struct Code *code, struct Parsing *parsing);
 #else
 int yyparse ();
 #endif
 #endif /* ! YYPARSE_PARAM */
 
 
-/* The lookahead symbol.  */
-int yychar;
-
-/* The semantic value of the lookahead symbol.  */
-YYSTYPE yylval;
-
-/* Number of syntax errors so far.  */
-int yynerrs;
 
 
 
@@ -1198,15 +1204,23 @@ yyparse (YYPARSE_PARAM)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 int
-yyparse (void)
+yyparse (struct Code *code, struct Parsing *parsing)
 #else
 int
-yyparse ()
-
+yyparse (code, parsing)
+    struct Code *code;
+    struct Parsing *parsing;
 #endif
 #endif
 {
+/* The lookahead symbol.  */
+int yychar;
 
+/* The semantic value of the lookahead symbol.  */
+YYSTYPE yylval;
+
+    /* Number of syntax errors so far.  */
+    int yynerrs;
 
     int yystate;
     /* Number of tokens to shift before error messages enabled.  */
@@ -1450,9 +1464,9 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 104 "compile.y"
+#line 109 "compile.y"
     {
-    fprintf(stderr, "%s: empty source\n", PFL(Parsing));
+    fprintf(stderr, "%s: empty source\n", PFL(parsing));
     YYABORT;
  ;}
     break;
@@ -1460,28 +1474,28 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 121 "compile.y"
-    { addOpIV(SETLINENO, PLN(Parsing)); ;}
+#line 126 "compile.y"
+    { addOpIV(SETLINENO, PLN(parsing)); ;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 122 "compile.y"
-    { addOpIV(SETLINENO, PLN(Parsing)); ;}
+#line 127 "compile.y"
+    { addOpIV(SETLINENO, PLN(parsing)); ;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 123 "compile.y"
+#line 128 "compile.y"
     { YYABORT; ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 133 "compile.y"
+#line 138 "compile.y"
     {
     addOp(HALT);
 ;}
@@ -1490,7 +1504,7 @@ yyreduce:
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 139 "compile.y"
+#line 144 "compile.y"
     {
     addOp(JUMP);
 ;}
@@ -1499,7 +1513,7 @@ yyreduce:
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 142 "compile.y"
+#line 147 "compile.y"
     {
     addOp(JUMPT);
 ;}
@@ -1508,7 +1522,7 @@ yyreduce:
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 148 "compile.y"
+#line 153 "compile.y"
     {
     addOp(SET);
 ;}
@@ -1517,7 +1531,7 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 151 "compile.y"
+#line 156 "compile.y"
     {
     addOp(WRITE_INT);
 ;}
@@ -1526,16 +1540,16 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 154 "compile.y"
+#line 159 "compile.y"
     {
-    addOpSV(WRITE_STR, PST(Parsing));
+    addOpSV(WRITE_STR, PST(parsing));
 ;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 157 "compile.y"
+#line 162 "compile.y"
     {	/* this is an extension */
     addOp(WRITELN_INT);
 ;}
@@ -1544,16 +1558,16 @@ yyreduce:
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 160 "compile.y"
+#line 165 "compile.y"
     {	/* this is an extension */
-    addOpSV(WRITELN_STR, PST(Parsing));
+    addOpSV(WRITELN_STR, PST(parsing));
 ;}
     break;
 
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 163 "compile.y"
+#line 168 "compile.y"
     {
     addOp(READ);
 ;}
@@ -1562,7 +1576,7 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 173 "compile.y"
+#line 178 "compile.y"
     {
     addOp(EQ);
 ;}
@@ -1571,7 +1585,7 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 176 "compile.y"
+#line 181 "compile.y"
     {
     addOp(NE);
 ;}
@@ -1580,7 +1594,7 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 179 "compile.y"
+#line 184 "compile.y"
     {
     addOp(GT);
 ;}
@@ -1589,7 +1603,7 @@ yyreduce:
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 182 "compile.y"
+#line 187 "compile.y"
     {
     addOp(LT);
 ;}
@@ -1598,7 +1612,7 @@ yyreduce:
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 185 "compile.y"
+#line 190 "compile.y"
     {
     addOp(GE);
 ;}
@@ -1607,7 +1621,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 188 "compile.y"
+#line 193 "compile.y"
     {
     addOp(LE);
 ;}
@@ -1616,7 +1630,7 @@ yyreduce:
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 199 "compile.y"
+#line 204 "compile.y"
     {
     addOp(ADD);
 ;}
@@ -1625,7 +1639,7 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 202 "compile.y"
+#line 207 "compile.y"
     {
     addOp(SUB);
 ;}
@@ -1634,7 +1648,7 @@ yyreduce:
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 209 "compile.y"
+#line 214 "compile.y"
     {
     addOp(MUL);
 ;}
@@ -1643,7 +1657,7 @@ yyreduce:
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 212 "compile.y"
+#line 217 "compile.y"
     {		
     addOp(DIV);
 ;}
@@ -1652,7 +1666,7 @@ yyreduce:
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 215 "compile.y"
+#line 220 "compile.y"
     { /* this is an extension */
     addOp(MOD);
 ;}
@@ -1661,21 +1675,21 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 227 "compile.y"
+#line 232 "compile.y"
     {
     long value;
     char *ep;
 
     errno = 0;
-    value = strtol(PTK(Parsing), &ep, 10);
+    value = strtol(PTK(parsing), &ep, 10);
 
     if (errno == ERANGE) {
-	yyerror("integer literal too large");
+	error("integer literal too large");
 	YYABORT;
     }
 
     if (*ep != '\0') {
-	yyerror("invalid integer literal");
+	error("invalid integer literal");
 	YYABORT;
     }
 
@@ -1686,7 +1700,7 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 249 "compile.y"
+#line 254 "compile.y"
     {
     addOp(MEM);
 ;}
@@ -1695,7 +1709,7 @@ yyreduce:
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 255 "compile.y"
+#line 260 "compile.y"
     {
     addOp(IP);
 ;}
@@ -1704,7 +1718,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1708 "compile.c"
+#line 1722 "compile.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1739,7 +1753,7 @@ yyerrlab:
     {
       ++yynerrs;
 #if ! YYERROR_VERBOSE
-      yyerror (YY_("syntax error"));
+      yyerror (code, parsing, YY_("syntax error"));
 #else
       {
 	YYSIZE_T yysize = yysyntax_error (0, yystate, yychar);
@@ -1763,11 +1777,11 @@ yyerrlab:
 	if (0 < yysize && yysize <= yymsg_alloc)
 	  {
 	    (void) yysyntax_error (yymsg, yystate, yychar);
-	    yyerror (yymsg);
+	    yyerror (code, parsing, yymsg);
 	  }
 	else
 	  {
-	    yyerror (YY_("syntax error"));
+	    yyerror (code, parsing, YY_("syntax error"));
 	    if (yysize != 0)
 	      goto yyexhaustedlab;
 	  }
@@ -1791,7 +1805,7 @@ yyerrlab:
       else
 	{
 	  yydestruct ("Error: discarding",
-		      yytoken, &yylval);
+		      yytoken, &yylval, code, parsing);
 	  yychar = YYEMPTY;
 	}
     }
@@ -1847,7 +1861,7 @@ yyerrlab1:
 
 
       yydestruct ("Error: popping",
-		  yystos[yystate], yyvsp);
+		  yystos[yystate], yyvsp, code, parsing);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -1882,7 +1896,7 @@ yyabortlab:
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
-  yyerror (YY_("memory exhausted"));
+  yyerror (code, parsing, YY_("memory exhausted"));
   yyresult = 2;
   /* Fall through.  */
 #endif
@@ -1890,7 +1904,7 @@ yyexhaustedlab:
 yyreturn:
   if (yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
-		 yytoken, &yylval);
+		 yytoken, &yylval, code, parsing);
   /* Do not reclaim the symbols of the rule which action triggered
      this YYABORT or YYACCEPT.  */
   YYPOPSTACK (yylen);
@@ -1898,7 +1912,7 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-		  yystos[*yyssp], yyvsp);
+		  yystos[*yyssp], yyvsp, code, parsing);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
@@ -1916,17 +1930,18 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 259 "compile.y"
+#line 264 "compile.y"
 
   /* *INDENT-ON* */
 
-PRIVATE void
-yyerror(const char *msg)
+void
+yyerror(struct Code* code, struct Parsing * parsing, const char *msg)
 {
-    fprintf(stderr, "%s: %s at line %d", PFL(Parsing), msg, PLN(Parsing));
+    fprintf(stderr, "%s: %s at line %d", PFL(parsing), msg, PLN(parsing));
 
-    if (PTK(Parsing) != NULL && *PTK(Parsing) != '\0')
-	fprintf(stderr, ", near token '%s'", PTK(Parsing));
+    if (PTK(parsing) != NULL && *PTK(parsing) != '\0') {
+	fprintf(stderr, ", near token '%s'", PTK(parsing));
+    }
 
     fprintf(stderr, "\n");
 }
@@ -1955,35 +1970,41 @@ addOp4(struct Code *c, int op, int iv, char *sv)
 }
 
 /* This opcode is *always* the first. */
-PRIVATE struct Op o = {
+struct Op o = {
     START,		/* opcode       */
     -1,			/* intv         */
     NULL,		/* strv         */
     NULL		/* next         */
 };
 
-PUBLIC struct Code *
+struct Code *
 compileSource(void)
 {
-    register struct Code *c;
+    struct Code *code = xmalloc(sizeof(struct Code));
+    struct Parsing parsing = {
+      NULL,		/* filename     */
+      NULL,		/* fp           */
+      NULL,		/* lines        */
+      NULL,		/* tok          */
+      1,			/* lineno       */
+      0,			/* offset       */
+      "",			/* strtok       */
+      NULL		/* strtok_p     */
+    };
 
 #if defined(WITH_PARSER_DEBUG)
     yydebug = 1;
 #endif
-
-    /* Create a new Code structure... */
-    c = xmalloc(sizeof(struct Code));
+    code->size = 1;
+    code->jumps = NULL;
+    code->head = &o; // TODO: really necessary?
+    code->code = &o; 
     
-    CSZ(c) = 1;
-    CJM(c) = NULL;
-    CCD(c) = CHD(c) = &o;
-    
-    if (yyparse(c) == 0) {
-	register int j;
-	register struct Op *i;
+    if (yyparse(code, &parsing) == 0) {
+	int j;
+	struct Op *i;
 
-	CJM(c) = (struct Op **) xmalloc((CSZ(c) - 1) *
-					sizeof(struct Op *));
+	code->jumps = (struct Op **) xmalloc(code->size - 1 * sizeof(void *));  
 
 	/*
 	 * Jump-table generation. It maps the source's lines with
@@ -2006,17 +2027,17 @@ compileSource(void)
 	 * In such case the nth SETLINENO opcode (i) will be mapped in
 	 * c->jumps[18], i.e. *(CJM(c) + 18) = i.
 	 */
-	for (j = 0, i = CHD(c); i != NULL; i = ONX(i))
+	for (j = 0, i = code->head; i != NULL; i = ONX(i))
 	    if (OOP(i) == SETLINENO)
-		*(CJM(c) + j++) = i;
+		*(CJM(code) + j++) = i;
 
 	/* Add, if needed, a trailing HALT opcode. */
-	if (OOP(CCD(c)) != HALT)
-	    if (OOP(CCD(c)) != JUMP)
-		if (OOP(CCD(c)) != JUMPT)
+	if (OOP(CCD(code)) != HALT)
+	    if (OOP(CCD(code)) != JUMP)
+		if (OOP(CCD(code)) != JUMPT)
 		    addOp(HALT);
 
-	return c;
+	return code;
     }
     else
 	return NULL;

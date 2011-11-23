@@ -175,7 +175,9 @@ See the LICENSE for more details.\n";
 
 	    if (with(flags, DBG)) {
 		fprintf(stdout, licenseMsg, VERSION);
-		sts = debugCode(v);
+		printf("TODO: unsupported\n");
+		sts = 1;
+		/* sts = debugCode(v); */
 	    }
 	    else
 		sts = evalCode(v);
