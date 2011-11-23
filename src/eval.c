@@ -137,17 +137,17 @@ finiVM(struct VM *v)
 PUBLIC int
 evalCode(struct VM *v)
 {
-    register long p;	/* first operand                */
-    register long q;	/* second operand               */
-    register int sts;	/* status                       */
-    register char *s;	/* for xreadline()              */
-    register double x;	/* for overflow checking        */
-    register double y;	/* for overflow checking        */
-
+    long p;	/* first operand                */
+    long q;	/* second operand               */
+    int sts;	/* status                       */
+    double x;	/* for overflow checking        */
+    double y;	/* for overflow checking        */
+    char *tmp;
+    char s[20]; /* used by readline */
     /* These are cloned here to .  */
-    register struct Op *ip;
-    register struct Code *c;
-    register long lineno;
+    struct Op *ip;
+    struct Code *c;
+    long lineno;
 
     /* Handy macros. */
 #define LOAD_REGISTERS				\
@@ -186,7 +186,6 @@ evalCode(struct VM *v)
     /* Initialization. */
     LOAD_REGISTERS;
     sts = 0;
-    s = NULL;
     
     /* Main loop. */
     for (;;) {
@@ -286,13 +285,13 @@ evalCode(struct VM *v)
 
 	case WRITE_INT:
 	    p = POP();
-	    s = with(VF(v), STEP) ? "\n" : "";
-	    fprintf(stdout, "%ld%s", p, s);
+	    tmp = with(VF(v), STEP) ? "\n" : "";
+	    fprintf(stdout, "%ld%s", p, tmp);
 	    goto flush;
 
 	case WRITE_STR:
-	    s = with(VF(v), STEP) ? "\n" : "";
-	    fprintf(stdout, "%s%s", OSV(ip), s);
+	    tmp = with(VF(v), STEP) ? "\n" : "";
+	    fprintf(stdout, "%s%s", OSV(ip), tmp);
 	    goto flush;
 
 	case WRITELN_INT:
@@ -305,7 +304,7 @@ evalCode(struct VM *v)
 	    goto flush;
 
 	flush:
-	    (void) fflush(stdout);
+	    fflush(stdout);
 	    break;
 
 	case READ:
@@ -315,15 +314,8 @@ evalCode(struct VM *v)
 		DIE(("invalid memory address %d for "
 		     "read at line %d", p, lineno));
 
-	    free(s);
-	    s = readline("? "); /* FIXME: leak is possible here. */
-
-	    if (s == NULL) {
-		sts = 1;
-		goto halt;
-	    }
-	    else
-		s[strlen(s) - 1] = '\0';
+	    printf("? ");
+	    fgets(s, sizeof s, stdin);
 
 	    do {
 		char *ep;

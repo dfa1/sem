@@ -23,10 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* gnulib */
-#include "trim.h"
-#include "readline.h"
-
 /* 
  *       THE LESSER-KNOWN PROGRAMMING LANGUAGES #10: SIMPLE
  *
@@ -39,6 +35,13 @@
  * they achieve the results of programs written in other languages without
  * the tedious, frustrating process of testing and debugging.
  */
+
+#define VERSION "3.0"
+
+// HACKS
+#define xmalloc malloc
+#define xstrdup strdup
+#define trim(s) (s)
 
 /* Features */
 

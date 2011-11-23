@@ -154,24 +154,18 @@ re(struct VM *v)
     VF(v) = 0;
 }
 
-/* Ask. */
-PRIVATE int
+
+int
 ask(const char *question)
 {
-    char *p = NULL;
+    const char p[20];
     int answer;
 
-    /* This piece of code is goto powered! :-) */
+    /* 2004: This piece of code is goto powered! :-) */
+    /* 2011: This piece of code is cursed! ;-(       */
   again:
-    if (p != NULL)
-	free(p);
-
-    p = readline(question);
-
-    if (p == NULL)
-	goto again;
-
-    p = trim(p);
+    printf("%s", question);
+    fgets(p, sizeof 20, stdin);
 
     if (p[0] == 'Y' || p[0] == 'y') {
 	if (strlen(p) == 1) {
@@ -203,7 +197,6 @@ ask(const char *question)
 	goto again;
 
   exit:
-    free(p);
     return answer;
 }
 
@@ -511,9 +504,8 @@ runCommand(const char *p, struct VM *v)
 PUBLIC int
 debugCode(struct VM *v)
 {
-    register char *p = NULL;
-    /* Commands callbacks. */
-    static struct Cmd cmds[] = {	/* TODO: gperf */
+    /* TODO: gperf */
+    static struct Cmd cmds[] = {	
 	/* *INDENT-OFF* */
 	{ "next",       nextDoc,	nextCmd		},	
 	{ "run",        runDoc, 	runCmd		},
@@ -532,36 +524,20 @@ debugCode(struct VM *v)
 	/* *INDENT-ON* */
     };
     
-    /* Initialize Cmds pointer. */
     Cmds = cmds;
-    
-    /* Initialize Parsing->lines. */
     PLI(Parsing) = file2lines(PFP(Parsing), CSZ(VCD(v)));
-    
-    /* Debug! */
+    char s[20];
     for (fprintf(stdout, "Type `help' to get help.\n");;) {
-	if (p != NULL)
-	    free(p);
+
+	printf("sem> ");
+	fgets(s, sizeof s, stdin);
 	
-	/* Get a line. */
-	p = readline("sem> ");
-
-	if (p == NULL)
-	    if (quitCmd(v))
-		break;
-
-	/* Strip it. */
-	p = trim(p);
-
-	/* Get a new line if this is empty. */
-	if (strcmp(p, "") == 0)
+	if (strcmp(s, "") == 0)
 	    continue;
 
-	/* Run line. */
-	if (runCommand(p, v) == 1)
+	if (runCommand(s, v) == 1)
 	    break;
     }
 
-    free(p);
     return 0;
 }

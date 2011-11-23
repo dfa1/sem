@@ -22,7 +22,6 @@
 
 #include "sem.h"
 
-#include "config.h"
 #include <getopt.h>
 
 /*
@@ -128,7 +127,7 @@ See the LICENSE for more details.\n";
     }
 
     if (with(flags, VRS)) {
-	fprintf(stdout, licenseMsg, PACKAGE_VERSION);
+	fprintf(stdout, licenseMsg, VERSION);
 	sts = EXIT_SUCCESS;
 	goto exit;
     }
@@ -175,7 +174,7 @@ See the LICENSE for more details.\n";
 	    v = initVM(c, memSize, stackSize);
 
 	    if (with(flags, DBG)) {
-		fprintf(stdout, licenseMsg, PACKAGE_VERSION);
+		fprintf(stdout, licenseMsg, VERSION);
 		sts = debugCode(v);
 	    }
 	    else
