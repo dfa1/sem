@@ -1,12 +1,14 @@
 Release 3.0
 ===========
 
-- no autotools
-- support only modern C compilers 
-- separate semdebug binary
+- clean code:
+ - remove most of the global state 
+ - support only modern C compilers 
+ - no autotools
+ - automated tests
+- separate debugger binary
 - BUG: integer overflow checking doesn't works
 - strtol() and strtod() checks are weak
-- automated tests
  
 Other
 =====
