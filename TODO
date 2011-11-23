@@ -1,13 +1,19 @@
+Release 3.0
+===========
 
+- no autotools
+- support only modern C compilers 
+- separate semdebug binary
 - BUG: integer overflow checking doesn't works
-- debugger commands: `trace' and `break'
 - strtol() and strtod() checks are weak
-- improve error messages
-- optionally use boehm-gc
-- try using GNU gperf for keywords
+- automated tests
+ 
+Other
+=====
+ 
+- debugger commands: `trace' and `break'
+- use boehm-gc?
+- use GNU gperf?
 - a script that autogerates opstr in debug.c 
-- unit testing: autotest 
 - sem-mode for GNU emacs 
 - more documentation (examples, man page)
-- some other cool features. Do you have any ideas on how to 
-  improve this program?
