@@ -1,2 +1,0 @@
-#!/bin/sh
-gnulib-tool --dir=. --lib=libgnu --source-base=gnulib --m4-base=m4 --aux-dir=. --libtool --macro-prefix=gl --import $@
