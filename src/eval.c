@@ -22,14 +22,7 @@
 #include "sem.h"
 
 #include <float.h>		/* for DBL_EPSILON */
-#include <errno.h>		/* for errno */
-#include <stdarg.h>		/* for va_start(), va_end() and va_list */
-
-/* Hide GCC attributes from compilers that don't support them. */
-#if !defined(__GNUC__) || __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 7)
-static void printErr(const char *, ...)
-	__attribute__ (format(printf, 1, 2));
-#endif
+#include <stdarg.h>		
 
 static void
 printErr(const char *format, ...)
@@ -38,18 +31,18 @@ printErr(const char *format, ...)
     char buf[1024];
 
     va_start(va, format);
-    (void) vsnprintf(buf, 1024, format, va);
+    vsnprintf(buf, sizeof buf, format, va);
     va_end(va);
 
     fprintf(stderr, "sem: %s\n", buf);
-    (void) fflush(stderr);
+    fflush(stderr);
 }
 
 struct VM *
 initVM(struct Code *c, int ms, int ss)
 {
-    register struct VM *v;
-    register int i;
+    struct VM *v;
+    int i;
 
     /* Create a new VM structure... */
     v = (struct VM *) xmalloc(sizeof(struct VM));
