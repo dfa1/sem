@@ -24,15 +24,6 @@
 
 #include <getopt.h>
 
-/*
- * It is practically impossible to teach good programming style to
- * students that have had prior exposure to BASIC: as potential
- * programmers they are mentally mutilated beyond hope of
- * regeneration.
- *
- * 	-- Dijkstra
- */
-
 /* Command line option flags. */
 #define VRS     	1 << 0	/* version      -v      */
 #define MMR     	1 << 1	/* memory size  -m      */
@@ -40,15 +31,13 @@
 #define DBG 		1 << 3	/* debug        -d      */
 
 /* Flags. */
-PRIVATE int flags = 0;
+int flags = 0;
 
 /* Program name. */
-PRIVATE char *program;
+char *program;
 
 /* Print the usage message and exit. */
-PRIVATE void
-usage(int sts)
-{
+static void usage(int sts) {
     if (sts == EXIT_SUCCESS)
 	fprintf(sts ? stderr : stdout, "\r\
 Usage: %s [options] file\n\
@@ -68,10 +57,8 @@ Report bugs to <davide.angelocola@gmail.com>\n", program);
     exit(sts);
 }
 
-/* The main(). */
-PUBLIC int
-main(int argc, char **argv)
-{
+
+int main(int argc, char **argv) {
     const char licenseMsg[] = "\r\
 sem %s -- A SIMPLESEM interpreter\n\
 Copyright (C) 2004-2009 Davide Angelocola <davide.angelocola@gmail.com>\n\
@@ -81,7 +68,6 @@ it and/or modify it under the terms of the GNU General Public License.\n\
 There is ABSOLUTELY NO WARRANTY for this program. \n\
 \n\
 See the LICENSE for more details.\n";
-    int sts = 1;
     int memSize = 64;
     int stackSize = 32;
     int opt = 0;
@@ -128,60 +114,45 @@ See the LICENSE for more details.\n";
 
     if (with(flags, VRS)) {
 	fprintf(stdout, licenseMsg, VERSION);
-	sts = EXIT_SUCCESS;
-	goto exit;
+	return 0;
     }
 
     if (with(flags, MMR)) {
 	if (sscanf(optarg, "%d", &memSize) != 1 || memSize < 1) {
 	    fprintf(stderr, "sem: invalid memory size (%s)\n",
 		    optarg);
-	    sts = EXIT_FAILURE;
-	    goto exit;
+	    return 1;
 	}
     }
 
     if (with(flags, STC)) {
 	if (sscanf(optarg, "%d", &stackSize) != 1 || stackSize < 1) {
-	    fprintf(stderr,
-		    "sem: invalid stack size (%s)\n", optarg);
-	    sts = EXIT_FAILURE;
-	    goto exit;
+	    fprintf(stderr, "sem: invalid stack size (%s)\n", optarg);
+	    return 1;
 	}
     }
 
-
-    /*
-     * Your lucky number is 3552664958674928. Watch for it everywhere. 
-     *      -- Anonymous 
-     */
-
-    if (optind < argc && strcmp(argv[optind], "-") != 0) {
-	struct Code *code = compileSource(argv[optind]);
-
-	if (code == NULL)
-	    /* void */ ;
-	else {
-	    register struct VM *v;
-
-	    v = initVM(code, memSize, stackSize);
-
-	    if (with(flags, DBG)) {
-		fprintf(stdout, licenseMsg, VERSION);
-		printf("TODO: unsupported\n");
-		sts = 1;
-		/* sts = debugCode(v); */
-	    }
-	    else
-		sts = evalCode(v);
-
-	    finiCompiler(code);
-	    finiVM(v);
-	}
+    if (optind < argc && strcmp(argv[optind], "-") == 0) {
+      fprintf(stderr, "sem: no input\n");
+      return 1;
     }
-    else
-	fprintf(stderr, "%s: no input\n", program);
+    
+    struct Code *code = compileSource(argv[optind]);
+    
+    if (code == NULL) {
+      fprintf(stderr, "sem: error during compile\n");
+      return 1;
+    }
 
-  exit:
-    return sts;
+    struct VM *vm= initVM(code, memSize, stackSize);
+	
+    if (with(flags, DBG)) {
+      fprintf(stdout, "TODO: unsupported\n");
+      return 1;
+    }
+
+    int status = evalCode(vm);
+    finiCompiler(code);
+    finiVM(vm);
+    return status;
 }
