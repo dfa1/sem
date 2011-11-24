@@ -104,13 +104,6 @@ struct Parsing {
   char *pstr;
 };
 
-/* struct Parsing access macros. */
-#define PFL(p)	((p)->filename)
-#define PFP(p)	((p)->fp)
-#define PTK(p)	((p)->token)
-#define PLN(p)	((p)->lineno)
-#define POF(p)	((p)->offset)
-
 extern struct Code *compileSource(const char* filename);
 extern void finiCompiler(struct Code *);
 

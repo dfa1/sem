@@ -103,8 +103,8 @@ stmts
 ;
 
 stmt    
-: { addOpIV(SETLINENO, PLN(parsing)); } tNEWLINE
-| { addOpIV(SETLINENO, PLN(parsing)); } simple_stmt tNEWLINE
+: { addOpIV(SETLINENO, parsing->lineno); } tNEWLINE
+| { addOpIV(SETLINENO, parsing->lineno); } simple_stmt tNEWLINE
 | error { YYABORT; }
 ;
 
@@ -214,7 +214,7 @@ literal
     char *ep;
 
     errno = 0;
-    value = strtol(PTK(parsing), &ep, 10);
+    value = strtol(parsing->token, &ep, 10);
 
     if (errno == ERANGE) {
 	error("integer literal too large");
@@ -247,7 +247,8 @@ aip
 void
 yyerror(struct Code* code, struct Parsing * parsing, const char *msg)
 {
-    fprintf(stderr, "%s: %s at line %d", PFL(parsing), msg, PLN(parsing));
+    fprintf(stderr, "%s: %s at line %d", 
+	    parsing->filename, msg, parsing->lineno);
 
     if (parsing->token != NULL && *parsing->token != '\0') {
 	fprintf(stderr, ", near token '%s'", parsing->token);

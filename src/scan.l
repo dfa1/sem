@@ -127,16 +127,15 @@ update_locations(struct Parsing *parsing)
   for (int i = 0; yytext[i] != '\0'; i++) {
     switch (yytext[i]) {
     case '\n':
-      PLN(parsing)++;
-
+      parsing->lineno++;
       break;
       
     case '\t':
-      POF(parsing) += 8 - (POF(parsing) % 8);
+      parsing->offset += 8 - (parsing->offset % 8);
       break;
       
     default:
-      POF(parsing)++;
+      parsing->offset++;
     }
   }
 

@@ -1458,14 +1458,14 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 106 "compile.y"
-    { addOpIV(SETLINENO, PLN(parsing)); ;}
+    { addOpIV(SETLINENO, parsing->lineno); ;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
 #line 107 "compile.y"
-    { addOpIV(SETLINENO, PLN(parsing)); ;}
+    { addOpIV(SETLINENO, parsing->lineno); ;}
     break;
 
   case 11:
@@ -1664,7 +1664,7 @@ yyreduce:
     char *ep;
 
     errno = 0;
-    value = strtol(PTK(parsing), &ep, 10);
+    value = strtol(parsing->token, &ep, 10);
 
     if (errno == ERANGE) {
 	error("integer literal too large");
@@ -1920,7 +1920,8 @@ yyreturn:
 void
 yyerror(struct Code* code, struct Parsing * parsing, const char *msg)
 {
-    fprintf(stderr, "%s: %s at line %d", PFL(parsing), msg, PLN(parsing));
+    fprintf(stderr, "%s: %s at line %d", 
+	    parsing->filename, msg, parsing->lineno);
 
     if (parsing->token != NULL && *parsing->token != '\0') {
 	fprintf(stderr, ", near token '%s'", parsing->token);
