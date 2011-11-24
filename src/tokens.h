@@ -70,6 +70,6 @@ typedef int YYSTYPE;
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
-
+extern YYSTYPE yylval;
 
 

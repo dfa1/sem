@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>		
 
 /* 
  *       THE LESSER-KNOWN PROGRAMMING LANGUAGES #10: SIMPLE
@@ -36,7 +37,7 @@
  * the tedious, frustrating process of testing and debugging.
  */
 
-#define VERSION "3.0"
+#define VERSION "3.0-SNAPSHOT"
 
 // HACKS
 #define xmalloc malloc
@@ -104,7 +105,7 @@ typedef enum
 } op_t;
 
 /* Structures */
-struct Op
+struct Op // TODO: rename to instr
 {
 op_t opcode:8;		/* opcode (as a bit field) */
     long intv;		/* integer argument */
@@ -132,16 +133,12 @@ struct Code
 #define CSZ(c)  ((c)->size)
 #define CJM(c)  ((c)->jumps)
 
-struct Parsing
-{
-    char *filename;		/* the input */
-    FILE *fp;		/* the stream */
-    char **lines;		/* the file */
-    char *token;		/* the current token */
-    int lineno;		/* line number */
-    int offset;		/* offset of the current line */
-    char string[1024];	/* latest string token */
-    char *string_p;		/* pointer to string */
+struct Parsing {
+  char *filename;
+  FILE *fp;	
+  char *token;	
+  int lineno;	
+  int offset;	
 };
 
 /* struct Parsing access macros. */
@@ -153,12 +150,8 @@ struct Parsing
 #define PST(p)	((p)->string)
 #define PSP(p)	((p)->string_p)
 
-/* Init/Fini the compiler. */
-IMPORT int initCompiler(const char *);
-IMPORT void finiCompiler(struct Code *);
-
-/* Compile a SIMPLESEM source file. */
-IMPORT struct Code *compileSource(void);
+extern struct Code *compileSource(const char* filename);
+extern void finiCompiler(struct Code *);
 
 /* The interpreter. */
 struct VM

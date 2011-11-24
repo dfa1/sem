@@ -529,19 +529,8 @@ char *yytext;
 #include "tokens.h"
 
 #define YY_DECL int yylex (struct Parsing *parsing)
-#define YY_USER_INIT		/* void */
-#define YY_USER_ACTION  upd(parsing);	/* update the Parsing structure */
-static void upd(struct Parsing *parsing);
-#if 0
-/* <STRING>\\n   		*(parsing->string_p)++ = '\n'; */
-/* <STRING>\\r   		*parsing->string_p++ = '\r'; */
-/* <STRING>\\t   		*parsing->string_p++ = '\t'; */
-/* <STRING>\\v   		*parsing->string_p++ = '\v'; */
-/* <STRING>\\f   		*parsing->string_p++ = '\f'; */
-/* <STRING>\\b   		*parsing->string_p++ = '\b'; */
-/* <STRING>\\a   		*parsing->string_p++ = '\a'; */
-/* <STRING>.     		*(parsing->string_p)++ = *yytext; */
-#endif
+#define YY_USER_ACTION  update_locations(parsing);	
+static void update_locations(struct Parsing *parsing);
 
 /* *INDENT-OFF* */
 /* TODO: pure tokenizer */
@@ -550,7 +539,7 @@ static void upd(struct Parsing *parsing);
 /* Character classes. */
 /* Start conditions. */
 
-#line 554 "scan.c"
+#line 543 "scan.c"
 
 #define INITIAL 0
 #define STRING 1
@@ -738,10 +727,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 58 "scan.l"
+#line 47 "scan.l"
 
 	/* Keywords. */
-#line 745 "scan.c"
+#line 734 "scan.c"
 
 	if ( !(yy_init) )
 		{
@@ -822,73 +811,81 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 60 "scan.l"
+#line 49 "scan.l"
 return kHALT;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 61 "scan.l"
+#line 50 "scan.l"
 return kSET;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 62 "scan.l"
+#line 51 "scan.l"
 return kJUMP;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 63 "scan.l"
+#line 52 "scan.l"
 return kJUMPT;
 	YY_BREAK
 /* Special and/or unique and/or reserved names. */
 case 5:
 YY_RULE_SETUP
-#line 66 "scan.l"
+#line 55 "scan.l"
 return rD;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 67 "scan.l"
+#line 56 "scan.l"
 return rIP;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 68 "scan.l"
+#line 57 "scan.l"
 return rREAD;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 69 "scan.l"
+#line 58 "scan.l"
 return rWRITE;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 70 "scan.l"
+#line 59 "scan.l"
 return rWRITELN;
 	YY_BREAK
 /* Other names. Used to report errors. */
 case 10:
 YY_RULE_SETUP
-#line 73 "scan.l"
+#line 62 "scan.l"
 return tNAME;
 	YY_BREAK
 /* Integers. */ 
 case 11:
 YY_RULE_SETUP
-#line 76 "scan.l"
+#line 65 "scan.l"
 return tINT; 
 	YY_BREAK
 /* Strings. */ 
 case 12:
 YY_RULE_SETUP
-#line 79 "scan.l"
+#line 68 "scan.l"
 {
     BEGIN STRING;
 }
 	YY_BREAK
+/* <STRING>\\n   		*(parsing->string_p)++ = '\n'; */
+/* <STRING>\\r   		*parsing->string_p++ = '\r'; */
+/* <STRING>\\t   		*parsing->string_p++ = '\t'; */
+/* <STRING>\\v   		*parsing->string_p++ = '\v'; */
+/* <STRING>\\f   		*parsing->string_p++ = '\f'; */
+/* <STRING>\\b   		*parsing->string_p++ = '\b'; */
+/* <STRING>\\a   		*parsing->string_p++ = '\a'; */
+/* <STRING>.     		*(prsing->string_p)++ = *yytext; */
 case 13:
 YY_RULE_SETUP
-#line 83 "scan.l"
+#line 82 "scan.l"
 {
     BEGIN INITIAL;
     return tSTRING;
@@ -897,109 +894,109 @@ YY_RULE_SETUP
 /* Operators. */
 case 14:
 YY_RULE_SETUP
-#line 88 "scan.l"
+#line 87 "scan.l"
 return '+';
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 89 "scan.l"
+#line 88 "scan.l"
 return '-';
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 90 "scan.l"
+#line 89 "scan.l"
 return '*';
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 91 "scan.l"
+#line 90 "scan.l"
 return '/';
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 92 "scan.l"
+#line 91 "scan.l"
 return '%';
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 94 "scan.l"
+#line 93 "scan.l"
 return tEQ;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 95 "scan.l"
+#line 94 "scan.l"
 return tNE;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 96 "scan.l"
+#line 95 "scan.l"
 return tGT;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 97 "scan.l"
+#line 96 "scan.l"
 return tLT;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 98 "scan.l"
+#line 97 "scan.l"
 return tGE;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 99 "scan.l"
+#line 98 "scan.l"
 return tLE;
 	YY_BREAK
 /* Other tokens. */
 case 25:
 /* rule 25 can match eol */
 YY_RULE_SETUP
-#line 102 "scan.l"
+#line 101 "scan.l"
 return tNEWLINE;
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 103 "scan.l"
+#line 102 "scan.l"
 return ',';
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 104 "scan.l"
+#line 103 "scan.l"
 return '[';
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 105 "scan.l"
+#line 104 "scan.l"
 return ']';
 	YY_BREAK
 /* Ignore blanks. */
 case 29:
 YY_RULE_SETUP
-#line 108 "scan.l"
+#line 107 "scan.l"
 
 	YY_BREAK
 /* Comment. */
 case 30:
 YY_RULE_SETUP
-#line 111 "scan.l"
+#line 110 "scan.l"
 
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STRING):
-#line 114 "scan.l"
+#line 112 "scan.l"
 yyterminate();
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 115 "scan.l"
+#line 113 "scan.l"
 return 0; 
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 116 "scan.l"
+#line 114 "scan.l"
 ECHO;
 	YY_BREAK
-#line 1003 "scan.c"
+#line 1000 "scan.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1992,15 +1989,14 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 116 "scan.l"
+#line 114 "scan.l"
 
 
 /* *INDENT-ON* */
 
 static void
-upd(struct Parsing *parsing)
+update_locations(struct Parsing *parsing)
 {
-  printf("**** update\n");
   if (yytext != NULL && yytext[0] != '\n') {
     parsing->token = yytext;
   } else {
@@ -2022,7 +2018,7 @@ upd(struct Parsing *parsing)
       POF(parsing)++;
     }
   }
-  printf("**** end update\n");
+
 }
 
 

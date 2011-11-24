@@ -157,21 +157,14 @@ See the LICENSE for more details.\n";
      */
 
     if (optind < argc && strcmp(argv[optind], "-") != 0) {
-	register struct Code *c;
+	struct Code *code = compileSource(argv[optind]);
 
-	if (initCompiler(argv[optind]) != 0) {
-	    sts = 1;
-	    goto exit;
-	}
-
-	c = compileSource();
-
-	if (c == NULL)
+	if (code == NULL)
 	    /* void */ ;
 	else {
 	    register struct VM *v;
 
-	    v = initVM(c, memSize, stackSize);
+	    v = initVM(code, memSize, stackSize);
 
 	    if (with(flags, DBG)) {
 		fprintf(stdout, licenseMsg, VERSION);
@@ -182,7 +175,7 @@ See the LICENSE for more details.\n";
 	    else
 		sts = evalCode(v);
 
-	    finiCompiler(c);
+	    finiCompiler(code);
 	    finiVM(v);
 	}
     }

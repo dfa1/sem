@@ -27,9 +27,8 @@
 #include "tokens.h"
 
 #define YY_DECL int yylex (struct Parsing *parsing)
-#define YY_USER_INIT		/* void */
-#define YY_USER_ACTION  upd(parsing);	/* update the Parsing structure */
-static void upd(struct Parsing *parsing);
+#define YY_USER_ACTION  update_locations(parsing);	
+static void update_locations(struct Parsing *parsing);
 
 /* *INDENT-OFF* */
 %}
@@ -68,24 +67,22 @@ D               [0-9]
 	/* Strings. */ 
 "\"" {
     BEGIN STRING;
-    parsing->string_p = parsing->string;
 }
+
+   /* <STRING>\\n   		*(parsing->string_p)++ = '\n'; */
+   /* <STRING>\\r   		*parsing->string_p++ = '\r'; */
+   /* <STRING>\\t   		*parsing->string_p++ = '\t'; */
+   /* <STRING>\\v   		*parsing->string_p++ = '\v'; */
+   /* <STRING>\\f   		*parsing->string_p++ = '\f'; */
+   /* <STRING>\\b   		*parsing->string_p++ = '\b'; */
+   /* <STRING>\\a   		*parsing->string_p++ = '\a'; */
+   /* <STRING>.     		*(prsing->string_p)++ = *yytext; */
+
 
 <STRING>"\"" {
     BEGIN INITIAL;
-    *parsing->string_p = '\0';
     return tSTRING;
  }
-
-<STRING>\\n   		*parsing->string_p++ = '\n';
-<STRING>\\r   		*parsing->string_p++ = '\r';
-<STRING>\\t   		*parsing->string_p++ = '\t';
-<STRING>\\v   		*parsing->string_p++ = '\v';
-<STRING>\\f   		*parsing->string_p++ = '\f';
-<STRING>\\b   		*parsing->string_p++ = '\b';
-<STRING>\\a   		*parsing->string_p++ = '\a';
-<STRING>.     		*parsing->string_p++ = *yytext;
-
 	/* Operators. */
 "+"			return '+';
 "-"			return '-';
@@ -109,80 +106,39 @@ D               [0-9]
 	/* Ignore blanks. */
 [ \t]+
 
-	/* Comment. */
+         /* Comment. */
 #[^*\n]*
-
 
 <<EOF>>			yyterminate();
 . 			return 0; 
 %%
-
 /* *INDENT-ON* */
+
 static void
-upd(struct Parsing *parsing)
+update_locations(struct Parsing *parsing)
 {
-    register int i;
+  if (yytext != NULL && yytext[0] != '\n') {
+    parsing->token = yytext;
+  } else {
+    parsing->token = NULL;
+  }
 
-    if (yytext != NULL && yytext[0] != '\n')
-	parsing->token = yytext;
-    else
-	parsing->token = NULL;
+  for (int i = 0; yytext[i] != '\0'; i++) {
+    switch (yytext[i]) {
+    case '\n':
+      PLN(parsing)++;
 
-    for (i = 0; yytext[i] != '\0'; i++) {
-	switch (yytext[i]) {
-	case '\n':
-	    PLN(parsing)++;
-	    break;
-	    
-	case '\t':
-	    POF(parsing) += 8 - (POF(parsing) % 8);
-	    break;
-
-	default:
-	    POF(parsing)++;
-	}
+      break;
+      
+    case '\t':
+      POF(parsing) += 8 - (POF(parsing) % 8);
+      break;
+      
+    default:
+      POF(parsing)++;
     }
+  }
+
 }
 
-int
-initCompiler(const char *filename)
-{
-    if ((yyin = fopen(filename, "r")) == NULL) {
-	fprintf(stderr, "sem: cannot open `%s'\n", filename);
-	return 1;
-    }
 
-    /* PFL(Parsing) = xstrdup(filename); */
-    /* PFP(Parsing) = yyin; */
-    return 0;
-}
-
-void
-finiCompiler(struct Code *c)
-{
-  struct Op *o = CHD(c);
-  struct Op *t;
-
-  
-    o = ONX(o);		/* XXX: skip START */
-
-    for (;;) {
-	if (o != NULL) {
-	    t = ONX(o);
-
-	    /* Free the string, if needed. */
-	    if (OSV(o) != NULL)
-		free(OSV(o));
-
-	    /* Free this node. */
-	    free(o);
-	    o = t;
-	}
-	else
-	    break;
-    }
-
-    free(CJM(c));
-    free(c);
-    fclose(yyin);
-}

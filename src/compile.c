@@ -52,7 +52,7 @@
 #define YYSKELETON_NAME "yacc.c"
 
 /* Pure parsers.  */
-#define YYPURE 1
+#define YYPURE 0
 
 /* Push parsers.  */
 #define YYPUSH 0
@@ -96,15 +96,6 @@
 
 #include "sem.h"
 
-#include <errno.h>		/* for errno */
-
-/*
- * In a five year period we can get one superb programming language. Only
- * we can't control when the five year period will begin.
- *
- * 	-- Anonymous
- */
-
 #if defined(WITH_PARSER_DEBUG)
 # define YYDEBUG 	1
 #endif
@@ -116,28 +107,20 @@
 #define YYSTYPE 	struct op *
 extern int yylex();
 
-/* 
- * The GNU bison parser detects a "syntax error" or "parse error" whenever
- * it reads a token which cannot satisfy any syntax rule. This function
- * is called whenever a syntax error occurs. 
- */
- static void yyerror(struct Code* code, struct Parsing *parsing, const char *); 
-
+static void yyerror(struct Code* code, struct Parsing *parsing, const char *); 
 #define error(msg) yyerror(code, parsing, (msg))
 
-/* Handy macros. */
+/* Append an opcode to the list (see Code struct). */
 #define addOp(op)            addOp4(code, (op), -1, NULL)
 #define addOpIV(op, iv)      addOp4(code, (op), (iv), NULL);
 #define addOpSV(op, sv)      addOp4(code, (op), -1, (sv))
-
-/* Append an opcode to the list (see Code). */
 static void addOp4(struct Code *, int, int, char *);
 
 /* *INDENT-OFF* */
 
 
 /* Line 189 of yacc.c  */
-#line 141 "compile.c"
+#line 124 "compile.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -200,7 +183,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 204 "compile.c"
+#line 187 "compile.c"
 
 #ifdef short
 # undef short
@@ -498,13 +481,13 @@ static const yytype_int8 yyrhs[] =
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-static const yytype_uint16 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,   109,   109,   113,   116,   121,   122,   126,   126,   127,
-     127,   128,   132,   133,   134,   138,   144,   147,   153,   156,
-     159,   162,   165,   168,   174,   178,   181,   184,   187,   190,
-     193,   199,   203,   204,   207,   213,   214,   217,   220,   226,
-     227,   228,   232,   254,   260
+       0,    90,    90,    94,    97,   102,   103,   107,   107,   108,
+     108,   109,   113,   114,   115,   119,   125,   128,   134,   137,
+     140,   143,   146,   149,   155,   159,   162,   165,   168,   171,
+     174,   180,   184,   185,   188,   194,   195,   198,   201,   207,
+     208,   209,   213,   235,   241
 };
 #endif
 
@@ -726,9 +709,9 @@ while (YYID (0))
 /* YYLEX -- calling `yylex' with the right arguments.  */
 
 #ifdef YYLEX_PARAM
-# define YYLEX yylex (&yylval, YYLEX_PARAM)
+# define YYLEX yylex (YYLEX_PARAM)
 #else
-# define YYLEX yylex (&yylval)
+# define YYLEX yylex (parsing)
 #endif
 
 /* Enable debugging if requested.  */
@@ -1183,6 +1166,14 @@ int yyparse ();
 #endif /* ! YYPARSE_PARAM */
 
 
+/* The lookahead symbol.  */
+int yychar;
+
+/* The semantic value of the lookahead symbol.  */
+YYSTYPE yylval;
+
+/* Number of syntax errors so far.  */
+int yynerrs;
 
 
 
@@ -1213,14 +1204,7 @@ yyparse (code, parsing)
 #endif
 #endif
 {
-/* The lookahead symbol.  */
-int yychar;
 
-/* The semantic value of the lookahead symbol.  */
-YYSTYPE yylval;
-
-    /* Number of syntax errors so far.  */
-    int yynerrs;
 
     int yystate;
     /* Number of tokens to shift before error messages enabled.  */
@@ -1464,9 +1448,9 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 109 "compile.y"
+#line 90 "compile.y"
     {
-    fprintf(stderr, "%s: empty source\n", PFL(parsing));
+    fprintf(stderr, "%s: empty source\n", parsing->filename);
     YYABORT;
  ;}
     break;
@@ -1474,28 +1458,28 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 126 "compile.y"
+#line 107 "compile.y"
     { addOpIV(SETLINENO, PLN(parsing)); ;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 127 "compile.y"
+#line 108 "compile.y"
     { addOpIV(SETLINENO, PLN(parsing)); ;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 128 "compile.y"
+#line 109 "compile.y"
     { YYABORT; ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 138 "compile.y"
+#line 119 "compile.y"
     {
     addOp(HALT);
 ;}
@@ -1504,7 +1488,7 @@ yyreduce:
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 144 "compile.y"
+#line 125 "compile.y"
     {
     addOp(JUMP);
 ;}
@@ -1513,7 +1497,7 @@ yyreduce:
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 147 "compile.y"
+#line 128 "compile.y"
     {
     addOp(JUMPT);
 ;}
@@ -1522,7 +1506,7 @@ yyreduce:
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 153 "compile.y"
+#line 134 "compile.y"
     {
     addOp(SET);
 ;}
@@ -1531,7 +1515,7 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 156 "compile.y"
+#line 137 "compile.y"
     {
     addOp(WRITE_INT);
 ;}
@@ -1540,16 +1524,16 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 159 "compile.y"
+#line 140 "compile.y"
     {
-    addOpSV(WRITE_STR, PST(parsing));
+    addOpSV(WRITE_STR, parsing->token);
 ;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 162 "compile.y"
+#line 143 "compile.y"
     {	/* this is an extension */
     addOp(WRITELN_INT);
 ;}
@@ -1558,16 +1542,16 @@ yyreduce:
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 165 "compile.y"
+#line 146 "compile.y"
     {	/* this is an extension */
-    addOpSV(WRITELN_STR, PST(parsing));
+    addOpSV(WRITELN_STR,parsing->token);
 ;}
     break;
 
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 168 "compile.y"
+#line 149 "compile.y"
     {
     addOp(READ);
 ;}
@@ -1576,7 +1560,7 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 178 "compile.y"
+#line 159 "compile.y"
     {
     addOp(EQ);
 ;}
@@ -1585,7 +1569,7 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 181 "compile.y"
+#line 162 "compile.y"
     {
     addOp(NE);
 ;}
@@ -1594,7 +1578,7 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 184 "compile.y"
+#line 165 "compile.y"
     {
     addOp(GT);
 ;}
@@ -1603,7 +1587,7 @@ yyreduce:
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 187 "compile.y"
+#line 168 "compile.y"
     {
     addOp(LT);
 ;}
@@ -1612,7 +1596,7 @@ yyreduce:
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 190 "compile.y"
+#line 171 "compile.y"
     {
     addOp(GE);
 ;}
@@ -1621,7 +1605,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 193 "compile.y"
+#line 174 "compile.y"
     {
     addOp(LE);
 ;}
@@ -1630,7 +1614,7 @@ yyreduce:
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 204 "compile.y"
+#line 185 "compile.y"
     {
     addOp(ADD);
 ;}
@@ -1639,7 +1623,7 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 207 "compile.y"
+#line 188 "compile.y"
     {
     addOp(SUB);
 ;}
@@ -1648,7 +1632,7 @@ yyreduce:
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 214 "compile.y"
+#line 195 "compile.y"
     {
     addOp(MUL);
 ;}
@@ -1657,7 +1641,7 @@ yyreduce:
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 217 "compile.y"
+#line 198 "compile.y"
     {		
     addOp(DIV);
 ;}
@@ -1666,7 +1650,7 @@ yyreduce:
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 220 "compile.y"
+#line 201 "compile.y"
     { /* this is an extension */
     addOp(MOD);
 ;}
@@ -1675,7 +1659,7 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 232 "compile.y"
+#line 213 "compile.y"
     {
     long value;
     char *ep;
@@ -1700,7 +1684,7 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 254 "compile.y"
+#line 235 "compile.y"
     {
     addOp(MEM);
 ;}
@@ -1709,7 +1693,7 @@ yyreduce:
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 260 "compile.y"
+#line 241 "compile.y"
     {
     addOp(IP);
 ;}
@@ -1718,7 +1702,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1722 "compile.c"
+#line 1706 "compile.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1930,7 +1914,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 264 "compile.y"
+#line 245 "compile.y"
 
   /* *INDENT-ON* */
 
@@ -1946,100 +1930,121 @@ yyerror(struct Code* code, struct Parsing * parsing, const char *msg)
     fprintf(stderr, "\n");
 }
 
-PRIVATE void
-addOp4(struct Code *c, int op, int iv, char *sv)
-{
-    register struct Op *o;
-	 
-    /* Allocating a new Op structure... */
-    o = xmalloc(sizeof(struct Op));
 
-    /* ... and filling it... */
-    OOP(o) = op;
-    OIV(o) = iv;
-    OSV(o) = sv != NULL ? xstrdup(sv) : NULL;
-    ONX(o) = NULL;
-
-    /* ...link it to the list... */
-    ONX(CCD(c)) = o;
-    CCD(c) = o;
-	 
-    /* and update the Code structure, if needed. */
-    if (op == SETLINENO)
-	CSZ(c) += 1;
+struct Op *
+createOp(int opcode, int iv, char *sv) {
+  struct Op *op = xmalloc(sizeof(struct Op));
+  op->opcode = op;
+  op->intv = iv;
+  op->strv = (sv != NULL) ? xstrdup(sv) : NULL;
+  op->next = NULL;
+  return op;
 }
 
-/* This opcode is *always* the first. */
-struct Op o = {
-    START,		/* opcode       */
-    -1,			/* intv         */
-    NULL,		/* strv         */
-    NULL		/* next         */
-};
+static void
+addOp4(struct Code *code, int opcode, int iv, char *sv)
+{
+  struct Op *op = createOp(opcode, iv, sv);
+  ONX(CCD(code)) = op;
+  CCD(code) = op;
+  if (opcode == SETLINENO) {
+    CSZ(code) += 1;
+  }
+}
+
+extern FILE* yyin;
 
 struct Code *
-compileSource(void)
+compileSource(const char *filename)
 {
-    struct Code *code = xmalloc(sizeof(struct Code));
-    struct Parsing parsing = {
-      NULL,		/* filename     */
-      NULL,		/* fp           */
-      NULL,		/* lines        */
-      NULL,		/* tok          */
-      1,			/* lineno       */
-      0,			/* offset       */
-      "",			/* strtok       */
-      NULL		/* strtok_p     */
-    };
-
 #if defined(WITH_PARSER_DEBUG)
-    yydebug = 1;
+  yydebug = 1;
 #endif
-    code->size = 1;
-    code->jumps = NULL;
-    code->head = &o; // TODO: really necessary?
-    code->code = &o; 
-    
-    if (yyparse(code, &parsing) == 0) {
-	int j;
-	struct Op *i;
+  
+  if ((yyin = fopen(filename, "r")) == NULL) {
+    fprintf(stderr, "sem: cannot open '%s'\n", filename);
+    return NULL;
+  }
+  
+  struct Parsing *parsing = xmalloc(sizeof(struct Parsing)); 
+  parsing->token = NULL;		
+  parsing->lineno = 1;		
+  parsing->offset = 0;		
+  parsing->filename = xstrdup(filename); 
+  parsing->fp = yyin; 
+  struct Op *start = createOp(START, 0, NULL);
+  struct Code *code = xmalloc(sizeof(struct Code));
+  code->size = 1;
+  code->jumps = NULL;
+  code->head = start; 
+  code->code = start; 
+  
+  if (yyparse(code, parsing) != 0) {
+    return NULL;
+  }
+  
+  code->jumps = (struct Op **) xmalloc(code->size - 1 * sizeof(void *));  
+   
+  /*
+   * Jump-table generation. It maps the source's lines with
+   * the internal code representation. For example the
+   * internal code representation of:
+   *
+   *   set D[1] + 1, D[0]
+   *
+   * will be:
+   *
+   *   SETLINENO             19
+   *   INT                   1
+   *   MEM
+   *   INT                   1
+   *   ADD
+   *   INT                   0
+   *   MEM
+   *   SET
+   *
+   * In such case the nth SETLINENO opcode (i) will be mapped in
+   * c->jumps[18], i.e. *(CJM(c) + 18) = i.
+   */
+  struct Op *i;
+  int j;
+  for (j = 0, i = code->head; i != NULL; i = ONX(i))
+    if (OOP(i) == SETLINENO)
+      *(CJM(code) + j++) = i;
+  
+  /* Add, if needed, a trailing HALT opcode. */
+  if (OOP(CCD(code)) != HALT)
+    if (OOP(CCD(code)) != JUMP)
+      if (OOP(CCD(code)) != JUMPT)
+	addOp(HALT);
+  
+  return code;
+}
 
-	code->jumps = (struct Op **) xmalloc(code->size - 1 * sizeof(void *));  
+void
+finiCompiler(struct Code *c)
+{
+  struct Op *o = CHD(c);
+  struct Op *t;
 
-	/*
-	 * Jump-table generation. It maps the source's lines with
-	 * the internal code representation. For example the
-	 * internal code representation of:
-	 *
-	 *   set D[1] + 1, D[0]
-	 *
-	 * will be:
-	 *
-	 *   SETLINENO             19
-	 *   INT                   1
-	 *   MEM
-	 *   INT                   1
-	 *   ADD
-	 *   INT                   0
-	 *   MEM
-	 *   SET
-	 *
-	 * In such case the nth SETLINENO opcode (i) will be mapped in
-	 * c->jumps[18], i.e. *(CJM(c) + 18) = i.
-	 */
-	for (j = 0, i = code->head; i != NULL; i = ONX(i))
-	    if (OOP(i) == SETLINENO)
-		*(CJM(code) + j++) = i;
+  for (;;) {
+    if (o != NULL) {
+	    t = ONX(o);
 
-	/* Add, if needed, a trailing HALT opcode. */
-	if (OOP(CCD(code)) != HALT)
-	    if (OOP(CCD(code)) != JUMP)
-		if (OOP(CCD(code)) != JUMPT)
-		    addOp(HALT);
+	    /* Free the string, if needed. */
+	    if (OSV(o) != NULL)
+		free(OSV(o));
 
-	return code;
+	    /* Free this node. */
+	    free(o);
+	    o = t;
+	}
+	else
+	    break;
     }
-    else
-	return NULL;
+
+    free(CJM(c));
+    free(c);
+    fclose(yyin);
 }
 
