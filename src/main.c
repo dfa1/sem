@@ -61,7 +61,7 @@ Report bugs to <davide.angelocola@gmail.com>\n", program);
 int main(int argc, char **argv) {
     const char licenseMsg[] = "\r\
 sem %s -- A SIMPLESEM interpreter\n\
-Copyright (C) 2004-2009 Davide Angelocola <davide.angelocola@gmail.com>\n\
+Copyright (C) 2003-2011 Davide Angelocola <davide.angelocola@gmail.com>\n\
 \n\
 This program is free software, and you are welcome to redistribute\n\
 it and/or modify it under the terms of the GNU General Public License.\n\
