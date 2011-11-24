@@ -1922,8 +1922,8 @@ yyerror(struct Code* code, struct Parsing * parsing, const char *msg)
 {
     fprintf(stderr, "%s: %s at line %d", PFL(parsing), msg, PLN(parsing));
 
-    if (PTK(parsing) != NULL && *PTK(parsing) != '\0') {
-	fprintf(stderr, ", near token '%s'", PTK(parsing));
+    if (parsing->token != NULL && *parsing->token != '\0') {
+	fprintf(stderr, ", near token '%s'", parsing->token);
     }
 
     fprintf(stderr, "\n");
@@ -1952,6 +1952,12 @@ addOp4(struct Code *code, int opcode, int iv, char *sv)
 }
 
 extern FILE* yyin;
+
+#ifdef WITH_COMPILER_DEBUG
+# define DPRINTF(...) printf(__VA_ARGS__) 
+#else 
+# define DPRINTF(...)
+#endif
 
 struct Code *
 compileSource(const char *filename)
@@ -1982,7 +1988,8 @@ compileSource(const char *filename)
     return NULL;
   }
   
-  code->jumps = (struct Op **) xmalloc(code->size - 1 * sizeof(void *));  
+  DPRINTF("code size = %d\n", code->size);
+  code->jumps = (struct Op **) xmalloc(code->size * sizeof(void *));  
    
   /*
    * Jump-table generation. It maps the source's lines with
@@ -2007,15 +2014,24 @@ compileSource(const char *filename)
    */
   struct Op *i;
   int j;
-  for (j = 0, i = code->head; i != NULL; i = ONX(i))
-    if (OOP(i) == SETLINENO)
-      *(CJM(code) + j++) = i;
+  for (j = 0, i = code->head; i != NULL; i = ONX(i)) {
+    DPRINTF("COMPILE: %p (op=%d,intv=%d,strv=%s)\n", 
+	    i, i->opcode, i->intv, i->strv);
+    if (i->opcode == SETLINENO) {
+      DPRINTF("COMPILE:  line %j jumps to %p\n", j, i);
+      code->jumps[j++] = i;
+    }
+  }
   
   /* Add, if needed, a trailing HALT opcode. */
-  if (OOP(CCD(code)) != HALT)
-    if (OOP(CCD(code)) != JUMP)
-      if (OOP(CCD(code)) != JUMPT)
+  if (OOP(CCD(code)) != HALT) {
+    if (OOP(CCD(code)) != JUMP) {
+      if (OOP(CCD(code)) != JUMPT) {
 	addOp(HALT);
+	DPRINTF("COMPILE: inserting missing HALT instruction at end");
+      }
+    }
+  }
   
   return code;
 }

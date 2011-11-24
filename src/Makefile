@@ -17,7 +17,10 @@ sem: $(OBJECTS)
 	gcc $(OBJECTS) -o $@ 
 
 debug: sem
-	gdb sem
+	gdb ./sem
+
+valgrind: sem
+	valgrind ./sem ../examples/fact.sem
 
 run: sem
 	./sem ../examples/fact.sem

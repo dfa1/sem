@@ -22,21 +22,6 @@
 #include "sem.h"
 
 #include <float.h>		/* for DBL_EPSILON */
-#include <stdarg.h>		
-
-static void
-printErr(const char *format, ...)
-{
-    va_list va;
-    char buf[1024];
-
-    va_start(va, format);
-    vsnprintf(buf, sizeof buf, format, va);
-    va_end(va);
-
-    fprintf(stderr, "sem: %s\n", buf);
-    fflush(stderr);
-}
 
 struct VM *
 initVM(struct Code *c, int ms, int ss)
@@ -106,8 +91,8 @@ finiVM(struct VM *v)
 
 int evalCode(struct VM *v)
 {
-    long p;	/* first operand                */
-    long q;	/* second operand               */
+    int p;	/* first operand                */
+    int q;	/* second operand               */
     int sts;	/* status                       */
     double x;	/* for overflow checking        */
     double y;	/* for overflow checking        */
@@ -116,7 +101,7 @@ int evalCode(struct VM *v)
     /* These are cloned here to .  */
     struct Op *ip;
     struct Code *c;
-    long lineno;
+    int lineno;
 
     /* Handy macros. */
 #define LOAD_REGISTERS				\
@@ -132,11 +117,11 @@ int evalCode(struct VM *v)
 	VLN(v) = lineno;			\
     } while(0)
 
-#define DIE(a)					\
+#define DIE(...)				\
     do {					\
-	printErr a;				\
-	sts = 1;				\
-	goto halt;				\
+      fprintf(stderr,  __VA_ARGS__);	\
+      sts = 1;					\
+      goto halt;				\
     } while(0)
 
     /* Stack manipulation macros. It's all magic :-) */
@@ -177,8 +162,7 @@ int evalCode(struct VM *v)
 	    p = POP();
 
 	    if (p < 0 || p >= VMS(v))
-		DIE(("invalid memory address %d for "
-		     "target at line %d", p, lineno));
+		DIE("invalid memory address %d for target at line %d", p, lineno);
 
 	    *(VMM(v) + p) = q;
 	    break;
@@ -187,8 +171,8 @@ int evalCode(struct VM *v)
 	    p = POP();
 
 	    if (p < 0 || p >= VMS(v))
-		DIE(("invalid memory address %d at "
-		     "line %d", p, lineno));
+		DIE("invalid memory address %d at "
+		     "line %d", p, lineno);
 
 	    PUSH(*(VMM(v) + p));
 	    break;
@@ -207,9 +191,9 @@ int evalCode(struct VM *v)
 	case JUMP:
 	    q = POP();
 
-	    if (q < 1 || q >= CSZ(c))
-		DIE(("cannot jump from line %d to "
-		     "line %d", lineno, q));
+	    if (q < 1 || q >= CSZ(c)) {
+		DIE("cannot jump from line %d to line %d", lineno, q);
+	    }
 
 	    ip = *(CJM(c) + q - 1);	/* jump */
 
@@ -225,8 +209,7 @@ int evalCode(struct VM *v)
 	    q = POP();
 
 	    if (q < 1 || q >= CSZ(c))
-		DIE(("cannot jump from line %d to "
-		     "line %d", lineno, q));
+		DIE("cannot jump from line %d to line %d", lineno, q);
 
 	    if (p == 0)
 		/* void */ ;
@@ -255,7 +238,7 @@ int evalCode(struct VM *v)
 	case WRITE_INT:
 	    p = POP();
 	    tmp = with(VF(v), STEP) ? "\n" : "";
-	    fprintf(stdout, "%ld%s", p, tmp);
+	    fprintf(stdout, "%d%s", p, tmp);
 	    goto flush;
 
 	case WRITE_STR:
@@ -265,7 +248,7 @@ int evalCode(struct VM *v)
 
 	case WRITELN_INT:
 	    p = POP();
-	    fprintf(stdout, "%ld\n", p);
+	    fprintf(stdout, "%d\n", p);
 	    goto flush;
 
 	case WRITELN_STR:
@@ -280,8 +263,8 @@ int evalCode(struct VM *v)
 	    p = POP();
 
 	    if (p < 0 || p >= VMS(v))
-		DIE(("invalid memory address %d for "
-		     "read at line %d", p, lineno));
+		DIE("invalid memory address %d for "
+		     "read at line %d", p, lineno);
 
 	    printf("? ");
 	    fgets(s, sizeof s, stdin);
@@ -293,11 +276,13 @@ int evalCode(struct VM *v)
 		errno = 0;
 		q = strtol(s, &ep, 10);
 
-		if (errno == ERANGE)
-		    DIE(("invalid integer literal '%s'", s));
+		if (errno == ERANGE) {
+		    DIE("invalid integer literal '%s'", s);
+		}
 
-		if (*ep != '\0')
-		    DIE(("invalid '%c' in integer " "literal '%s' ", *ep, s));
+		if (*ep != '\0') {
+		  DIE("invalid '%c' in integer " "literal '%s' ", *ep, s);
+		}
 	    } while (0);
 
 	    *(VMM(v) + p) = q;
@@ -314,7 +299,7 @@ int evalCode(struct VM *v)
 		x = (double) (i);		\
 		y = (d);			\
 		if ((x - y) > DBL_EPSILON)	\
-		    DIE(("integer overflow"));	\
+		    DIE("integer overflow");	\
 		else				\
 		    PUSH((i));			\
 	    } while(0);				\
@@ -335,7 +320,7 @@ int evalCode(struct VM *v)
 #define DIV_OP(op)				\
 	    do {				\
                 if (q == 0)			\
-		    DIE(("division by zero"));	\
+		    DIE("division by zero");	\
 		PUSH((op));			\
 	    } while(0);				\
 	    break
@@ -374,8 +359,7 @@ int evalCode(struct VM *v)
 	    TEST(p <= q);
 
 	default:
-	    DIE(("unknown opcode (%d); top is %d",
-		 OOP(ip), TOP()));
+	    DIE("unknown opcode (%d); top is %ld", OOP(ip), TOP());
 	}
     }
     /* End main loop. */
