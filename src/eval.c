@@ -285,6 +285,7 @@ int evalCode(struct VM *v)
 
 	    printf("? ");
 	    fgets(s, sizeof s, stdin);
+	    s[strlen(s) -1] = 0; // chop
 
 	    do {
 		char *ep;
