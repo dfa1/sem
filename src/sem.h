@@ -25,19 +25,6 @@
 #include <errno.h>
 
 #include "version.h"
-/* 
- *       THE LESSER-KNOWN PROGRAMMING LANGUAGES #10: SIMPLE
- *
- * SIMPLE is an acronym for Sheer Idiot's Monopurpose Programming Language
- * Environment.  This language, developed at the Hanover College for
- * Technological Misfits, was designed to make it impossible to write code
- * with errors in it.  The statements are, therefore, confined to BEGIN,
- * END and STOP.  No matter how you arrange the statements, you can't make
- * a syntax error.  Programs written in SIMPLE do nothing useful.  Thus
- * they achieve the results of programs written in other languages without
- * the tedious, frustrating process of testing and debugging.
- */
-
 
 // HACKS
 #define xmalloc malloc

@@ -25,28 +25,6 @@
 #include <errno.h>		/* for errno */
 #include <stdarg.h>		/* for va_start(), va_end() and va_list */
 
-/* 
- * Proposed Additions to the PDP-11 Instruction Set:
- *
- * BBW     Branch Both Ways      D
- * BEW     Branch Either Way
- * BBBF    Branch on Bit Bucket Full
- * BH      Branch and Hang       D
- * BMR     Branch Multiple RegistDrs
- * BOB     Branch On Bug
- * BPO     Branch on Power Off
- * BST     Backspace and Stretch Tape
- * CDS     Condense and Destroy System
- * CLBR    Clobber Register
- * CLBRI   Clobber Register Immediately
- * CM      Circulate Memory
- * CMFRM   Come From -- essential for truly structured programming
- * CPPR    Crumple Printer Paper and Rip
- * CRN     Convert to Roman Numerals
- *  
- * 	-- Anonymous
- */
-
 /* Hide GCC attributes from compilers that don't support them. */
 #if !defined(__GNUC__) || __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 7)
 static void printErr(const char *, ...)
@@ -407,7 +385,7 @@ int evalCode(struct VM *v)
 	}
     }
     /* End main loop. */
-
+    
   halt:
     if (sts != 0)
 	/* void */ ;
