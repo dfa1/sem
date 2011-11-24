@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
 	}
     }
 
-    if (optind < argc && strcmp(argv[optind], "-") == 0) {
+    if (optind >= argc || strcmp(argv[optind], "-") == 0) {
       fprintf(stderr, "sem: no input\n");
       return EXIT_FAILURE;
     }
