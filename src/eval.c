@@ -49,11 +49,11 @@
 
 /* Hide GCC attributes from compilers that don't support them. */
 #if !defined(__GNUC__) || __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 7)
-PRIVATE void printErr(const char *, ...)
+static void printErr(const char *, ...)
 	__attribute__ (format(printf, 1, 2));
 #endif
 
-PRIVATE void
+static void
 printErr(const char *format, ...)
 {
     va_list va;
@@ -67,7 +67,7 @@ printErr(const char *format, ...)
     (void) fflush(stderr);
 }
 
-PUBLIC struct VM *
+struct VM *
 initVM(struct Code *c, int ms, int ss)
 {
     register struct VM *v;
@@ -99,7 +99,7 @@ initVM(struct Code *c, int ms, int ss)
     return v;
 }
 
-PUBLIC void
+void
 finiVM(struct VM *v)
 {
     free(VMM(v));
@@ -133,9 +133,7 @@ finiVM(struct VM *v)
  *                          +---------------------+
  */
 
-/* The interpreter. */
-PUBLIC int
-evalCode(struct VM *v)
+int evalCode(struct VM *v)
 {
     long p;	/* first operand                */
     long q;	/* second operand               */

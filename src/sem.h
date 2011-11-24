@@ -57,11 +57,6 @@
 /* This enables a more precise parsing error messages. */
 /* #define WITH_VERBOSE_ERROR */
 
-/* Symbols visibility. */
-#define PUBLIC
-#define PRIVATE	static
-#define IMPORT	extern
-
 /* Macros for setting/clearing/getting bits in flags. */
 #define set(var,flag)          (var) |= (flag)
 #define clear(var,flag)        (var) |= ~(flag)
@@ -196,12 +191,8 @@ struct VM
 #define VLN(v)	((v)->lineno)
 #define VF(v)	((v)->flags)
 
-IMPORT struct VM *initVM(struct Code *, int, int);
-IMPORT void finiVM(struct VM *);
-
-/* The interpreter. */
-IMPORT int evalCode(struct VM *);
-
-/* The debugger. */
-IMPORT int debugCode(struct VM *);
+extern struct VM *initVM(struct Code *, int, int);
+extern void finiVM(struct VM *);
+extern int evalCode(struct VM *);
+extern int debugCode(struct VM *);
 
