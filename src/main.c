@@ -24,34 +24,41 @@
 
 #include <getopt.h>
 
-static void usage(int sts) {
-  FILE *target = (sts == EXIT_SUCCESS)? stdout : stderr;
-  
-  fprintf(target, "\r\
-Usage: sem [options] file\n			\
-\n\
-Options:\n\
-  -h      : print this help message and exit\n\
-  -m      : set the data memory size (the default is 64)\n\
-  -s      : set the evaluation stack size (the default is 32)\n\
-  -v      : print the version and exit\n\
-\n\
-Report bugs to <davide.angelocola@gmail.com>\n");
-  exit(sts);
-}
+#define S(s) STRINGIFY(s)
+#define STRINGIFY(s) #s
+#define DEFAULT_DATA_SIZE 64
+#define DEFAULT_STACK_SIZE 32
 
-int main(int argc, char **argv) {
-    const char licenseMsg[] = "\r\
-sem %s -- A SIMPLESEM interpreter\n\
+static char license[] = "\r\
+sem " VERSION " -- A SIMPLESEM interpreter\n\
 Copyright (C) 2003-2011 Davide Angelocola <davide.angelocola@gmail.com>\n\
 \n\
 This program is free software, and you are welcome to redistribute\n\
 it and/or modify it under the terms of the GNU General Public License.\n\
-There is ABSOLUTELY NO WARRANTY for this program. \n\
+There is ABSOLUTELY NO WARRANTY for this program.\n\
 \n\
-See the LICENSE for more details.\n";
-    int memSize = 64;
-    int stackSize = 32;
+See the COPYING filefor more details.\n";
+
+static char help[] = "\r\
+Usage: sem [options] file\n\
+\n\
+Options:\n\
+  -h : print this help message and exit\n\
+  -m : set the data memory size (the default is " S(DEFAULT_DATA_SIZE) ")\n\
+  -s : set the stack size (the default is " S(DEFAULT_STACK_SIZE) ")\n\
+  -v : print the version and exit\n\
+\n\
+Report bugs to <davide.angelocola@gmail.com>\n";
+  
+static void usage(int sts) {
+  FILE *target = (sts == EXIT_SUCCESS)? stdout : stderr;
+  fprintf(target, help);
+  exit(sts);
+}
+
+int main(int argc, char **argv) {
+    int memSize = DEFAULT_DATA_SIZE;
+    int stackSize = DEFAULT_STACK_SIZE;
     int opt = 0;
     struct option long_options[] = {
 	{ "version", 0, 0, 'v' },
@@ -69,7 +76,6 @@ See the LICENSE for more details.\n";
 
 	case 'h':
 	    usage(EXIT_SUCCESS);
-	    break;
 
 	case 'm':
 	  if (sscanf(optarg, "%d", &memSize) != 1 || memSize < 1) {
@@ -86,12 +92,11 @@ See the LICENSE for more details.\n";
 	  break;
 
 	case 'v':
-	  fprintf(stdout, licenseMsg, VERSION);
+	  fprintf(stdout, license);
 	  return EXIT_SUCCESS;
 
 	default:
-	  fprintf(stderr, "Try `sem -h' for more information.\n");
-	  return EXIT_FAILURE;
+	  usage(EXIT_FAILURE);
 	}
     }
 
@@ -103,11 +108,11 @@ See the LICENSE for more details.\n";
     struct Code *code = compileSource(argv[optind]);
     
     if (code == NULL) {
-      // error message should be already displayed
+      // error message should be already displayed at this point
       return EXIT_FAILURE;
     }
 
-    struct VM *vm= initVM(code, memSize, stackSize);
+    struct VM *vm = initVM(code, memSize, stackSize);
     int status = evalCode(vm);
     finiCompiler(code);
     finiVM(vm);

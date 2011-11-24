@@ -69,16 +69,6 @@ D               [0-9]
     BEGIN STRING;
 }
 
-   /* <STRING>\\n   		*(parsing->string_p)++ = '\n'; */
-   /* <STRING>\\r   		*parsing->string_p++ = '\r'; */
-   /* <STRING>\\t   		*parsing->string_p++ = '\t'; */
-   /* <STRING>\\v   		*parsing->string_p++ = '\v'; */
-   /* <STRING>\\f   		*parsing->string_p++ = '\f'; */
-   /* <STRING>\\b   		*parsing->string_p++ = '\b'; */
-   /* <STRING>\\a   		*parsing->string_p++ = '\a'; */
-   /* <STRING>.     		*(prsing->string_p)++ = *yytext; */
-
-
 <STRING>"\"" {
     BEGIN INITIAL;
     return tSTRING;
