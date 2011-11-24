@@ -69,7 +69,7 @@ typedef enum
 struct Op // TODO: rename to instr
 {
   op_t opcode;		/* opcode */
-  long intv;		/* integer argument */
+  int intv;		/* integer argument */
   char *strv;		/* string argument */
   struct Op *next;	/* next opcode */
 };
@@ -121,7 +121,7 @@ struct VM
 
     /* The Instruction Pointer. */
     struct Op *ip;
-    long lineno;
+    int lineno;
 
     /*
      * The data memory
@@ -131,7 +131,7 @@ struct VM
      * at 0 and it can be used /only/ to store/retrieve integers.
      * The memory size can changed via -m option.
      */
-    long *mem;
+    int *mem;
     int memsize;
 
     /*
@@ -143,9 +143,9 @@ struct VM
      * system could let it grow dynamically but at this point is
      * useless. The stack size can be changed via -s option.
      */
-    long *stack;
+    int *stack;
     int stacksize;
-    long *stacktop;
+    int *stacktop;
 
     /* Flags */
 #define	STEP	1 << 0		/* Eval step by step.           */

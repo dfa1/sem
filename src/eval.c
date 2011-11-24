@@ -36,14 +36,14 @@ initVM(struct Code *c, int ms, int ss)
     VIP(v) = CHD(c);
 
     VMS(v) = ms;
-    VMM(v) = (long *) xmalloc(sizeof(long) * VMS(v));
+    VMM(v) = xmalloc(sizeof(int) * VMS(v));
 
     /* Initialize the memory. */
     for (i = 0; i < VMS(v); i++)
 	*(VMM(v) + i) = 0;
 
     VSS(v) = ss;
-    VST(v) = (long *) xmalloc(sizeof(long) * VSS(v));
+    VST(v) = xmalloc(sizeof(int) * VSS(v));
 
     /* Initialize the stack. */
     for (i = 0; i < VSS(v); i++)
@@ -119,12 +119,18 @@ int evalCode(struct VM *v)
 
 #define DIE(...)				\
     do {					\
-      fprintf(stderr,  __VA_ARGS__);	\
+      fprintf(stderr, "sem: " __VA_ARGS__);	\
+      fprintf(stderr, "\n");			\
+      fprintf(stderr, "line: %d\n", lineno);	\
+      fprintf(stderr, "stack: \n");		\
+      while (!EMPTY()) {			\
+      	fprintf(stderr, " [%d] %d\n", (int) LEVEL(), POP());	\
+      }						\
       sts = 1;					\
       goto halt;				\
     } while(0)
 
-    /* Stack manipulation macros. It's all magic :-) */
+    /* Stack manipulation macros. */
 #define TOP()           (*VTP(v))
 #define LEVEL()         (VTP(v) - VST(v))
 #define EMPTY()         (LEVEL() == 0)
@@ -134,7 +140,7 @@ int evalCode(struct VM *v)
 	if (LEVEL() < VSS(v))			\
 	    (*VTP((v))++ = (x));		\
 	else					\
-	    DIE(("stack overflow"));		\
+	    DIE("stack overflow");		\
     } while(0)
 
     /* Initialization. */
@@ -281,7 +287,7 @@ int evalCode(struct VM *v)
 		}
 
 		if (*ep != '\0') {
-		  DIE("invalid '%c' in integer " "literal '%s' ", *ep, s);
+		  DIE("invalid '%c' in integer literal '%s' ", *ep, s);
 		}
 	    } while (0);
 
@@ -359,7 +365,7 @@ int evalCode(struct VM *v)
 	    TEST(p <= q);
 
 	default:
-	    DIE("unknown opcode (%d); top is %ld", OOP(ip), TOP());
+	    DIE("unknown opcode (%d); top is %d", OOP(ip), TOP());
 	}
     }
     /* End main loop. */
