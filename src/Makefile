@@ -10,7 +10,7 @@ scan.c: scan.l tokens.h
 
 OBJECTS=compile.o scan.o eval.o main.o
 
-$(OBJECTS): sem.h
+$(OBJECTS): sem.h version.h
 
 # TODO: debugger as separate binary
 sem: $(OBJECTS)

@@ -22,8 +22,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>		
+#include <errno.h>
 
+#include "version.h"
 /* 
  *       THE LESSER-KNOWN PROGRAMMING LANGUAGES #10: SIMPLE
  *
@@ -37,25 +38,11 @@
  * the tedious, frustrating process of testing and debugging.
  */
 
-#define VERSION "3.0-SNAPSHOT"
 
 // HACKS
 #define xmalloc malloc
 #define xstrdup strdup
 #define trim(s) (s)
-
-/* Features */
-
-/* 
- * If the Bison grammar (compile.y) compiles properly but doesn't do
- * what you want when it runs, the `yydebug' parser-trace feature can
- * help you figure out why. Define the macro `WITH_PARSER_DEBUG'
- * before you compile sem. This is compliant with POSIX Yacc.
- */
-/* #define WITH_PARSER_DEBUG */
-
-/* This enables a more precise parsing error messages. */
-/* #define WITH_VERBOSE_ERROR */
 
 /* Macros for setting/clearing/getting bits in flags. */
 #define set(var,flag)          (var) |= (flag)
