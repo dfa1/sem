@@ -41,8 +41,6 @@ static void update_locations(struct Parsing *parsing);
 	/* Character classes. */
 L               [A-Z]|[a-z]
 D               [0-9]
-	
-	/* Start conditions. */
 %x STRING
 %%
 	/* Keywords. */
@@ -67,12 +65,25 @@ D               [0-9]
 	/* Strings. */ 
 "\"" {
     BEGIN STRING;
+    parsing->pstr = parsing->str;
 }
 
 <STRING>"\"" {
     BEGIN INITIAL;
+    *parsing->pstr = 0;
     return tSTRING;
  }
+
+<STRING>\\n             *parsing->pstr++ = '\n';
+<STRING>\\r             *parsing->pstr++ = '\r';
+<STRING>\\t             *parsing->pstr++ = '\t';
+<STRING>\\v             *parsing->pstr++ = '\v';
+<STRING>\\f             *parsing->pstr++ = '\f';
+<STRING>\\b             *parsing->pstr++ = '\b';
+<STRING>\\a             *parsing->pstr++ = '\a';
+<STRING>.               *parsing->pstr++ = *yytext;
+
+
 	/* Operators. */
 "+"			return '+';
 "-"			return '-';

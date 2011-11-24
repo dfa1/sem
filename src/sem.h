@@ -100,6 +100,8 @@ struct Parsing {
   char *token;	
   int lineno;	
   int offset;	
+  char str[1024];
+  char *pstr;
 };
 
 /* struct Parsing access macros. */
@@ -108,8 +110,6 @@ struct Parsing {
 #define PTK(p)	((p)->token)
 #define PLN(p)	((p)->lineno)
 #define POF(p)	((p)->offset)
-#define PST(p)	((p)->string)
-#define PSP(p)	((p)->string_p)
 
 extern struct Code *compileSource(const char* filename);
 extern void finiCompiler(struct Code *);

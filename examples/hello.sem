@@ -1,2 +1,2 @@
-set writeln, "Hello World!"
+set write, "Hello World!\n"
 

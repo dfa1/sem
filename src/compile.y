@@ -137,13 +137,13 @@ set_stmt
     addOp(WRITE_INT);
 }
 | kSET rWRITE ',' tSTRING {
-    addOpSV(WRITE_STR, parsing->token);
+    addOpSV(WRITE_STR, parsing->str);
 }
 | kSET rWRITELN ',' expr {	/* this is an extension */
     addOp(WRITELN_INT);
 }
 | kSET rWRITELN ',' tSTRING {	/* this is an extension */
-    addOpSV(WRITELN_STR,parsing->token);
+    addOpSV(WRITELN_STR, parsing->str);
 }
 | kSET expr ',' rREAD {
     addOp(READ);

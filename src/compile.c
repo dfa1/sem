@@ -1525,7 +1525,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 139 "compile.y"
     {
-    addOpSV(WRITE_STR, parsing->token);
+    addOpSV(WRITE_STR, parsing->str);
 ;}
     break;
 
@@ -1543,7 +1543,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 145 "compile.y"
     {	/* this is an extension */
-    addOpSV(WRITELN_STR,parsing->token);
+    addOpSV(WRITELN_STR, parsing->str);
 ;}
     break;
 
