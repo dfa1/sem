@@ -106,7 +106,6 @@
 
 #define YYSTYPE 	struct op *
 extern int yylex();
-
 static void yyerror(struct Code* code, struct Parsing *parsing, const char *); 
 #define error(msg) yyerror(code, parsing, (msg))
 
@@ -120,7 +119,7 @@ static void addOp4(struct Code *, int, int, char *);
 
 
 /* Line 189 of yacc.c  */
-#line 124 "compile.c"
+#line 123 "compile.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -183,7 +182,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 187 "compile.c"
+#line 186 "compile.c"
 
 #ifdef short
 # undef short
@@ -483,11 +482,11 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    90,    90,    94,    97,   102,   103,   107,   107,   108,
-     108,   109,   113,   114,   115,   119,   125,   128,   134,   137,
-     140,   143,   146,   149,   155,   159,   162,   165,   168,   171,
-     174,   180,   184,   185,   188,   194,   195,   198,   201,   207,
-     208,   209,   213,   235,   241
+       0,    89,    89,    93,    96,   101,   102,   106,   106,   107,
+     107,   108,   112,   113,   114,   118,   124,   127,   133,   136,
+     139,   142,   145,   148,   154,   158,   161,   164,   167,   170,
+     173,   179,   183,   184,   187,   193,   194,   197,   200,   206,
+     207,   208,   212,   234,   240
 };
 #endif
 
@@ -1448,7 +1447,7 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 90 "compile.y"
+#line 89 "compile.y"
     {
     fprintf(stderr, "%s: empty source\n", parsing->filename);
     YYABORT;
@@ -1458,28 +1457,28 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 107 "compile.y"
+#line 106 "compile.y"
     { addOpIV(SETLINENO, PLN(parsing)); ;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 108 "compile.y"
+#line 107 "compile.y"
     { addOpIV(SETLINENO, PLN(parsing)); ;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 109 "compile.y"
+#line 108 "compile.y"
     { YYABORT; ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 119 "compile.y"
+#line 118 "compile.y"
     {
     addOp(HALT);
 ;}
@@ -1488,7 +1487,7 @@ yyreduce:
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 125 "compile.y"
+#line 124 "compile.y"
     {
     addOp(JUMP);
 ;}
@@ -1497,7 +1496,7 @@ yyreduce:
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 128 "compile.y"
+#line 127 "compile.y"
     {
     addOp(JUMPT);
 ;}
@@ -1506,7 +1505,7 @@ yyreduce:
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 134 "compile.y"
+#line 133 "compile.y"
     {
     addOp(SET);
 ;}
@@ -1515,7 +1514,7 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 137 "compile.y"
+#line 136 "compile.y"
     {
     addOp(WRITE_INT);
 ;}
@@ -1524,7 +1523,7 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 140 "compile.y"
+#line 139 "compile.y"
     {
     addOpSV(WRITE_STR, parsing->token);
 ;}
@@ -1533,7 +1532,7 @@ yyreduce:
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 143 "compile.y"
+#line 142 "compile.y"
     {	/* this is an extension */
     addOp(WRITELN_INT);
 ;}
@@ -1542,7 +1541,7 @@ yyreduce:
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 146 "compile.y"
+#line 145 "compile.y"
     {	/* this is an extension */
     addOpSV(WRITELN_STR,parsing->token);
 ;}
@@ -1551,7 +1550,7 @@ yyreduce:
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 149 "compile.y"
+#line 148 "compile.y"
     {
     addOp(READ);
 ;}
@@ -1560,7 +1559,7 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 159 "compile.y"
+#line 158 "compile.y"
     {
     addOp(EQ);
 ;}
@@ -1569,7 +1568,7 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 162 "compile.y"
+#line 161 "compile.y"
     {
     addOp(NE);
 ;}
@@ -1578,7 +1577,7 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 165 "compile.y"
+#line 164 "compile.y"
     {
     addOp(GT);
 ;}
@@ -1587,7 +1586,7 @@ yyreduce:
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 168 "compile.y"
+#line 167 "compile.y"
     {
     addOp(LT);
 ;}
@@ -1596,7 +1595,7 @@ yyreduce:
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 171 "compile.y"
+#line 170 "compile.y"
     {
     addOp(GE);
 ;}
@@ -1605,7 +1604,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 174 "compile.y"
+#line 173 "compile.y"
     {
     addOp(LE);
 ;}
@@ -1614,7 +1613,7 @@ yyreduce:
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 185 "compile.y"
+#line 184 "compile.y"
     {
     addOp(ADD);
 ;}
@@ -1623,7 +1622,7 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 188 "compile.y"
+#line 187 "compile.y"
     {
     addOp(SUB);
 ;}
@@ -1632,7 +1631,7 @@ yyreduce:
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 195 "compile.y"
+#line 194 "compile.y"
     {
     addOp(MUL);
 ;}
@@ -1641,7 +1640,7 @@ yyreduce:
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 198 "compile.y"
+#line 197 "compile.y"
     {		
     addOp(DIV);
 ;}
@@ -1650,7 +1649,7 @@ yyreduce:
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 201 "compile.y"
+#line 200 "compile.y"
     { /* this is an extension */
     addOp(MOD);
 ;}
@@ -1659,7 +1658,7 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 213 "compile.y"
+#line 212 "compile.y"
     {
     long value;
     char *ep;
@@ -1684,7 +1683,7 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 235 "compile.y"
+#line 234 "compile.y"
     {
     addOp(MEM);
 ;}
@@ -1693,7 +1692,7 @@ yyreduce:
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 241 "compile.y"
+#line 240 "compile.y"
     {
     addOp(IP);
 ;}
@@ -1702,7 +1701,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1706 "compile.c"
+#line 1705 "compile.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1914,7 +1913,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 245 "compile.y"
+#line 244 "compile.y"
 
   /* *INDENT-ON* */
 
@@ -1934,7 +1933,7 @@ yyerror(struct Code* code, struct Parsing * parsing, const char *msg)
 struct Op *
 createOp(int opcode, int iv, char *sv) {
   struct Op *op = xmalloc(sizeof(struct Op));
-  op->opcode = op;
+  op->opcode = opcode;
   op->intv = iv;
   op->strv = (sv != NULL) ? xstrdup(sv) : NULL;
   op->next = NULL;

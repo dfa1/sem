@@ -36,7 +36,6 @@
 
 #define YYSTYPE 	struct op *
 extern int yylex();
-
 static void yyerror(struct Code* code, struct Parsing *parsing, const char *); 
 #define error(msg) yyerror(code, parsing, (msg))
 
@@ -261,7 +260,7 @@ yyerror(struct Code* code, struct Parsing * parsing, const char *msg)
 struct Op *
 createOp(int opcode, int iv, char *sv) {
   struct Op *op = xmalloc(sizeof(struct Op));
-  op->opcode = op;
+  op->opcode = opcode;
   op->intv = iv;
   op->strv = (sv != NULL) ? xstrdup(sv) : NULL;
   op->next = NULL;

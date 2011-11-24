@@ -62,13 +62,6 @@
 #define PRIVATE	static
 #define IMPORT	extern
 
-/* Hide GCC attributes if aren't available. */
-#if !defined(__GNUC__) || __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 7)
-# define ATTRIBUTE(x)
-#else
-# define ATTRIBUTE(x) __attribute__(x)
-#endif
-
 /* Macros for setting/clearing/getting bits in flags. */
 #define set(var,flag)          (var) |= (flag)
 #define clear(var,flag)        (var) |= ~(flag)
@@ -104,14 +97,13 @@ typedef enum
     HALT
 } op_t;
 
-/* Structures */
 struct Op // TODO: rename to instr
 {
-op_t opcode:8;		/* opcode (as a bit field) */
-    long intv;		/* integer argument */
-    char *strv;		/* string argument */
-    struct Op *next;	/* next opcode */
-} ATTRIBUTE((packed));
+  op_t opcode;		/* opcode */
+  long intv;		/* integer argument */
+  char *strv;		/* string argument */
+  struct Op *next;	/* next opcode */
+};
 
 /* struct Op access macros. */
 #define OOP(o)	((o)->opcode)
