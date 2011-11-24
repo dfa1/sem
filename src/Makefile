@@ -1,4 +1,4 @@
-CFLAGS=-W -Wall -g -std=c99
+CFLAGS=-W -Wall -pedantic -g -std=c99 
 
 all: sem
 
@@ -20,7 +20,7 @@ debug: sem
 	gdb ./sem
 
 valgrind: sem
-	valgrind ./sem ../examples/fact.sem
+	valgrind -v --leak-check=full ./sem ../examples/fact.sem
 
 run: sem
 	./sem ../examples/fact.sem
