@@ -1,4 +1,3 @@
-CC=gcc
 CFLAGS=-W -Wall -g -std=c99
 
 all: sem
@@ -15,7 +14,7 @@ $(OBJECTS): sem.h
 
 # TODO: debugger as separate binary
 sem: $(OBJECTS)
-	$(CC) $(OBJECTS) -o $@ 
+	gcc $(OBJECTS) -o $@ 
 
 debug: sem
 	gdb sem
