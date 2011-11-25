@@ -32,9 +32,9 @@
 #define trim(s) (s)
 
 /* Macros for setting/clearing/getting bits in flags. */
-#define set(var,flag)          (var) |= (flag)
-#define clear(var,flag)        (var) |= ~(flag)
-#define with(var,flag)         (((var) & (flag)) != 0)
+#define SET(var,flag)          (var) |= (flag)
+#define UNSET(var,flag)        (var) |= ~(flag)
+#define IS_SET(var,flag)         (((var) & (flag)) != 0)
 
 /* Opcodes. */
 typedef enum

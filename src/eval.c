@@ -187,7 +187,7 @@ int evalCode(struct VM *v)
 	    lineno = OIV(ip);
 
 	    /* Is step mode requested ? */
-	    if (with(VF(v), STEP) && lineno > 1) {
+	    if (IS_SET(VF(v), STEP) && lineno > 1) {
 		sts = 0;
 		goto halt;
 	    }
@@ -203,7 +203,7 @@ int evalCode(struct VM *v)
 
 	    ip = *(CJM(c) + q - 1);	/* jump */
 
-	    if (with(VF(v), STEP)) {
+	    if (IS_SET(VF(v), STEP)) {
 		lineno = q;
 		sts = 0;
 		goto halt;
@@ -222,7 +222,7 @@ int evalCode(struct VM *v)
 	    else {
 		ip = *(CJM(c) + q - 1);	/* jump */
 
-		if (with(VF(v), STEP)) {
+		if (IS_SET(VF(v), STEP)) {
 		    lineno = q;
 		    sts = 0;
 		    goto halt;
@@ -231,8 +231,8 @@ int evalCode(struct VM *v)
 	    break;
 
 	case HALT:
-	    if (with(VF(v), STEP))
-		set(VF(v), HALTED);
+	    if (IS_SET(VF(v), STEP))
+		SET(VF(v), HALTED);
 
 	    sts = 0;
 	    goto halt;
@@ -243,12 +243,12 @@ int evalCode(struct VM *v)
 
 	case WRITE_INT:
 	    p = POP();
-	    tmp = with(VF(v), STEP) ? "\n" : "";
+	    tmp = IS_SET(VF(v), STEP) ? "\n" : "";
 	    fprintf(stdout, "%d%s", p, tmp);
 	    goto flush;
 
 	case WRITE_STR:
-	    tmp = with(VF(v), STEP) ? "\n" : "";
+	    tmp = IS_SET(VF(v), STEP) ? "\n" : "";
 	    fprintf(stdout, "%s%s", OSV(ip), tmp);
 	    goto flush;
 
