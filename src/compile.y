@@ -34,6 +34,12 @@
 # define YYERROR_VERBOSE
 #endif
 
+#ifdef WITH_COMPILER_DEBUG
+# define DPRINTF(...) printf(__VA_ARGS__) 
+#else 
+# define DPRINTF(...)
+#endif
+
 #define YYSTYPE 	struct op *
 extern int yylex();
 static void yyerror(struct Code* code, struct Parsing *parsing, const char *); 
@@ -258,7 +264,7 @@ yyerror(struct Code* code, struct Parsing * parsing, const char *msg)
 }
 
 
-struct Op *
+static struct Op *
 createOp(int opcode, int iv, char *sv) {
   struct Op *op = xmalloc(sizeof(struct Op));
   op->opcode = opcode;
@@ -280,12 +286,6 @@ addOp4(struct Code *code, int opcode, int iv, char *sv)
 }
 
 extern FILE* yyin;
-
-#ifdef WITH_COMPILER_DEBUG
-# define DPRINTF(...) printf(__VA_ARGS__) 
-#else 
-# define DPRINTF(...)
-#endif
 
 struct Code *
 compileSource(const char *filename)

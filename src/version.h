@@ -8,3 +8,7 @@
  */
 /* #define WITH_PARSER_DEBUG */
 
+/*
+ * Enables compiler debugging output.
+ */
+/* #define WITH_COMPILER_DEBUG */

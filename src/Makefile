@@ -1,4 +1,4 @@
-CFLAGS=-W -Wall -pedantic -g -std=c99 
+CFLAGS=-W -Wall -Wformat -pedantic -g -std=c99 
 
 all: sem
 
