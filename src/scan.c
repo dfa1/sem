@@ -2057,7 +2057,6 @@ update_locations(struct Parsing *parsing)
       parsing->offset++;
     }
   }
-
 }
 
 

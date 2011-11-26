@@ -8,7 +8,7 @@ compile.c: compile.y
 scan.c: scan.l tokens.h
 	flex -o $@ $<
 
-OBJECTS=compile.o scan.o eval.o main.o
+OBJECTS=compile.o scan.o eval.o io.o memory.o  main.o
 
 $(OBJECTS): sem.h version.h
 

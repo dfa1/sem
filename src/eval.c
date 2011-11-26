@@ -97,8 +97,7 @@ int evalCode(struct VM *v)
     double x;	/* for overflow checking        */
     double y;	/* for overflow checking        */
     char *tmp;
-    char s[20]; /* used by readline */
-    /* These are cloned here to .  */
+    char s[20]; /* used by ask */
     struct Op *ip;
     struct Code *c;
     int lineno;
@@ -245,24 +244,20 @@ int evalCode(struct VM *v)
 	    p = POP();
 	    tmp = IS_SET(VF(v), STEP) ? "\n" : "";
 	    fprintf(stdout, "%d%s", p, tmp);
-	    goto flush;
+	    break;
 
 	case WRITE_STR:
 	    tmp = IS_SET(VF(v), STEP) ? "\n" : "";
 	    fprintf(stdout, "%s%s", OSV(ip), tmp);
-	    goto flush;
+	    break;
 
 	case WRITELN_INT:
 	    p = POP();
 	    fprintf(stdout, "%d\n", p);
-	    goto flush;
+	    break;
 
 	case WRITELN_STR:
 	    fprintf(stdout, "%s\n", OSV(ip));
-	    goto flush;
-
-	flush:
-	    fflush(stdout);
 	    break;
 
 	case READ:
@@ -272,9 +267,7 @@ int evalCode(struct VM *v)
 		DIE("invalid memory address %d for "
 		     "read at line %d", p, lineno);
 
-	    printf("? ");
-	    fgets(s, sizeof s, stdin);
-	    s[strlen(s) -1] = 0; // chop
+	    ask(s, sizeof(s));
 
 	    do {
 		char *ep;
@@ -283,7 +276,7 @@ int evalCode(struct VM *v)
 		q = strtol(s, &ep, 10);
 
 		if (errno == ERANGE) {
-		    DIE("invalid integer literal '%s'", s);
+		  DIE("invalid integer literal '%s'", s);
 		}
 
 		if (*ep != '\0') {

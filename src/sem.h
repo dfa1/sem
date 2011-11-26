@@ -22,14 +22,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <errno.h>
 
 #include "version.h"
 
+// io.c
+extern char *ask(char *question, int size);
+    
 // HACKS
 #define xmalloc malloc
 #define xstrdup strdup
-#define trim(s) (s)
 
 /* Macros for setting/clearing/getting bits in flags. */
 #define SET(var,flag)          (var) |= (flag)

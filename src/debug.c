@@ -23,9 +23,6 @@
 
 #include <ctype.h>		/* for isspace() */
 
-/* Currently only few commands are using the VM parameter. */
-#define UNUSED(x)	(void) (x)
-
 /* Debugger's commands. */
 struct Cmd
 {
@@ -43,12 +40,8 @@ enum
     QUIT
 };
 
-/* Aliases. */
-#define YES 	CONTINUE
-#define NO	QUIT
-
 /* This function expands special characters. */
-PRIVATE char *
+char *
 repr(register const char *s)
 {
     register char *p;
