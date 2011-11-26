@@ -21,8 +21,6 @@
 
 #include "sem.h"
 
-#include <float.h>		/* for DBL_EPSILON */
-
 struct VM *
 initVM(struct Code *c, int ms, int ss)
 {
@@ -94,8 +92,6 @@ int evalCode(struct VM *v)
     int p;	/* first operand                */
     int q;	/* second operand               */
     int sts;	/* status                       */
-    double x;	/* for overflow checking        */
-    double y;	/* for overflow checking        */
     char *tmp;
     char s[20]; /* used by ask */
     struct Op *ip;
@@ -293,28 +289,28 @@ int evalCode(struct VM *v)
 		p = POP();			\
 	    } while(0)
 
-#define OVR_OP(i, d)				\
-	    do {				\
-		x = (double) (i);		\
-		y = (d);			\
-		if ((x - y) > DBL_EPSILON)	\
-		    DIE("integer overflow");	\
-		else				\
-		    PUSH((i));			\
-	    } while(0);				\
-	    break
+#define OVR_OP(as_int, as_double)			\
+	    do {					\
+	      if ((double) (as_int) != (as_double))	\
+		DIE("integer overflow");		\
+	      else					\
+		PUSH((as_int));				\
+	    } while(0);					
 
 	case ADD:	/* p + q */
 	    LOAD_OP;
-	    OVR_OP(p + q, (double) p + (double) q);
+	    OVR_OP(p + q, (double) p + q);
+	    break;
 
 	case SUB:	/* p - q */
 	    LOAD_OP;
-	    OVR_OP(p - q, (double) p - (double) q);
+	    OVR_OP(p - q, (double) p - q);
+	    break;
 
 	case MUL:	/* p * q */
 	    LOAD_OP;
-	    OVR_OP(p * q, (double) p * (double) q);
+	    OVR_OP(p * q, (double) p * q);
+	    break;
 
 #define DIV_OP(op)				\
 	    do {				\
