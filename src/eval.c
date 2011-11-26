@@ -91,7 +91,7 @@ int evalCode(struct VM *v)
     int p;	/* first operand                */
     int q;	/* second operand               */
     int sts;	/* status                       */
-    char s[20]; /* used by ask */
+    char answer[20]; /* used by ask */
     struct Op *ip;
     struct Code *c;
     int lineno;
@@ -264,21 +264,21 @@ int evalCode(struct VM *v)
 	    if (p < 0 || p >= VMS(v))
 		DIE("invalid memory address %d for "
 		     "read at line %d", p, lineno);
-
-	    ask(s, sizeof(s));
+	    
+	    ask("?", answer, sizeof(answer));
 
 	    do {
 		char *ep;
 
 		errno = 0;
-		q = strtol(s, &ep, 10);
+		q = strtol(answer, &ep, 10);
 
 		if (errno == ERANGE) {
-		  DIE("invalid integer literal '%s'", s);
+		  DIE("invalid integer literal '%s'", answer);
 		}
 
 		if (*ep != '\0') {
-		  DIE("invalid '%c' in integer literal '%s' ", *ep, s);
+		  DIE("invalid '%c' in integer literal '%s' ", *ep, answer);
 		}
 	    } while (0);
 

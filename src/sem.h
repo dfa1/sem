@@ -28,7 +28,7 @@
 #include "version.h"
 
 // io.c
-extern char *ask(char *question, int size);
+extern char *ask(char *question, char *answer, int answer_size);
     
 // HACKS
 #define xmalloc malloc

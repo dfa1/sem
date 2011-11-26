@@ -1,20 +1,19 @@
 #include "sem.h"
 
-char *
-ask(char *question, int size) {
+char *ask(char *question, char *answer, int answer_size) {
   fputs(question, stdout);
-  fgets(question, sizeof(size), stdin);
-  question[strlen(question) - 1] = 0;
-  return question;
+  fgets(answer, sizeof(answer_size), stdin);
+  answer[strlen(answer) - 1] = 0; 
+  return answer;
 }
 
 int
-ask_yes_no()
+ask_yes_no(char *question)
 {
-  char question[20];
+  char answer[20];
   const char *p;
   do {
-    p = ask(question, sizeof(question));
+    p = ask(question, answer, sizeof(answer));
     if (strcasecmp(p, "yes") == 0 || strcasecmp(p, "y") == 0) {
       return 1;
     } else if (strcasecmp(p, "no") == 0 || strcasecmp(p, "n") == 0) {
