@@ -285,67 +285,77 @@ int evalCode(struct VM *v)
 	    *(VMM(v) + p) = q;
 	    break;
 
-#define LOAD_OP					\
-	    do {				\
-		q = POP();			\
-		p = POP();			\
-	    } while(0)
-
 	case ADD:	/* p + q */
-	    LOAD_OP;
-	    PUSH(p + q);
-	    break;
+	  q = POP();			
+	  p = POP();			
+	  PUSH(p + q);
+	  break;
 
 	case SUB:	/* p - q */
-	    LOAD_OP;
-	    PUSH(p - q);
-	    break;
+	  q = POP();			
+	  p = POP();			
+	  PUSH(p - q);
+	  break;
 
 	case MUL:	/* p * q */
-	    LOAD_OP;
-	    PUSH(p * q);
-	    break;
-
-#define DIV_OP(op)				\
-	    do {				\
-                if (q == 0)			\
-		    DIE("division by zero");	\
-		PUSH((op));			\
-	    } while(0);				\
-	    break
+	  q = POP();			
+	  p = POP();			
+	  PUSH(p * q);
+	  break;
 
 	case DIV:	/* p / q */
-	    LOAD_OP;
-	    DIV_OP(p / q);
+	  q = POP();			
+	  p = POP();			
+	  if (q == 0) {				
+	    DIE("division by zero");		
+	  }
+	  PUSH(p / q);
+	  break;
 
 	case MOD:	/* p % q */
-	    LOAD_OP;
-	    DIV_OP(p % q);
-
-#define TEST(op)				\
-	    do {				\
-		LOAD_OP;			\
-        	PUSH((op));			\
-	    } while(0);				\
-	    break
+	  q = POP();			
+	  p = POP();			
+	  if (q == 0) {				
+	    DIE("division by zero");		
+	  }
+	  PUSH(p % q);
+	  break;
 
 	case EQ:	/* p = q */
-	    TEST(p == q);
+	  q = POP();			
+	  p = POP();			
+	  PUSH(p == q);				
+	  break;
 
 	case NE:	/* p != q */
-	    TEST(p != q);
+	  q = POP();			
+	  p = POP();			
+	  PUSH(p != q);				
+	  break;
 
 	case GT:	/* p > q */
-	    TEST(p > q);
+	  q = POP();			
+	  p = POP();			
+	  PUSH(p > q);				
+	  break;
 
 	case LT:	/* p < q */
-	    TEST(p < q);
+	  q = POP();			
+	  p = POP();			
+	  PUSH(p < q);				
+	  break;
 
 	case GE:	/* p >= q */
-	    TEST(p >= q);
+	  q = POP();			
+	  p = POP();			
+	  PUSH(p >= q);				
+	  break;
 
 	case LE:	/* p <= q */
-	    TEST(p <= q);
+	  q = POP();			
+	  p = POP();			
+	  PUSH(p <= q);				
+	  break;
 
 	default:
 	    DIE("unknown opcode (%d); top is %d", OOP(ip), TOP());
