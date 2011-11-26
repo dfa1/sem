@@ -7,8 +7,7 @@ Release 3.0
  - no autotools
  - automated tests
 - separate debugger binary
-- BUG: integer overflow checking doesn't works
-- strtol() and strtod() checks are weak
+
  
 
 Other

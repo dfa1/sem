@@ -265,7 +265,7 @@ int evalCode(struct VM *v)
 		DIE("invalid memory address %d for "
 		     "read at line %d", p, lineno);
 	    
-	    ask("?", answer, sizeof(answer));
+	    ask("", answer, sizeof(answer));
 
 	    do {
 		char *ep;
@@ -277,7 +277,7 @@ int evalCode(struct VM *v)
 		  DIE("invalid integer literal '%s'", answer);
 		}
 
-		if (*ep != '\0') {
+		if (*ep != 0) {
 		  DIE("invalid '%c' in integer literal '%s' ", *ep, answer);
 		}
 	    } while (0);
@@ -291,27 +291,19 @@ int evalCode(struct VM *v)
 		p = POP();			\
 	    } while(0)
 
-#define OVR_OP(as_int, as_double)			\
-	    do {					\
-	      if ((double) (as_int) != (as_double))	\
-		DIE("integer overflow");		\
-	      else					\
-		PUSH((as_int));				\
-	    } while(0);					
-
 	case ADD:	/* p + q */
 	    LOAD_OP;
-	    OVR_OP(p + q, (double) p + q);
+	    PUSH(p + q);
 	    break;
 
 	case SUB:	/* p - q */
 	    LOAD_OP;
-	    OVR_OP(p - q, (double) p - q);
+	    PUSH(p - q);
 	    break;
 
 	case MUL:	/* p * q */
 	    LOAD_OP;
-	    OVR_OP(p * q, (double) p * q);
+	    PUSH(p * q);
 	    break;
 
 #define DIV_OP(op)				\
