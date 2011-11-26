@@ -86,13 +86,11 @@ finiVM(struct VM *v)
  *                          |                     | 
  *                          +---------------------+
  */
-
 int evalCode(struct VM *v)
 {
     int p;	/* first operand                */
     int q;	/* second operand               */
     int sts;	/* status                       */
-    char *tmp;
     char s[20]; /* used by ask */
     struct Op *ip;
     struct Code *c;
@@ -238,22 +236,26 @@ int evalCode(struct VM *v)
 
 	case WRITE_INT:
 	    p = POP();
-	    tmp = IS_SET(VF(v), STEP) ? "\n" : "";
-	    fprintf(stdout, "%d%s", p, tmp);
+	    printf("%d", p);
+	    if (IS_SET(VF(v), STEP)) {
+	      printf("\n");
+	    }
 	    break;
 
 	case WRITE_STR:
-	    tmp = IS_SET(VF(v), STEP) ? "\n" : "";
-	    fprintf(stdout, "%s%s", OSV(ip), tmp);
+	    printf("%s", OSV(ip));
+	    if (IS_SET(VF(v), STEP)) {
+	      printf("\n");
+	    }
 	    break;
 
 	case WRITELN_INT:
 	    p = POP();
-	    fprintf(stdout, "%d\n", p);
+	    printf("%d\n", p);
 	    break;
 
 	case WRITELN_STR:
-	    fprintf(stdout, "%s\n", OSV(ip));
+	    printf("%s\n", OSV(ip));
 	    break;
 
 	case READ:
