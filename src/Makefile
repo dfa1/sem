@@ -1,5 +1,5 @@
-CC=gcc
-CFLAGS=-W -Wall -g -std=c99 
+CC=clang
+CFLAGS=-D_BSD_SOURCE=1 -W -Wall -g -std=c99
 
 all: sem
 
