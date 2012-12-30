@@ -2,19 +2,13 @@ Release 3.0
 ===========
 
 - clean code:
- - remove most of the global state 
- - support only modern C compilers 
  - automated tests
-- separate debugger binary
-
- 
-
-Other
-=====
- 
+ - code cosmetics (no_camel_case, indentation, no macros)
+ - improve module separation 
+- FreeBSD/OpenBSD port
+- MacOSX port
+- compilable with gcc/clang
 - debugger commands: `trace' and `break'
-- use boehm-gc?
-- use GNU gperf?
-- a script that autogerates opstr in debug.c 
-- sem-mode for GNU emacs 
+- a script that autogerates opstr
 - more documentation (examples, man page)
+- sem-mode for GNU emacs 
