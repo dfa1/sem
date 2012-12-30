@@ -6,16 +6,15 @@ all: sem
 compiler.c: compiler.y
 	bison --defines=tokens.h -o $@ $<
 
-
 scanner.c: scanner.l tokens.h
-	flex -o $@ $<
+	flex --header=scanner.h -o $@ $<
 
 OBJECTS=compiler.o scanner.o vm.o io.o memory.o main.o
 
 $(OBJECTS): sem.h version.h
 
 sem: $(OBJECTS)
-	$(CC) $(OBJECTS) -o $@ 
+	$(CC) $(OBJECTS) -o $@
 
 debug: sem
 	gdb ./sem

@@ -78,22 +78,12 @@ struct Code
     struct Op **jumps;	/* jumps */
 };
 
-struct Parsing {
-  char *filename; 
-  FILE *fp;	
-  char *token;	
-  int lineno;	
-  int offset;	
-  char str[1024];  // TODO: really needed?
-  char *pstr;
-};
-
 /* The interpreter. */
 struct VM
 {
     /* The Instruction Pointer. */
-    struct Op *ip; 
-    int lineno;
+    struct Op *ip; // TODO: non-sense 
+    int lineno;  
 
     /*
      * The data memory

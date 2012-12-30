@@ -3,7 +3,7 @@
 /* *INDENT-ON* */
 
 /*
- * scan.l -- yylex() 
+ * scanner.l -- the lexical scanner 
  *
  * Copyright (C) 2003-2011 Davide Angelocola <davide.angelocola@gmail.com>
  *  
@@ -26,17 +26,15 @@
 #include "sem.h"
 #include "tokens.h"
 
-#define YY_DECL int yylex (struct Parsing *parsing)
-#define YY_USER_ACTION  update_locations(parsing);	
-static void update_locations(struct Parsing *parsing);
+static char buf[512]; // TODO: global state    
+static char *p;
 
 /* *INDENT-OFF* */
 %}
-/* TODO: pure tokenizer */
-/* %option bison-bridge */
-/* %option reentrant */
+%option reentrant
 %option never-interactive 
 %option noyywrap 
+%option yylineno 
 
 	/* Character classes. */
 L               [A-Z]|[a-z]
@@ -62,27 +60,27 @@ D               [0-9]
 	/* Integers. */ 
 {D}*  			return tINT; 
 
-	/* Strings. */ 
+	/* Strings. */
 "\"" {
     BEGIN STRING;
-    parsing->pstr = parsing->str;
+    p = buf; 
 }
 
 <STRING>"\"" {
     BEGIN INITIAL;
-    *parsing->pstr = 0;
+    *p++ = 0;
+    yytext = buf;
     return tSTRING;
- }
+}
 
-<STRING>\\n             *parsing->pstr++ = '\n';
-<STRING>\\r             *parsing->pstr++ = '\r';
-<STRING>\\t             *parsing->pstr++ = '\t';
-<STRING>\\v             *parsing->pstr++ = '\v';
-<STRING>\\f             *parsing->pstr++ = '\f';
-<STRING>\\b             *parsing->pstr++ = '\b';
-<STRING>\\a             *parsing->pstr++ = '\a';
-<STRING>.               *parsing->pstr++ = *yytext;
-
+<STRING>\\n             *p++ = '\n';
+<STRING>\\r             *p++ = '\r';
+<STRING>\\t             *p++ = '\t';
+<STRING>\\v             *p++ = '\v';
+<STRING>\\f             *p++ = '\f';
+<STRING>\\b             *p++ = '\b';
+<STRING>\\a             *p++ = '\a';
+<STRING>.               *p++ = *yytext;
 
 	/* Operators. */
 "+"			return '+';
@@ -114,30 +112,4 @@ D               [0-9]
 . 			return 0; 
 %%
 /* *INDENT-ON* */
-
-static void
-update_locations(struct Parsing *parsing)
-{
-  if (yytext != NULL && yytext[0] != '\n') {
-    parsing->token = yytext;
-  } else {
-    parsing->token = NULL;
-  }
-
-  for (int i = 0; yytext[i] != '\0'; i++) {
-    switch (yytext[i]) {
-    case '\n':
-      parsing->lineno++;
-      break;
-      
-    case '\t':
-      parsing->offset += 8 - (parsing->offset % 8);
-      break;
-      
-    default:
-      parsing->offset++;
-    }
-  }
-}
-
 

@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "sem.h"
+#include "scanner.h"
 
 #if defined(WITH_PARSER_DEBUG)
 # define YYDEBUG 	1
@@ -44,9 +45,8 @@
 #endif
 
 #define YYSTYPE 	struct op *
-extern int yylex();
-static void yyerror(struct Code* code, struct Parsing *parsing, const char *); 
-#define error(msg) yyerror(code, parsing, (msg))
+static void yyerror(void* yyscanner, struct Code* code, const char *); 
+#define error(msg) yyerror(yyscanner, code, (msg))
 
 /* Emit an opcode to the list (see Code struct). */
 #define emit_op(op)            emit(code, (op), -1, NULL)
@@ -56,9 +56,9 @@ static void emit(struct Code *, int, int, char *);
 
 /* *INDENT-OFF* */
 %}
+%parse-param {void* yyscanner}
 %parse-param {struct Code *code}
-%parse-param {struct Parsing *parsing}
-%lex-param {struct Parsing *parsing}
+%lex-param {void *yyscanner}
 
 /* Keywords. */
 %token kSET
@@ -96,7 +96,7 @@ static void emit(struct Code *, int, int, char *);
 
 input
 : none {
-    fprintf(stderr, "%s: empty source\n", parsing->filename);
+    fprintf(stderr, "empty source\n");
     YYABORT;
  }
 | stmts
@@ -112,8 +112,8 @@ stmts
 ;
 
 stmt    
-: { emit_op_int(SETLINENO, parsing->lineno); } tNEWLINE
-| { emit_op_int(SETLINENO, parsing->lineno); } simple_stmt tNEWLINE
+: { emit_op_int(SETLINENO, yyget_lineno(yyscanner)); } tNEWLINE
+| { emit_op_int(SETLINENO, yyget_lineno(yyscanner)); } simple_stmt tNEWLINE
 | error { YYABORT; }
 ;
 
@@ -146,13 +146,13 @@ set_stmt
     emit_op(WRITE_INT);
 }
 | kSET rWRITE ',' tSTRING {
-    emit_op_string(WRITE_STR, parsing->str);
+    emit_op_string(WRITE_STR, yyget_text(yyscanner));
 }
 | kSET rWRITELN ',' expr {	/* this is an extension */
     emit_op(WRITELN_INT);
 }
 | kSET rWRITELN ',' tSTRING {	/* this is an extension */
-    emit_op_string(WRITELN_STR, parsing->str);
+    emit_op_string(WRITELN_STR, yyget_text(yyscanner));
 }
 | kSET expr ',' rREAD {
     emit_op(READ);
@@ -223,7 +223,7 @@ literal
     char *ep;
 
     errno = 0;
-    value = strtol(parsing->token, &ep, 10);
+    value = strtol(yyget_text(yyscanner), &ep, 10);
 
     if (errno == ERANGE) {
 	error("integer literal too large");
@@ -254,15 +254,10 @@ aip
   /* *INDENT-ON* */
 
 static void
-yyerror(struct Code* code, struct Parsing * parsing, const char *msg)
+yyerror(void *yyscanner, struct Code* code, const char *msg)
 {
-    fprintf(stderr, "%s: %s at line %d", parsing->filename, msg, parsing->lineno);
-
-    if (parsing->token != NULL && *parsing->token != '\0') {
-	fprintf(stderr, ", near token '%s'", parsing->token);
-    }
-
-    fprintf(stderr, "\n");
+    (void) code;
+    fprintf(stderr, "sem: %s at line %d near token '%s'\n", msg, yyget_lineno(yyscanner), yyget_text(yyscanner));
 }
 
 
@@ -288,34 +283,36 @@ emit(struct Code *code, int opcode, int iv, char *sv)
   }
 }
 
-extern FILE* yyin;
-
 struct Code *
-compile_code(const char *filename) // TODO: use FILE*
+compile_code(const char* filename) 
 {
-#if defined(WITH_PARSER_DEBUG)
-  yydebug = 1;
-#endif
-  
-  if ((yyin = fopen(filename, "r")) == NULL) {
-    fprintf(stderr, "sem: cannot open '%s'\n", filename);
-    return NULL;
+  FILE *fp;
+ 
+  if ((fp = fopen(filename, "r")) == NULL) {
+      fprintf(stderr, "sem: cannot open '%s'\n", filename);
+      return NULL;
   }
-  
-  struct Parsing *parsing = xmalloc(sizeof(struct Parsing)); 
-  parsing->token = NULL;		
-  parsing->lineno = 1;		
-  parsing->offset = 0;		
-  parsing->filename = xstrdup(filename); 
-  parsing->fp = yyin; 
+ 
   struct Op *start = op_init(START, 0, NULL);
   struct Code *code = xmalloc(sizeof(struct Code));
   code->size = 1;
   code->jumps = NULL;
   code->head = start; 
   code->code = start; 
-  
-  if (yyparse(code, parsing) != 0) {
+ 
+  yyscan_t scanner;
+  yylex_init(&scanner);
+  yyset_in(fp, scanner); 
+ 
+#if defined(WITH_PARSER_DEBUG)
+  yydebug = 1;
+#endif
+
+  int compile_status = yyparse(scanner, code);
+  yylex_destroy(scanner);
+  fclose(fp);
+
+  if (compile_status != 0) {
     return NULL;
   }
   

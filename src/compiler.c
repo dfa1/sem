@@ -97,6 +97,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "sem.h"
+#include "scanner.h"
 
 #if defined(WITH_PARSER_DEBUG)
 # define YYDEBUG 	1
@@ -114,9 +115,8 @@
 #endif
 
 #define YYSTYPE 	struct op *
-extern int yylex();
-static void yyerror(struct Code* code, struct Parsing *parsing, const char *); 
-#define error(msg) yyerror(code, parsing, (msg))
+static void yyerror(void* yyscanner, struct Code* code, const char *); 
+#define error(msg) yyerror(yyscanner, code, (msg))
 
 /* Emit an opcode to the list (see Code struct). */
 #define emit_op(op)            emit(code, (op), -1, NULL)
@@ -662,7 +662,7 @@ do								\
     }								\
   else								\
     {								\
-      yyerror (code, parsing, YY_("syntax error: cannot back up")); \
+      yyerror (yyscanner, code, YY_("syntax error: cannot back up")); \
       YYERROR;							\
     }								\
 while (YYID (0))
@@ -719,7 +719,7 @@ while (YYID (0))
 #ifdef YYLEX_PARAM
 # define YYLEX yylex (YYLEX_PARAM)
 #else
-# define YYLEX yylex (parsing)
+# define YYLEX yylex (yyscanner)
 #endif
 
 /* Enable debugging if requested.  */
@@ -742,7 +742,7 @@ do {									  \
     {									  \
       YYFPRINTF (stderr, "%s ", Title);					  \
       yy_symbol_print (stderr,						  \
-		  Type, Value, code, parsing); \
+		  Type, Value, yyscanner, code); \
       YYFPRINTF (stderr, "\n");						  \
     }									  \
 } while (YYID (0))
@@ -756,21 +756,21 @@ do {									  \
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, struct Code *code, struct Parsing *parsing)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void* yyscanner, struct Code *code)
 #else
 static void
-yy_symbol_value_print (yyoutput, yytype, yyvaluep, code, parsing)
+yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner, code)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
+    void* yyscanner;
     struct Code *code;
-    struct Parsing *parsing;
 #endif
 {
   if (!yyvaluep)
     return;
+  YYUSE (yyscanner);
   YYUSE (code);
-  YYUSE (parsing);
 # ifdef YYPRINT
   if (yytype < YYNTOKENS)
     YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
@@ -792,15 +792,15 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep, code, parsing)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, struct Code *code, struct Parsing *parsing)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void* yyscanner, struct Code *code)
 #else
 static void
-yy_symbol_print (yyoutput, yytype, yyvaluep, code, parsing)
+yy_symbol_print (yyoutput, yytype, yyvaluep, yyscanner, code)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
+    void* yyscanner;
     struct Code *code;
-    struct Parsing *parsing;
 #endif
 {
   if (yytype < YYNTOKENS)
@@ -808,7 +808,7 @@ yy_symbol_print (yyoutput, yytype, yyvaluep, code, parsing)
   else
     YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
 
-  yy_symbol_value_print (yyoutput, yytype, yyvaluep, code, parsing);
+  yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner, code);
   YYFPRINTF (yyoutput, ")");
 }
 
@@ -851,14 +851,14 @@ do {								\
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, int yyrule, struct Code *code, struct Parsing *parsing)
+yy_reduce_print (YYSTYPE *yyvsp, int yyrule, void* yyscanner, struct Code *code)
 #else
 static void
-yy_reduce_print (yyvsp, yyrule, code, parsing)
+yy_reduce_print (yyvsp, yyrule, yyscanner, code)
     YYSTYPE *yyvsp;
     int yyrule;
+    void* yyscanner;
     struct Code *code;
-    struct Parsing *parsing;
 #endif
 {
   int yynrhs = yyr2[yyrule];
@@ -872,7 +872,7 @@ yy_reduce_print (yyvsp, yyrule, code, parsing)
       YYFPRINTF (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
-		       		       , code, parsing);
+		       		       , yyscanner, code);
       YYFPRINTF (stderr, "\n");
     }
 }
@@ -880,7 +880,7 @@ yy_reduce_print (yyvsp, yyrule, code, parsing)
 # define YY_REDUCE_PRINT(Rule)		\
 do {					\
   if (yydebug)				\
-    yy_reduce_print (yyvsp, Rule, code, parsing); \
+    yy_reduce_print (yyvsp, Rule, yyscanner, code); \
 } while (YYID (0))
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -1131,20 +1131,20 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, struct Code *code, struct Parsing *parsing)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void* yyscanner, struct Code *code)
 #else
 static void
-yydestruct (yymsg, yytype, yyvaluep, code, parsing)
+yydestruct (yymsg, yytype, yyvaluep, yyscanner, code)
     const char *yymsg;
     int yytype;
     YYSTYPE *yyvaluep;
+    void* yyscanner;
     struct Code *code;
-    struct Parsing *parsing;
 #endif
 {
   YYUSE (yyvaluep);
+  YYUSE (yyscanner);
   YYUSE (code);
-  YYUSE (parsing);
 
   if (!yymsg)
     yymsg = "Deleting";
@@ -1167,7 +1167,7 @@ int yyparse ();
 #endif
 #else /* ! YYPARSE_PARAM */
 #if defined __STDC__ || defined __cplusplus
-int yyparse (struct Code *code, struct Parsing *parsing);
+int yyparse (void* yyscanner, struct Code *code);
 #else
 int yyparse ();
 #endif
@@ -1203,12 +1203,12 @@ yyparse (YYPARSE_PARAM)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 int
-yyparse (struct Code *code, struct Parsing *parsing)
+yyparse (void* yyscanner, struct Code *code)
 #else
 int
-yyparse (code, parsing)
+yyparse (yyscanner, code)
+    void* yyscanner;
     struct Code *code;
-    struct Parsing *parsing;
 #endif
 #endif
 {
@@ -1458,7 +1458,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 98 "compiler.y"
     {
-    fprintf(stderr, "%s: empty source\n", parsing->filename);
+    fprintf(stderr, "empty source\n");
     YYABORT;
  ;}
     break;
@@ -1467,14 +1467,14 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 115 "compiler.y"
-    { emit_op_int(SETLINENO, parsing->lineno); ;}
+    { emit_op_int(SETLINENO, yyget_lineno(yyscanner)); ;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
 #line 116 "compiler.y"
-    { emit_op_int(SETLINENO, parsing->lineno); ;}
+    { emit_op_int(SETLINENO, yyget_lineno(yyscanner)); ;}
     break;
 
   case 11:
@@ -1534,7 +1534,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 148 "compiler.y"
     {
-    emit_op_string(WRITE_STR, parsing->str);
+    emit_op_string(WRITE_STR, yyget_text(yyscanner));
 ;}
     break;
 
@@ -1552,7 +1552,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 154 "compiler.y"
     {	/* this is an extension */
-    emit_op_string(WRITELN_STR, parsing->str);
+    emit_op_string(WRITELN_STR, yyget_text(yyscanner));
 ;}
     break;
 
@@ -1673,7 +1673,7 @@ yyreduce:
     char *ep;
 
     errno = 0;
-    value = strtol(parsing->token, &ep, 10);
+    value = strtol(yyget_text(yyscanner), &ep, 10);
 
     if (errno == ERANGE) {
 	error("integer literal too large");
@@ -1745,7 +1745,7 @@ yyerrlab:
     {
       ++yynerrs;
 #if ! YYERROR_VERBOSE
-      yyerror (code, parsing, YY_("syntax error"));
+      yyerror (yyscanner, code, YY_("syntax error"));
 #else
       {
 	YYSIZE_T yysize = yysyntax_error (0, yystate, yychar);
@@ -1769,11 +1769,11 @@ yyerrlab:
 	if (0 < yysize && yysize <= yymsg_alloc)
 	  {
 	    (void) yysyntax_error (yymsg, yystate, yychar);
-	    yyerror (code, parsing, yymsg);
+	    yyerror (yyscanner, code, yymsg);
 	  }
 	else
 	  {
-	    yyerror (code, parsing, YY_("syntax error"));
+	    yyerror (yyscanner, code, YY_("syntax error"));
 	    if (yysize != 0)
 	      goto yyexhaustedlab;
 	  }
@@ -1797,7 +1797,7 @@ yyerrlab:
       else
 	{
 	  yydestruct ("Error: discarding",
-		      yytoken, &yylval, code, parsing);
+		      yytoken, &yylval, yyscanner, code);
 	  yychar = YYEMPTY;
 	}
     }
@@ -1853,7 +1853,7 @@ yyerrlab1:
 
 
       yydestruct ("Error: popping",
-		  yystos[yystate], yyvsp, code, parsing);
+		  yystos[yystate], yyvsp, yyscanner, code);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -1888,7 +1888,7 @@ yyabortlab:
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
-  yyerror (code, parsing, YY_("memory exhausted"));
+  yyerror (yyscanner, code, YY_("memory exhausted"));
   yyresult = 2;
   /* Fall through.  */
 #endif
@@ -1896,7 +1896,7 @@ yyexhaustedlab:
 yyreturn:
   if (yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
-		 yytoken, &yylval, code, parsing);
+		 yytoken, &yylval, yyscanner, code);
   /* Do not reclaim the symbols of the rule which action triggered
      this YYABORT or YYACCEPT.  */
   YYPOPSTACK (yylen);
@@ -1904,7 +1904,7 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-		  yystos[*yyssp], yyvsp, code, parsing);
+		  yystos[*yyssp], yyvsp, yyscanner, code);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
@@ -1927,15 +1927,10 @@ yyreturn:
   /* *INDENT-ON* */
 
 static void
-yyerror(struct Code* code, struct Parsing * parsing, const char *msg)
+yyerror(void *yyscanner, struct Code* code, const char *msg)
 {
-    fprintf(stderr, "%s: %s at line %d", parsing->filename, msg, parsing->lineno);
-
-    if (parsing->token != NULL && *parsing->token != '\0') {
-	fprintf(stderr, ", near token '%s'", parsing->token);
-    }
-
-    fprintf(stderr, "\n");
+    (void) code;
+    fprintf(stderr, "sem: %s at line %d near token '%s'\n", msg, yyget_lineno(yyscanner), yyget_text(yyscanner));
 }
 
 
@@ -1961,34 +1956,36 @@ emit(struct Code *code, int opcode, int iv, char *sv)
   }
 }
 
-extern FILE* yyin;
-
 struct Code *
-compile_code(const char *filename) // TODO: use FILE*
+compile_code(const char* filename) 
 {
-#if defined(WITH_PARSER_DEBUG)
-  yydebug = 1;
-#endif
-  
-  if ((yyin = fopen(filename, "r")) == NULL) {
-    fprintf(stderr, "sem: cannot open '%s'\n", filename);
-    return NULL;
+  FILE *fp;
+ 
+  if ((fp = fopen(filename, "r")) == NULL) {
+      fprintf(stderr, "sem: cannot open '%s'\n", filename);
+      return NULL;
   }
-  
-  struct Parsing *parsing = xmalloc(sizeof(struct Parsing)); 
-  parsing->token = NULL;		
-  parsing->lineno = 1;		
-  parsing->offset = 0;		
-  parsing->filename = xstrdup(filename); 
-  parsing->fp = yyin; 
+ 
   struct Op *start = op_init(START, 0, NULL);
   struct Code *code = xmalloc(sizeof(struct Code));
   code->size = 1;
   code->jumps = NULL;
   code->head = start; 
   code->code = start; 
-  
-  if (yyparse(code, parsing) != 0) {
+ 
+  yyscan_t scanner;
+  yylex_init(&scanner);
+  yyset_in(fp, scanner); 
+ 
+#if defined(WITH_PARSER_DEBUG)
+  yydebug = 1;
+#endif
+
+  int compile_status = yyparse(scanner, code);
+  yylex_destroy(scanner);
+  fclose(fp);
+
+  if (compile_status != 0) {
     return NULL;
   }
   
