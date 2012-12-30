@@ -82,7 +82,7 @@ struct Code
 struct VM
 {
     /* The Instruction Pointer. */
-    struct Op *ip; // TODO: non-sense 
+    struct Op *ip;
     int lineno;  
 
     /*
@@ -107,12 +107,6 @@ struct VM
     int *stack;
     int stacksize;
     int *stacktop;
-
-    /* Flags */
-#define	STEP	1 << 0		/* Eval step by step.           */
-#define TRACE 	1 << 1		/* Dump opcode execution.       */
-#define HALTED  1 << 2		/* Terminated.                  */
-    int flags; // TODO: remove 
 };
 
 extern struct Code *compile_code(const char* filename);

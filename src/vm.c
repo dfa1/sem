@@ -41,10 +41,9 @@ vm_init(int memsize, int stacksize)
     vm->stack = xmalloc(sizeof(int) * stacksize);
     memset(vm->stack, 0, sizeof(int) * stacksize);
     vm->stacktop = vm->stack;
-    // state
+    // ip
     vm->ip = NULL;
     vm->lineno = 1;
-    vm->flags = 0;
     return vm;
 }
 
@@ -88,13 +87,12 @@ eval_code(struct VM *vm, struct Code *code)
     int p;		/* first operand                */
     int q;		/* second operand               */
     int sts;	/* status                       */
-    char answer[20]; 	/* used by ask */
 
     /* Initialization. */
     sts = 0;
     vm->ip = code->head;
 
-// TODO: as function
+// TODO: rename as error
 #define DIE(...)				\
     do {					\
       fprintf(stderr, "sem: " __VA_ARGS__);	\
@@ -153,14 +151,7 @@ eval_code(struct VM *vm, struct Code *code)
 
 	case SETLINENO:
 	    vm->lineno = vm->ip->intv;
-
-	    /* Is step mode requested ? */
-	    if (IS_SET(vm->flags, STEP) && vm->lineno > 1) {
-		sts = 0;
-		goto halt;
-	    }
-	    else
-		break;
+	    break;
 
 	case JUMP:
 	    q = POP();
@@ -170,12 +161,6 @@ eval_code(struct VM *vm, struct Code *code)
 	    }
 
 	    vm->ip = code->jumps[q - 1];
-
-	    if (IS_SET(vm->flags, STEP)) {
-		vm->lineno = q;
-		sts = 0;
-		goto halt;
-	    }
 	    break;
 
 	case JUMPT:
@@ -188,19 +173,10 @@ eval_code(struct VM *vm, struct Code *code)
 
 	    if (p != 0) {
 		vm->ip = code->jumps[q - 1];
-
-		if (IS_SET(vm->flags, STEP)) {
-		    vm->lineno = q;
-		    sts = 0;
-		    goto halt;
-		}
 	    }
 	    break;
 
 	case HALT:
-	    if (IS_SET(vm->flags, STEP)) {
-		SET(vm->flags, HALTED);
-	    }
 	    sts = 0;
 	    goto halt;
 
@@ -211,16 +187,10 @@ eval_code(struct VM *vm, struct Code *code)
 	case WRITE_INT:
 	    p = POP();
 	    printf("%d", p);
-	    if (IS_SET(vm->flags, STEP)) { // TODO: dirty hack for debugger
-	      printf("\n");
-	    }
 	    break;
 
 	case WRITE_STR:
 	    printf("%s", vm->ip->strv);
-	    if (IS_SET(vm->flags, STEP)) { // TODO: dirty hack for debugger
-	      printf("\n");
-	    }
 	    break;
 
 	case WRITELN_INT:
@@ -232,31 +202,29 @@ eval_code(struct VM *vm, struct Code *code)
 	    printf("%s\n", vm->ip->strv);
 	    break;
 
-	case READ:
+	case READ: {
 	    p = POP();
 
 	    if (p < 0 || p >= vm->memsize) {
 		DIE("invalid memory address %d for read", p);
 	    }
 	    
+	    char answer[1024];
+   	    char *ep;
 	    ask("", answer, sizeof(answer));
+	errno = 0;
+	q = strtol(answer, &ep, 10);
 
-	    do {
-		char *ep;
+	if (errno == ERANGE) {
+	  DIE("invalid integer literal '%s'", answer);
+	}
 
-		errno = 0;
-		q = strtol(answer, &ep, 10);
-
-		if (errno == ERANGE) {
-		  DIE("invalid integer literal '%s'", answer);
-		}
-
-		if (*ep != 0) {
-		  DIE("invalid '%c' in integer literal '%s' ", *ep, answer);
-		}
-	    } while (0);
+	if (*ep != 0) {
+	  DIE("invalid '%c' in integer literal '%s' ", *ep, answer);
+	}
 	    vm->mem[p] = q;
 	    break;
+        }
 
 	case ADD:	/* p + q */
 	  q = POP();			
