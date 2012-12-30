@@ -26,9 +26,6 @@
 #include "sem.h"
 #include "tokens.h"
 
-static char buf[512]; // TODO: global state    
-static char *p;
-
 /* *INDENT-OFF* */
 %}
 %option reentrant
@@ -61,27 +58,10 @@ D               [0-9]
 {D}*  			return tINT; 
 
 	/* Strings. */
-"\"" {
-    BEGIN STRING;
-    p = buf; 
+\"([^\\\"]|\\.)*\"      {
+        drop_first_last_inplace(yytext, yyleng);
+	return tSTRING;
 }
-
-<STRING>"\"" {
-    BEGIN INITIAL;
-    *p++ = 0;
-    yytext = buf;
-    return tSTRING;
-}
-
-<STRING>\\n             *p++ = '\n';
-<STRING>\\r             *p++ = '\r';
-<STRING>\\t             *p++ = '\t';
-<STRING>\\v             *p++ = '\v';
-<STRING>\\f             *p++ = '\f';
-<STRING>\\b             *p++ = '\b';
-<STRING>\\a             *p++ = '\a';
-<STRING>.               *p++ = *yytext;
-
 	/* Operators. */
 "+"			return '+';
 "-"			return '-';

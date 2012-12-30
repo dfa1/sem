@@ -25,3 +25,14 @@ xstrdup(const char *s) {
 
   return dup;
 }
+
+/* example:
+ *   drop_first_last_inplace("abcd", 4) -> "bc"
+ */
+void
+drop_first_last_inplace(char *str, int len) {
+        for (int i = 0; i < len - 1; i++) {
+           str[i] = str[i + 1];
+        }
+        str[len - 2] = 0;
+}
