@@ -55,7 +55,7 @@ Report bugs to <davide.angelocola@gmail.com>\n";
 static void 
 usage(int sts) {
   FILE *target = (sts == EXIT_SUCCESS)? stdout : stderr;
-  fprintf(target, help);
+  fprintf(target, "%s", help);
   exit(sts);
 }
 
@@ -77,7 +77,6 @@ main(int argc, char **argv) {
     while ((opt = getopt_long(argc, argv, "hm:s:v", long_options, NULL)) 
 	   != EOF) {
 	switch (opt) {
-
 	case 'h':
 	    usage(EXIT_SUCCESS);
 
@@ -96,7 +95,7 @@ main(int argc, char **argv) {
 	  break;
 
 	case 'v':
-	  fprintf(stdout, license);
+	  fprintf(stdout, "%s", license);
 	  return EXIT_SUCCESS;
 
 	default:
@@ -108,8 +107,9 @@ main(int argc, char **argv) {
       fprintf(stderr, "sem: no input\n");
       return EXIT_FAILURE;
     }
-    
-    struct Code *code = compile_code(argv[optind]);
+   
+    char *filename = argv[optind];
+    struct Code *code = compile_code(filename);
     
     if (code == NULL) {
       // error message should be already displayed at this point
