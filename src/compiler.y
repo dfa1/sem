@@ -50,8 +50,8 @@ static void yyerror(struct Code* code, struct Parsing *parsing, const char *);
 
 /* Emit an opcode to the list (see Code struct). */
 #define emit_op(op)            emit(code, (op), -1, NULL)
-#define emit_op_int(op, iv)      emit(code, (op), (iv), NULL);
-#define emit_op_string(op, sv)      emit(code, (op), -1, (sv))
+#define emit_op_int(op, iv)    emit(code, (op), (iv), NULL);
+#define emit_op_string(op, sv) emit(code, (op), -1, (sv))
 static void emit(struct Code *, int, int, char *);
 
 /* *INDENT-OFF* */
@@ -253,11 +253,10 @@ aip
 %%
   /* *INDENT-ON* */
 
-void
+static void
 yyerror(struct Code* code, struct Parsing * parsing, const char *msg)
 {
-    fprintf(stderr, "%s: %s at line %d", 
-	    parsing->filename, msg, parsing->lineno);
+    fprintf(stderr, "%s: %s at line %d", parsing->filename, msg, parsing->lineno);
 
     if (parsing->token != NULL && *parsing->token != '\0') {
 	fprintf(stderr, ", near token '%s'", parsing->token);
@@ -281,10 +280,11 @@ static void
 emit(struct Code *code, int opcode, int iv, char *sv)
 {
   struct Op *op = op_init(opcode, iv, sv);
-  ONX(CCD(code)) = op;
-  CCD(code) = op;
+  code->code->next = op;
+  code->code = op;
+  
   if (opcode == SETLINENO) {
-    CSZ(code) += 1;
+    code->size += 1;
   }
 }
 
@@ -339,15 +339,12 @@ compile_code(const char *filename) // TODO: use FILE*
    *   INT                   0
    *   MEM
    *   SET
-   *
-   * In such case the nth SETLINENO opcode (i) will be mapped in
-   * c->jumps[18], i.e. *(CJM(c) + 18) = i.
    */
-  struct Op *i;
   int j;
-  for (j = 0, i = code->head; i != NULL; i = ONX(i)) {
-    DPRINTF("COMPILE: %p (op=%d,intv=%d,strv=%s)\n", 
-	    i, i->opcode, i->intv, i->strv);
+  struct Op *i;
+
+  for (j = 0, i = code->head; i != NULL; i = i->next) {
+    DPRINTF("COMPILE: %p (op=%d,intv=%d,strv=%s)\n", i, i->opcode, i->intv, i->strv);
     if (i->opcode == SETLINENO) {
       DPRINTF("COMPILE:  line %j jumps to %p\n", j, i);
       code->jumps[j++] = i;
@@ -355,13 +352,17 @@ compile_code(const char *filename) // TODO: use FILE*
   }
   
   /* Add, if needed, a trailing HALT opcode. */
-  if (OOP(CCD(code)) != HALT) {
-    if (OOP(CCD(code)) != JUMP) {
-      if (OOP(CCD(code)) != JUMPT) {
-	emit_op(HALT);
+  struct Op *last_instr = code->code;
+  switch (last_instr->opcode) {
+	case HALT:
+        case JUMP:
+        case JUMPT:
+          /* do nothing */
+          break;
+   
+      default:
+        emit_op(HALT);
 	DPRINTF("COMPILE: inserting missing HALT instruction at end");
-      }
-    }
   }
   
   return code;
@@ -370,26 +371,22 @@ compile_code(const char *filename) // TODO: use FILE*
 void
 code_destroy(struct Code *c)
 {
-  struct Op *o = CHD(c);
+  struct Op *o = c->head;
   struct Op *t;
 
-  for (;;) {
-    if (o != NULL) {
-	    t = ONX(o);
+  while (o != NULL) {
+	 t = o->next;
 
 	    /* Free the string, if needed. */
-	    if (OSV(o) != NULL)
-		free(OSV(o));
+	    if (o->strv != NULL) {
+		free(o->strv);
+            }
 
 	    /* Free this node. */
 	    free(o);
 	    o = t;
-	}
-	else
-	    break;
     }
 
-    free(CJM(c));
+    free(c->jumps);
     free(c);
-    fclose(yyin); // TODO: remove
 }

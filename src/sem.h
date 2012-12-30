@@ -70,25 +70,13 @@ struct Op // TODO: rename to instr
   struct Op *next;	/* next opcode */
 };
 
-/* struct Op access macros. */
-#define OOP(o)	((o)->opcode)
-#define OIV(o)	((o)->intv)
-#define OSV(o)	((o)->strv)
-#define ONX(o)	((o)->next)
-
 struct Code
 {
     struct Op *head;	/* the head */
     struct Op *code;	/* the code (as linked list) */
     int size;		/* the code size (number of lines) */
-    struct Op **jumps;	/* jumps (as linked list) */
+    struct Op **jumps;	/* jumps */
 };
-
-/* struct Code access macros. */
-#define CHD(c)	((c)->head)
-#define CCD(c)	((c)->code)
-#define CSZ(c)  ((c)->size)
-#define CJM(c)  ((c)->jumps)
 
 struct Parsing {
   char *filename; 
