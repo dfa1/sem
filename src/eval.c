@@ -261,9 +261,10 @@ int evalCode(struct VM *v)
 	case READ:
 	    p = POP();
 
-	    if (p < 0 || p >= VMS(v))
+	    if (p < 0 || p >= VMS(v)) {
 		DIE("invalid memory address %d for "
 		     "read at line %d", p, lineno);
+	    }
 	    
 	    ask("", answer, sizeof(answer));
 

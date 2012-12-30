@@ -28,8 +28,12 @@
 
 #include "version.h"
 
+// memory.c
+extern void *xmalloc(size_t);
+extern char* xstrdup(const char *);
+
 // io.c
-extern char *ask(const char *question, char *answer, int answer_size);
+extern void ask(const char *question, char *answer, int answer_size);
 extern int ask_yes_no(const char *question);
     
 /* Macros for setting/clearing/getting bits in flags. */

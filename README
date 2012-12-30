@@ -102,7 +102,7 @@ src/main.c		The main() and other stuff
 src/scan.c		The lexical scanner (generated from scan.l)
 src/scan.l		The lexical scanner (GNU flex input)
 src/sem.h		Just an handy header 	
-src/compile.h		Tokens 
+src/tokens.h		Tokens 
 
 
 Author
