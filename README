@@ -1,14 +1,8 @@
 Sem, an abstract semantic processor
 ===================================
 
-This is sem 2.1. Enjoy it! :)
+This is sem 3.0. Enjoy it! :)
 
-
-Copyright notice
-----------------
-
-Copyright (C) 2003-2011 Davide Angelocola <davide.angelocola@gmail.com>
- 
 
 License information
 -------------------
@@ -40,18 +34,6 @@ Requirements:
 - bison
 - flex
 - make
-- autoconf
-- automake
-- libtool
-- gnulib
-
-To start building type the following commands:
-
-  $ gnulib-tool --update
-
-  $ autoreconf
-  
-  $ ./configure
 
   $ make                                # build sem 
 
@@ -121,10 +103,6 @@ src/scan.c		The lexical scanner (generated from scan.l)
 src/scan.l		The lexical scanner (GNU flex input)
 src/sem.h		Just an handy header 	
 src/compile.h		Tokens 
-gnulib/*                gnulib sources
-m4/*                    ditto
-
-skip autoconf/automake/libtool/gnulib build files
 
 
 Author
@@ -141,8 +119,5 @@ Email:
   davide.angelocola@gmail.com
 
 URL:
-  http://www.humaorie.com
-
-That's all folks!
--- Davide
+  http://bitbucket.org/dfa/sem
 

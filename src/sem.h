@@ -1,5 +1,5 @@
 /*
- * sem.h -- Just an handy header
+ * sem.h 
  *
  * Copyright (C) 2003-2011 Davide Angelocola <davide.angelocola@gmail.com>
  *
@@ -19,6 +19,7 @@
  * 02111-1307, USA.
  */
 
+// TODO: remove 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,12 +29,9 @@
 #include "version.h"
 
 // io.c
-extern char *ask(char *question, char *answer, int answer_size);
+extern char *ask(const char *question, char *answer, int answer_size);
+extern int ask_yes_no(const char *question);
     
-// HACKS
-#define xmalloc malloc
-#define xstrdup strdup
-
 /* Macros for setting/clearing/getting bits in flags. */
 #define SET(var,flag)          (var) |= (flag)
 #define UNSET(var,flag)        (var) |= ~(flag)

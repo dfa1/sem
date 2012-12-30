@@ -4,7 +4,6 @@ Release 3.0
 - clean code:
  - remove most of the global state 
  - support only modern C compilers 
- - no autotools
  - automated tests
 - separate debugger binary
 
