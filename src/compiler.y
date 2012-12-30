@@ -23,7 +23,9 @@
  * 02111-1307, USA.
  *
  */
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
 #include "sem.h"
 
 #if defined(WITH_PARSER_DEBUG)

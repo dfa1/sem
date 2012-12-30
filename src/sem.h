@@ -19,14 +19,10 @@
  * 02111-1307, USA.
  */
 
-// TODO: remove 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-#include <errno.h>
-
-#include "version.h"
+/* Macros for setting/clearing/getting bits in flags. */
+#define SET(var,flag)          (var) |= (flag)
+#define UNSET(var,flag)        (var) |= ~(flag)
+#define IS_SET(var,flag)         (((var) & (flag)) != 0)
 
 // memory.c
 extern void *xmalloc(size_t);
@@ -35,11 +31,6 @@ extern char* xstrdup(const char *);
 // io.c
 extern void ask(const char *question, char *answer, int answer_size);
 extern int ask_yes_no(const char *question);
-    
-/* Macros for setting/clearing/getting bits in flags. */
-#define SET(var,flag)          (var) |= (flag)
-#define UNSET(var,flag)        (var) |= ~(flag)
-#define IS_SET(var,flag)         (((var) & (flag)) != 0)
 
 /* Opcodes. */
 typedef enum

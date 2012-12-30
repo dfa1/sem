@@ -20,9 +20,11 @@
  *
  */
 
-#include "sem.h"
-
+#include <stdio.h>
+#include <stdlib.h>
 #include <getopt.h>
+#include "sem.h"
+#include "version.h"
 
 #define S(s) STRINGIFY(s)
 #define STRINGIFY(s) #s
@@ -102,7 +104,7 @@ main(int argc, char **argv) {
 	}
     }
 
-    if (optind >= argc || strcmp(argv[optind], "-") == 0) {
+    if (optind >= argc) {
       fprintf(stderr, "sem: no input\n");
       return EXIT_FAILURE;
     }

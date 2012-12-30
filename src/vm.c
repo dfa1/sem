@@ -19,8 +19,12 @@
  * 02111-1307, USA.
  */
 
-#include "sem.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 #include <assert.h>
+#include "sem.h"
 
 struct VM *
 vm_init(int memsize, int stacksize)
