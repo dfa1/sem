@@ -22,7 +22,7 @@
 #include "sem.h"
 
 struct VM *
-initVM(struct Code *c, int ms, int ss)
+vm_init(struct Code *c, int ms, int ss)
 {
     struct VM *v;
     int i;
@@ -54,7 +54,7 @@ initVM(struct Code *c, int ms, int ss)
 }
 
 void
-finiVM(struct VM *v)
+vm_destroy(struct VM *v)
 {
     free(VMM(v));
     free(VST(v));
@@ -86,7 +86,7 @@ finiVM(struct VM *v)
  *                          |                     | 
  *                          +---------------------+
  */
-int evalCode(struct VM *v)
+int eval_code(struct VM *v)
 {
     int p;	/* first operand                */
     int q;	/* second operand               */
@@ -145,12 +145,7 @@ int evalCode(struct VM *v)
 	/* Instruction fetch. */
 	ip = ONX(ip);
 
-	/*
-	 * Instruction execution. These cases are ordered in a
-	 * MFUF (Most Frequently Used First) fashion, in
-	 * which, the most frequently used opcode, INT, goes
-	 * in the first case and so on.
-	 */
+	/* Instruction execution. */
 	switch (OOP(ip)) {
 	case INT:
 	    PUSH(OIV(ip));

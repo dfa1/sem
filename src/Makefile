@@ -1,19 +1,21 @@
-CFLAGS=-W -Wall -ggdb -std=c99 
+CC=gcc
+CFLAGS=-W -Wall -g -std=c99 
 
 all: sem
 
-compile.c: compile.y
+compiler.c: compiler.y
 	bison --defines=tokens.h -o $@ $<
 
-scan.c: scan.l tokens.h
+
+scanner.c: scanner.l tokens.h
 	flex -o $@ $<
 
-OBJECTS=compile.o scan.o eval.o io.o memory.o main.o
+OBJECTS=compiler.o scanner.o vm.o io.o memory.o main.o
 
 $(OBJECTS): sem.h version.h
 
 sem: $(OBJECTS)
-	gcc $(OBJECTS) -o $@ 
+	$(CC) $(OBJECTS) -o $@ 
 
 debug: sem
 	gdb ./sem
@@ -28,7 +30,7 @@ clean:
 	rm -f *.o sem
 
 distclean: clean
-	rm -f compile.c tokens.h scan.c
+	rm -f compiler.c tokens.h scanner.c
 
 
-.PHONY: all clean distclean
+.PHONY: all clean distclean run debug valgrind

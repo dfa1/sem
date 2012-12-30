@@ -1,6 +1,6 @@
-#line 2 "scan.c"
+#line 2 "scanner.c"
 
-#line 4 "scan.c"
+#line 4 "scanner.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -506,9 +506,9 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "scan.l"
+#line 1 "scanner.l"
 /* *INDENT-OFF* */
-#line 3 "scan.l"
+#line 3 "scanner.l"
 /* *INDENT-ON* */
 
 /*
@@ -545,7 +545,7 @@ static void update_locations(struct Parsing *parsing);
 /* %option reentrant */
 /* Character classes. */
 
-#line 549 "scan.c"
+#line 549 "scanner.c"
 
 #define INITIAL 0
 #define STRING 1
@@ -733,10 +733,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 45 "scan.l"
+#line 45 "scanner.l"
 
 	/* Keywords. */
-#line 740 "scan.c"
+#line 740 "scanner.c"
 
 	if ( !(yy_init) )
 		{
@@ -817,66 +817,66 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 47 "scan.l"
+#line 47 "scanner.l"
 return kHALT;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 48 "scan.l"
+#line 48 "scanner.l"
 return kSET;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 49 "scan.l"
+#line 49 "scanner.l"
 return kJUMP;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 50 "scan.l"
+#line 50 "scanner.l"
 return kJUMPT;
 	YY_BREAK
 /* Special and/or unique and/or reserved names. */
 case 5:
 YY_RULE_SETUP
-#line 53 "scan.l"
+#line 53 "scanner.l"
 return rD;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 54 "scan.l"
+#line 54 "scanner.l"
 return rIP;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 55 "scan.l"
+#line 55 "scanner.l"
 return rREAD;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 56 "scan.l"
+#line 56 "scanner.l"
 return rWRITE;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 57 "scan.l"
+#line 57 "scanner.l"
 return rWRITELN;
 	YY_BREAK
 /* Other names. Used to report errors. */
 case 10:
 YY_RULE_SETUP
-#line 60 "scan.l"
+#line 60 "scanner.l"
 return tNAME;
 	YY_BREAK
 /* Integers. */ 
 case 11:
 YY_RULE_SETUP
-#line 63 "scan.l"
+#line 63 "scanner.l"
 return tINT; 
 	YY_BREAK
 /* Strings. */ 
 case 12:
 YY_RULE_SETUP
-#line 66 "scan.l"
+#line 66 "scanner.l"
 {
     BEGIN STRING;
     parsing->pstr = parsing->str;
@@ -884,7 +884,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 71 "scan.l"
+#line 71 "scanner.l"
 {
     BEGIN INITIAL;
     *parsing->pstr = 0;
@@ -893,150 +893,150 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 77 "scan.l"
+#line 77 "scanner.l"
 *parsing->pstr++ = '\n';
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 78 "scan.l"
+#line 78 "scanner.l"
 *parsing->pstr++ = '\r';
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 79 "scan.l"
+#line 79 "scanner.l"
 *parsing->pstr++ = '\t';
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 80 "scan.l"
+#line 80 "scanner.l"
 *parsing->pstr++ = '\v';
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 81 "scan.l"
+#line 81 "scanner.l"
 *parsing->pstr++ = '\f';
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 82 "scan.l"
+#line 82 "scanner.l"
 *parsing->pstr++ = '\b';
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 83 "scan.l"
+#line 83 "scanner.l"
 *parsing->pstr++ = '\a';
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 84 "scan.l"
+#line 84 "scanner.l"
 *parsing->pstr++ = *yytext;
 	YY_BREAK
 /* Operators. */
 case 22:
 YY_RULE_SETUP
-#line 88 "scan.l"
+#line 88 "scanner.l"
 return '+';
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 89 "scan.l"
+#line 89 "scanner.l"
 return '-';
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 90 "scan.l"
+#line 90 "scanner.l"
 return '*';
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 91 "scan.l"
+#line 91 "scanner.l"
 return '/';
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 92 "scan.l"
+#line 92 "scanner.l"
 return '%';
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 94 "scan.l"
+#line 94 "scanner.l"
 return tEQ;
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 95 "scan.l"
+#line 95 "scanner.l"
 return tNE;
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 96 "scan.l"
+#line 96 "scanner.l"
 return tGT;
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 97 "scan.l"
+#line 97 "scanner.l"
 return tLT;
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 98 "scan.l"
+#line 98 "scanner.l"
 return tGE;
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 99 "scan.l"
+#line 99 "scanner.l"
 return tLE;
 	YY_BREAK
 /* Other tokens. */
 case 33:
 /* rule 33 can match eol */
 YY_RULE_SETUP
-#line 102 "scan.l"
+#line 102 "scanner.l"
 return tNEWLINE;
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 103 "scan.l"
+#line 103 "scanner.l"
 return ',';
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 104 "scan.l"
+#line 104 "scanner.l"
 return '[';
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 105 "scan.l"
+#line 105 "scanner.l"
 return ']';
 	YY_BREAK
 /* Ignore blanks. */
 case 37:
 YY_RULE_SETUP
-#line 108 "scan.l"
+#line 108 "scanner.l"
 
 	YY_BREAK
 /* Comment. */
 case 38:
 YY_RULE_SETUP
-#line 111 "scan.l"
+#line 111 "scanner.l"
 
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STRING):
-#line 113 "scan.l"
+#line 113 "scanner.l"
 yyterminate();
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 114 "scan.l"
+#line 114 "scanner.l"
 return 0; 
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 115 "scan.l"
+#line 115 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1040 "scan.c"
+#line 1040 "scanner.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2029,7 +2029,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 115 "scan.l"
+#line 115 "scanner.l"
 
 
 /* *INDENT-ON* */

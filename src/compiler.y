@@ -3,7 +3,7 @@
 /* *INDENT-ON* */
 
 /*
- * compile.y -- The compiler 
+ * compiler.y -- The compiler 
  *
  * Copyright (C) 2003-2011 Davide Angelocola <davide.angelocola@gmail.com>
  *
@@ -34,7 +34,8 @@
 # define YYERROR_VERBOSE
 #endif
 
-#ifdef WITH_COMPILER_DEBUG
+// TODO: runtime
+#ifdef WITH_COMPILER_DEBUG 
 # define DPRINTF(...) printf(__VA_ARGS__) 
 #else 
 # define DPRINTF(...)
@@ -45,11 +46,11 @@ extern int yylex();
 static void yyerror(struct Code* code, struct Parsing *parsing, const char *); 
 #define error(msg) yyerror(code, parsing, (msg))
 
-/* Append an opcode to the list (see Code struct). */
-#define addOp(op)            addOp4(code, (op), -1, NULL)
-#define addOpIV(op, iv)      addOp4(code, (op), (iv), NULL);
-#define addOpSV(op, sv)      addOp4(code, (op), -1, (sv))
-static void addOp4(struct Code *, int, int, char *);
+/* Emit an opcode to the list (see Code struct). */
+#define emit_op(op)            emit(code, (op), -1, NULL)
+#define emit_op_int(op, iv)      emit(code, (op), (iv), NULL);
+#define emit_op_string(op, sv)      emit(code, (op), -1, (sv))
+static void emit(struct Code *, int, int, char *);
 
 /* *INDENT-OFF* */
 %}
@@ -109,8 +110,8 @@ stmts
 ;
 
 stmt    
-: { addOpIV(SETLINENO, parsing->lineno); } tNEWLINE
-| { addOpIV(SETLINENO, parsing->lineno); } simple_stmt tNEWLINE
+: { emit_op_int(SETLINENO, parsing->lineno); } tNEWLINE
+| { emit_op_int(SETLINENO, parsing->lineno); } simple_stmt tNEWLINE
 | error { YYABORT; }
 ;
 
@@ -122,37 +123,37 @@ simple_stmt
 
 halt_stmt
 : kHALT {
-    addOp(HALT);
+    emit_op(HALT);
 }
 ;
 
 jump_stmt
 : kJUMP expr {
-    addOp(JUMP);
+    emit_op(JUMP);
 }
 | kJUMPT expr ',' test {
-    addOp(JUMPT);
+    emit_op(JUMPT);
 }
 ;	
 
 set_stmt
 : kSET expr ',' expr {
-    addOp(SET);
+    emit_op(SET);
 }
 | kSET rWRITE ',' expr {
-    addOp(WRITE_INT);
+    emit_op(WRITE_INT);
 }
 | kSET rWRITE ',' tSTRING {
-    addOpSV(WRITE_STR, parsing->str);
+    emit_op_string(WRITE_STR, parsing->str);
 }
 | kSET rWRITELN ',' expr {	/* this is an extension */
-    addOp(WRITELN_INT);
+    emit_op(WRITELN_INT);
 }
 | kSET rWRITELN ',' tSTRING {	/* this is an extension */
-    addOpSV(WRITELN_STR, parsing->str);
+    emit_op_string(WRITELN_STR, parsing->str);
 }
 | kSET expr ',' rREAD {
-    addOp(READ);
+    emit_op(READ);
 }
 ;
 
@@ -162,22 +163,22 @@ test
 
 relational_test
 : expr tEQ expr {
-    addOp(EQ);
+    emit_op(EQ);
 }
 | expr tNE expr {
-    addOp(NE);
+    emit_op(NE);
 }
 | expr tGT expr {
-    addOp(GT);
+    emit_op(GT);
 }
 | expr tLT expr {
-    addOp(LT);
+    emit_op(LT);
 }
 | expr tGE expr {
-    addOp(GE);
+    emit_op(GE);
 }
 | expr tLE expr {
-    addOp(LE);
+    emit_op(LE);
 }
 ;
 
@@ -188,23 +189,23 @@ expr
 additive_expr
 : multiplicative_expr
 | additive_expr '+' multiplicative_expr {
-    addOp(ADD);
+    emit_op(ADD);
 }
 | additive_expr '-' multiplicative_expr {
-    addOp(SUB);
+    emit_op(SUB);
 }
 ;
 
 multiplicative_expr
 : atom 
 | multiplicative_expr '*' atom {
-    addOp(MUL);
+    emit_op(MUL);
 }
 | multiplicative_expr '/' atom {		
-    addOp(DIV);
+    emit_op(DIV);
 }
 | multiplicative_expr '%' atom { /* this is an extension */
-    addOp(MOD);
+    emit_op(MOD);
 }
 ;
 
@@ -232,19 +233,19 @@ literal
 	YYABORT;
     }
 
-    addOpIV(INT, value);
+    emit_op_int(INT, value);
 }
 ;
 
 amem
 : rD '[' expr ']' {
-    addOp(MEM);
+    emit_op(MEM);
 }
 ;
 
 aip
 : rIP {
-    addOp(IP);
+    emit_op(IP);
 }
 ;
 %%
@@ -265,7 +266,7 @@ yyerror(struct Code* code, struct Parsing * parsing, const char *msg)
 
 
 static struct Op *
-createOp(int opcode, int iv, char *sv) {
+op_init(int opcode, int iv, char *sv) {
   struct Op *op = xmalloc(sizeof(struct Op));
   op->opcode = opcode;
   op->intv = iv;
@@ -275,9 +276,9 @@ createOp(int opcode, int iv, char *sv) {
 }
 
 static void
-addOp4(struct Code *code, int opcode, int iv, char *sv)
+emit(struct Code *code, int opcode, int iv, char *sv)
 {
-  struct Op *op = createOp(opcode, iv, sv);
+  struct Op *op = op_init(opcode, iv, sv);
   ONX(CCD(code)) = op;
   CCD(code) = op;
   if (opcode == SETLINENO) {
@@ -288,7 +289,7 @@ addOp4(struct Code *code, int opcode, int iv, char *sv)
 extern FILE* yyin;
 
 struct Code *
-compileSource(const char *filename)
+compile_code(const char *filename) // TODO: use FILE*
 {
 #if defined(WITH_PARSER_DEBUG)
   yydebug = 1;
@@ -305,7 +306,7 @@ compileSource(const char *filename)
   parsing->offset = 0;		
   parsing->filename = xstrdup(filename); 
   parsing->fp = yyin; 
-  struct Op *start = createOp(START, 0, NULL);
+  struct Op *start = op_init(START, 0, NULL);
   struct Code *code = xmalloc(sizeof(struct Code));
   code->size = 1;
   code->jumps = NULL;
@@ -355,7 +356,7 @@ compileSource(const char *filename)
   if (OOP(CCD(code)) != HALT) {
     if (OOP(CCD(code)) != JUMP) {
       if (OOP(CCD(code)) != JUMPT) {
-	addOp(HALT);
+	emit_op(HALT);
 	DPRINTF("COMPILE: inserting missing HALT instruction at end");
       }
     }
@@ -365,7 +366,7 @@ compileSource(const char *filename)
 }
 
 void
-finiCompiler(struct Code *c)
+code_destroy(struct Code *c)
 {
   struct Op *o = CHD(c);
   struct Op *t;
@@ -388,5 +389,5 @@ finiCompiler(struct Code *c)
 
     free(CJM(c));
     free(c);
-    fclose(yyin);
+    fclose(yyin); // TODO: remove
 }

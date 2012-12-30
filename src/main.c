@@ -50,15 +50,17 @@ Options:\n\
 \n\
 Report bugs to <davide.angelocola@gmail.com>\n";
   
-static void usage(int sts) {
+static void 
+usage(int sts) {
   FILE *target = (sts == EXIT_SUCCESS)? stdout : stderr;
   fprintf(target, help);
   exit(sts);
 }
 
-int main(int argc, char **argv) {
-    int memSize = DEFAULT_DATA_SIZE;
-    int stackSize = DEFAULT_STACK_SIZE;
+int 
+main(int argc, char **argv) {
+    int mem_size = DEFAULT_DATA_SIZE;
+    int stack_size = DEFAULT_STACK_SIZE;
     int opt = 0;
     struct option long_options[] = {
 	{ "version", 0, 0, 'v' },
@@ -78,14 +80,14 @@ int main(int argc, char **argv) {
 	    usage(EXIT_SUCCESS);
 
 	case 'm':
-	  if (sscanf(optarg, "%d", &memSize) != 1 || memSize < 1) {
+	  if (sscanf(optarg, "%d", &mem_size) != 1 || mem_size < 1) {
 	    fprintf(stderr, "sem: invalid memory size (%s)\n", optarg);
 	    return EXIT_FAILURE;
 	  }
 	  break;
 
 	case 's':
-	  if (sscanf(optarg, "%d", &stackSize) != 1 || stackSize < 1) {
+	  if (sscanf(optarg, "%d", &stack_size) != 1 || stack_size < 1) {
 	    fprintf(stderr, "sem: invalid stack size (%s)\n", optarg);
 	    return EXIT_FAILURE;
 	  }
@@ -105,16 +107,16 @@ int main(int argc, char **argv) {
       return EXIT_FAILURE;
     }
     
-    struct Code *code = compileSource(argv[optind]);
+    struct Code *code = compile_code(argv[optind]);
     
     if (code == NULL) {
       // error message should be already displayed at this point
       return EXIT_FAILURE;
     }
 
-    struct VM *vm = initVM(code, memSize, stackSize);
-    int status = evalCode(vm);
-    finiCompiler(code);
-    finiVM(vm);
+    struct VM *vm = vm_init(code, mem_size, stack_size);
+    int status = eval_code(vm);
+    code_destroy(code);
+    vm_destroy(vm);
     return status;
 }

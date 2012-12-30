@@ -109,13 +109,10 @@ struct Parsing {
   char *pstr;
 };
 
-extern struct Code *compileSource(const char* filename);
-extern void finiCompiler(struct Code *);
-
 /* The interpreter. */
 struct VM
 {
-    struct Code *code;
+    struct Code *code; // TODO: remove
 
     /* The Instruction Pointer. */
     struct Op *ip;
@@ -152,6 +149,7 @@ struct VM
     int flags;
 };
 
+// TODO: drop
 /* struct VM access macros. */
 #define VCD(v)	((v)->code)
 #define VIP(v)	((v)->ip)
@@ -163,8 +161,10 @@ struct VM
 #define VLN(v)	((v)->lineno)
 #define VF(v)	((v)->flags)
 
-extern struct VM *initVM(struct Code *, int, int);
-extern void finiVM(struct VM *);
-extern int evalCode(struct VM *);
-extern int debugCode(struct VM *);
+extern struct Code *compile_code(const char* filename);
+extern void code_destroy(struct Code *);
+extern struct VM *vm_init(struct Code *, int, int);
+extern void vm_destroy(struct VM *);
+extern int eval_code(struct VM *);
+extern int debug_code(struct VM *);
 
