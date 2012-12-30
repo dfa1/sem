@@ -1,5 +1,5 @@
 /*
- * eval.c -- The interpreter (this piece of code was cursed)
+ * vm.c -- The interpreter 
  *
  * Copyright (C) 2003-2011 Davide Angelocola <davide.angelocola@gmail.com> 
  *
@@ -20,45 +20,37 @@
  */
 
 #include "sem.h"
+#include <assert.h>
 
 struct VM *
-vm_init(struct Code *c, int ms, int ss)
+vm_init(int memsize, int stacksize)
 {
-    struct VM *v;
-    int i;
-
-    /* Create a new VM structure... */
-    v = (struct VM *) xmalloc(sizeof(struct VM));
-
-    VCD(v) = c;
-    VIP(v) = CHD(c);
-
-    VMS(v) = ms;
-    VMM(v) = xmalloc(sizeof(int) * VMS(v));
-
-    /* Initialize the memory. */
-    for (i = 0; i < VMS(v); i++)
-	*(VMM(v) + i) = 0;
-
-    VSS(v) = ss;
-    VST(v) = xmalloc(sizeof(int) * VSS(v));
-
-    /* Initialize the stack. */
-    for (i = 0; i < VSS(v); i++)
-	*(VST(v) + i) = 0;
-
-    VTP(v) = VST(v);
-    VLN(v) = 1;
-    VF(v) = 0;
-    return v;
+    assert(memsize > 0);
+    assert(stacksize > 0);
+    struct VM *vm = (struct VM *) xmalloc(sizeof(struct VM));
+    // memory
+    vm->memsize = memsize;
+    vm->mem = xmalloc(sizeof(int) * memsize);
+    memset(vm->mem, 0, sizeof(int) * memsize); 
+    // stack
+    vm->stacksize = stacksize;
+    vm->stack = xmalloc(sizeof(int) * stacksize);
+    memset(vm->stack, 0, sizeof(int) * stacksize);
+    vm->stacktop = vm->stack;
+    // state
+    vm->ip = NULL;
+    vm->lineno = 1;
+    vm->flags = 0;
+    return vm;
 }
 
 void
-vm_destroy(struct VM *v)
+vm_destroy(struct VM *vm)
 {
-    free(VMM(v));
-    free(VST(v));
-    free(v);
+    assert(vm != NULL);
+    free(vm->mem);
+    free(vm->stack);
+    free(vm);
 }
 
 /*
@@ -71,7 +63,7 @@ vm_destroy(struct VM *v)
  * and the operands on the stack to be in the *reverse* order.
  * 
  *  +-------+
- *  | START | LOAD_REGISTERS
+ *  | START | 
  *  +-------+
  *      |     
  *      | <-----------------+
@@ -82,39 +74,28 @@ vm_destroy(struct VM *v)
  *  | Fetch | --------> |  Run  | ------+      | HALT | ----> sts is 0 
  *  +-------+           +-------+              +------+
  *                          |                     ^
- *                          | HALT                | SAVE_REGISTERS
+ *                          | HALT                | 
  *                          |                     | 
  *                          +---------------------+
  */
-int eval_code(struct VM *v)
+int 
+eval_code(struct VM *vm, struct Code *code)
 {
-    int p;	/* first operand                */
-    int q;	/* second operand               */
+    int p;		/* first operand                */
+    int q;		/* second operand               */
     int sts;	/* status                       */
-    char answer[20]; /* used by ask */
-    struct Op *ip;
-    struct Code *c;
-    int lineno;
+    char answer[20]; 	/* used by ask */
 
-    /* Handy macros. */
-#define LOAD_REGISTERS				\
-    do {					\
-	c = VCD(v);				\
-	ip = VIP(v);				\
-	lineno = VLN(v);			\
-    } while(0)
+    /* Initialization. */
+    sts = 0;
+    vm->ip = code->head;
 
-#define SAVE_REGISTERS				\
-    do {					\
-	VIP(v) = ip;				\
-	VLN(v) = lineno;			\
-    } while(0)
-
+// TODO: as function
 #define DIE(...)				\
     do {					\
       fprintf(stderr, "sem: " __VA_ARGS__);	\
       fprintf(stderr, "\n");			\
-      fprintf(stderr, "line: %d\n", lineno);	\
+      fprintf(stderr, "line: %d\n", vm->lineno);	\
       fprintf(stderr, "stack: \n");		\
       while (!EMPTY()) {			\
       	fprintf(stderr, " [%d] %d\n", (int) LEVEL(), POP());	\
@@ -124,58 +105,53 @@ int eval_code(struct VM *v)
     } while(0)
 
     /* Stack manipulation macros. */
-#define TOP()           (*VTP(v))
-#define LEVEL()         (VTP(v) - VST(v))
+#define TOP()           (*vm->stacktop)
+#define LEVEL()         (vm->stacktop - vm->stack)
 #define EMPTY()         (LEVEL() == 0)
-#define POP()           (*--VTP(v))
+#define POP()           (*--vm->stacktop)
 #define PUSH(x)					\
     do {					\
-	if (LEVEL() < VSS(v))			\
-	    (*VTP((v))++ = (x));		\
+	if (LEVEL() < vm->stacksize)		\
+	    *vm->stacktop++ = (x);		\
 	else					\
 	    DIE("stack overflow");		\
     } while(0)
 
-    /* Initialization. */
-    LOAD_REGISTERS;
-    sts = 0;
-    
     /* Main loop. */
     for (;;) {
 	/* Instruction fetch. */
-	ip = ONX(ip);
+	vm->ip = vm->ip->next;
 
 	/* Instruction execution. */
-	switch (OOP(ip)) {
+	switch (vm->ip->opcode) {
 	case INT:
-	    PUSH(OIV(ip));
+	    PUSH(vm->ip->intv);
 	    break;
 
 	case SET:
 	    q = POP();
 	    p = POP();
 
-	    if (p < 0 || p >= VMS(v))
-		DIE("invalid memory address %d for target at line %d", p, lineno);
-
-	    *(VMM(v) + p) = q;
+	    if (p < 0 || p >= vm->memsize) {
+		DIE("invalid memory address %d for target", p);
+	    }
+	    vm->mem[p] = q;
 	    break;
 
 	case MEM:
 	    p = POP();
 
-	    if (p < 0 || p >= VMS(v))
-		DIE("invalid memory address %d at "
-		     "line %d", p, lineno);
+	    if (p < 0 || p >= vm->memsize)
+		DIE("invalid memory address %d", p);
 
-	    PUSH(*(VMM(v) + p));
+	    PUSH(vm->mem[p]);
 	    break;
 
 	case SETLINENO:
-	    lineno = OIV(ip);
+	    vm->lineno = vm->ip->intv;
 
 	    /* Is step mode requested ? */
-	    if (IS_SET(VF(v), STEP) && lineno > 1) {
+	    if (IS_SET(vm->flags, STEP) && vm->lineno > 1) {
 		sts = 0;
 		goto halt;
 	    }
@@ -185,14 +161,14 @@ int eval_code(struct VM *v)
 	case JUMP:
 	    q = POP();
 
-	    if (q < 1 || q >= CSZ(c)) {
-		DIE("cannot jump from line %d to line %d", lineno, q);
+	    if (q < 1 || q >= code->size) {
+		DIE("cannot jump to line %d", q);
 	    }
 
-	    ip = *(CJM(c) + q - 1);	/* jump */
+	    vm->ip = code->jumps[q - 1];
 
-	    if (IS_SET(VF(v), STEP)) {
-		lineno = q;
+	    if (IS_SET(vm->flags, STEP)) {
+		vm->lineno = q;
 		sts = 0;
 		goto halt;
 	    }
@@ -202,16 +178,15 @@ int eval_code(struct VM *v)
 	    p = POP();
 	    q = POP();
 
-	    if (q < 1 || q >= CSZ(c))
-		DIE("cannot jump from line %d to line %d", lineno, q);
+	    if (q < 1 || q >= code->size) {
+		DIE("cannot jump to line %d", q);
+            }
 
-	    if (p == 0)
-		/* void */ ;
-	    else {
-		ip = *(CJM(c) + q - 1);	/* jump */
+	    if (p != 0) {
+		vm->ip = code->jumps[q - 1];
 
-		if (IS_SET(VF(v), STEP)) {
-		    lineno = q;
+		if (IS_SET(vm->flags, STEP)) {
+		    vm->lineno = q;
 		    sts = 0;
 		    goto halt;
 		}
@@ -219,27 +194,27 @@ int eval_code(struct VM *v)
 	    break;
 
 	case HALT:
-	    if (IS_SET(VF(v), STEP))
-		SET(VF(v), HALTED);
-
+	    if (IS_SET(vm->flags, STEP)) {
+		SET(vm->flags, HALTED);
+	    }
 	    sts = 0;
 	    goto halt;
 
 	case IP:
-	    PUSH(lineno + 1);
+	    PUSH(vm->lineno + 1);
 	    break;
 
 	case WRITE_INT:
 	    p = POP();
 	    printf("%d", p);
-	    if (IS_SET(VF(v), STEP)) {
+	    if (IS_SET(vm->flags, STEP)) { // TODO: dirty hack for debugger
 	      printf("\n");
 	    }
 	    break;
 
 	case WRITE_STR:
-	    printf("%s", OSV(ip));
-	    if (IS_SET(VF(v), STEP)) {
+	    printf("%s", vm->ip->strv);
+	    if (IS_SET(vm->flags, STEP)) { // TODO: dirty hack for debugger
 	      printf("\n");
 	    }
 	    break;
@@ -250,15 +225,14 @@ int eval_code(struct VM *v)
 	    break;
 
 	case WRITELN_STR:
-	    printf("%s\n", OSV(ip));
+	    printf("%s\n", vm->ip->strv);
 	    break;
 
 	case READ:
 	    p = POP();
 
-	    if (p < 0 || p >= VMS(v)) {
-		DIE("invalid memory address %d for "
-		     "read at line %d", p, lineno);
+	    if (p < 0 || p >= vm->memsize) {
+		DIE("invalid memory address %d for read", p);
 	    }
 	    
 	    ask("", answer, sizeof(answer));
@@ -277,8 +251,7 @@ int eval_code(struct VM *v)
 		  DIE("invalid '%c' in integer literal '%s' ", *ep, answer);
 		}
 	    } while (0);
-
-	    *(VMM(v) + p) = q;
+	    vm->mem[p] = q;
 	    break;
 
 	case ADD:	/* p + q */
@@ -354,16 +327,11 @@ int eval_code(struct VM *v)
 	  break;
 
 	default:
-	    DIE("unknown opcode (%d); top is %d", OOP(ip), TOP());
+	    DIE("unknown opcode (%d); top is %d", vm->ip->opcode, TOP());
 	}
     }
     /* End main loop. */
     
   halt:
-    if (sts != 0)
-	/* void */ ;
-    else
-	SAVE_REGISTERS;
-
     return sts;
 }

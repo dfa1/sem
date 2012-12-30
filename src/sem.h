@@ -100,22 +100,20 @@ struct Code
 #define CJM(c)  ((c)->jumps)
 
 struct Parsing {
-  char *filename;
+  char *filename; 
   FILE *fp;	
   char *token;	
   int lineno;	
   int offset;	
-  char str[1024];
+  char str[1024];  // TODO: really needed?
   char *pstr;
 };
 
 /* The interpreter. */
 struct VM
 {
-    struct Code *code; // TODO: remove
-
     /* The Instruction Pointer. */
-    struct Op *ip;
+    struct Op *ip; 
     int lineno;
 
     /*
@@ -124,7 +122,6 @@ struct VM
      *
      * This is the data memory (D). Data memory's addresses start
      * at 0 and it can be used /only/ to store/retrieve integers.
-     * The memory size can changed via -m option.
      */
     int *mem;
     int memsize;
@@ -136,7 +133,7 @@ struct VM
      * The stack is a fixed size, which means there's a limit on
      * the nesting allowed in expressions. A more sophisticated
      * system could let it grow dynamically but at this point is
-     * useless. The stack size can be changed via -s option.
+     * useless. 
      */
     int *stack;
     int stacksize;
@@ -146,25 +143,13 @@ struct VM
 #define	STEP	1 << 0		/* Eval step by step.           */
 #define TRACE 	1 << 1		/* Dump opcode execution.       */
 #define HALTED  1 << 2		/* Terminated.                  */
-    int flags;
+    int flags; // TODO: remove 
 };
-
-// TODO: drop
-/* struct VM access macros. */
-#define VCD(v)	((v)->code)
-#define VIP(v)	((v)->ip)
-#define VMM(v)	((v)->mem)
-#define VMS(v)	((v)->memsize)
-#define VST(v)	((v)->stack)
-#define VSS(v)	((v)->stacksize)
-#define VTP(v)	((v)->stacktop)
-#define VLN(v)	((v)->lineno)
-#define VF(v)	((v)->flags)
 
 extern struct Code *compile_code(const char* filename);
 extern void code_destroy(struct Code *);
-extern struct VM *vm_init(struct Code *, int, int);
+extern struct VM *vm_init(int mem_size, int stack_size);
 extern void vm_destroy(struct VM *);
-extern int eval_code(struct VM *);
+extern int eval_code(struct VM *, struct Code *);
 extern int debug_code(struct VM *);
 

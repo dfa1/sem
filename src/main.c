@@ -114,8 +114,8 @@ main(int argc, char **argv) {
       return EXIT_FAILURE;
     }
 
-    struct VM *vm = vm_init(code, mem_size, stack_size);
-    int status = eval_code(vm);
+    struct VM *vm = vm_init(mem_size, stack_size);
+    int status = eval_code(vm, code);
     code_destroy(code);
     vm_destroy(vm);
     return status;
