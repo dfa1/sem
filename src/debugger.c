@@ -179,7 +179,7 @@ int ask(const char *question)
 PRIVATE char dumpDoc[] = "Dump internal code representation.";
 
 /* *INDENT-OFF* */
-PRIVATE const char *opstr[] = {	/* TODO: gperf */
+PRIVATE const char *opstr[] = {	/* TODO: autogenerate these from sem.h */
 	"START",	"SET", 		"JUMP", 	"JUMPT",
 	"SETLINENO", 	"INT", 		"READ", 	"WRITE_INT",
 	"WRITE_STR", 	"WRITELN_INT",	"WRITELN_STR",	"MEM", 		

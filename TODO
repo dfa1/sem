@@ -1,14 +1,9 @@
 Release 3.0
 ===========
 
-- clean code:
- - automated tests
- - code cosmetics (no_camel_case, indentation, no macros)
- - improve module separation 
+- smoke tests, unit tests 
 - FreeBSD/OpenBSD port
 - MacOSX port
-- compilable with gcc/clang
 - debugger commands: `trace' and `break'
-- a script that autogerates opstr
 - more documentation (examples, man page)
 - sem-mode for GNU emacs 
