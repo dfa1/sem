@@ -32,7 +32,7 @@ enum {
 };
 
 struct debug_state {
-	int state;	
+	int state;
 	struct vm *vm;
 	struct code *code;
 	struct cmd *cmds;
@@ -78,7 +78,7 @@ static int dump_func(struct debug_state *ds)
 	for (i = ds->code->head; i != NULL; i = i->next) {
 		fprintf(stdout, "%-20s\t", opstr[i->opcode]);
 
-		if (i->intv != -1) { // TODO: -1 is a valid integer
+		if (i->intv != -1) {	// TODO: -1 is a valid integer
 			fprintf(stdout, "%d\n", i->intv);
 		} else if (i->strv != NULL) {
 			char *t = repr(i->strv);
@@ -100,7 +100,8 @@ static int help_func(struct debug_state *ds)
 {
 	struct cmd *cmd;
 	for (cmd = ds->cmds; cmd->name != NULL; cmd++) {
-		fprintf(stdout, "%-20s %-10c %-30s\n", cmd->name, cmd->name[0], cmd->doc);
+		fprintf(stdout, "%-20s %-10c %-30s\n", cmd->name, cmd->name[0],
+			cmd->doc);
 	}
 	return CONTINUE;
 }
