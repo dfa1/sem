@@ -61,10 +61,10 @@ typedef enum {
 	LE,
 	IP,
 	HALT
-} op_t;
+} opcode_t;
 
 struct instr {
-	op_t opcode;		/* opcode */
+	opcode_t opcode;	/* opcode */
 	int intv;		/* integer argument */
 	char *strv;		/* string argument */
 	struct instr *next;	/* next opcode */
