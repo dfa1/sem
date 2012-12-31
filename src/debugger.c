@@ -24,9 +24,15 @@
 #include <string.h>
 #include <ctype.h>
 #include "sem.h"
+#include "version.h"
+
+enum {
+	RUNNING,
+	HALTED,
+};
 
 struct debug_state {
-	int state;		// TODO: RUNNING, HALTED, STEP, TRACE..
+	int state;	
 	struct vm *vm;
 	struct code *code;
 	struct cmd *cmds;
@@ -72,7 +78,7 @@ static int dump_func(struct debug_state *ds)
 	for (i = ds->code->head; i != NULL; i = i->next) {
 		fprintf(stdout, "%-20s\t", opstr[i->opcode]);
 
-		if (i->intv != -1) {
+		if (i->intv != -1) { // TODO: -1 is a valid integer
 			fprintf(stdout, "%d\n", i->intv);
 		} else if (i->strv != NULL) {
 			char *t = repr(i->strv);
@@ -94,8 +100,7 @@ static int help_func(struct debug_state *ds)
 {
 	struct cmd *cmd;
 	for (cmd = ds->cmds; cmd->name != NULL; cmd++) {
-		fprintf(stdout, "%-20s %-10c %-30s\n", cmd->name, cmd->name[0],
-			cmd->doc);
+		fprintf(stdout, "%-20s %-10c %-30s\n", cmd->name, cmd->name[0], cmd->doc);
 	}
 	return CONTINUE;
 }
@@ -249,7 +254,8 @@ int debug_code(struct vm *vm, struct code *code)
 	pds->vm = vm;
 	pds->code = code;
 	pds->cmds = cmds;
-	fprintf(stdout, "Type 'help' to get help.\n");
+	fprintf(stdout, "sem %s -- Debugger \n", VERSION);
+	fprintf(stdout, "Type 'help' to list available commands.\n");
 	for (;;) {
 		int res = ask("sem> ", cmd_name, sizeof(cmd_name));
 		if (res < 0) {
@@ -262,6 +268,5 @@ int debug_code(struct vm *vm, struct code *code)
 			break;
 		}
 	}
-
 	return 0;
 }
