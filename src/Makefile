@@ -17,21 +17,24 @@ sem: $(OBJECTS)
 	$(CC) $(OBJECTS) -o $@
 
 debug: sem
-	gdb ./sem
-
-valgrind: sem
-	valgrind -v --leak-check=full ./sem ../examples/fact.sem
+	./sem -d ../examples/fact.sem
 
 run: sem
 	./sem ../examples/fact.sem
 
+test: test_memory
+	
+test_memory: test_memory.c
+	$(CC) $(CFLAGS) test_memory.c memory.c -o $@
+	./test_memory
+
 clean: 
-	rm -f *.o sem
+	rm -f *.o sem test_memory
 
 distclean: clean
 	rm -f compiler.c tokens.h scanner.c
 
 indent:
-	indent -linux compiler.y scanner.l debugger.c vm.c io.c memory.c main.c
+	indent -linux compiler.y scanner.l debugger.c vm.c io.c memory.c main.c test_*.c
 
-.PHONY: all clean distclean run debug valgrind indent
+.PHONY: all clean distclean run debug valgrind indent test

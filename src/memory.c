@@ -36,8 +36,11 @@ void drop_first_last_inplace(char *str, int len)
 	str[len - 2] = 0;
 }
 
-char *expand_special_chars(const char *s)
-{ 
+/* example:
+ *   '\nì -> '"\\n"''
+ */
+char *repr(const char *s)
+{
 	char *p;
 	int size, i, j = 0;
 

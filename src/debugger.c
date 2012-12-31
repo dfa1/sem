@@ -45,7 +45,6 @@ enum {
 	QUIT
 };
 
-
 /* 
  * Commands 
  * --------
@@ -76,7 +75,7 @@ static int dump_func(struct debug_state *ds)
 		if (i->intv != -1) {
 			fprintf(stdout, "%d\n", i->intv);
 		} else if (i->strv != NULL) {
-			char *t = expand_special_chars(i->strv);
+			char *t = repr(i->strv);
 			fprintf(stdout, "%.50s\n", t);
 			free(t);
 		} else {
@@ -95,7 +94,8 @@ static int help_func(struct debug_state *ds)
 {
 	struct cmd *cmd;
 	for (cmd = ds->cmds; cmd->name != NULL; cmd++) {
-		fprintf(stdout, "%-20s %-10c %-30s\n", cmd->name, cmd->name[0], cmd->doc);
+		fprintf(stdout, "%-20s %-10c %-30s\n", cmd->name, cmd->name[0],
+			cmd->doc);
 	}
 	return CONTINUE;
 }
@@ -192,7 +192,7 @@ static int notimpl_func(struct debug_state *ds)
 	return CONTINUE;
 }
 
-static struct cmd cmds[] = {	
+static struct cmd cmds[] = {
 	{"dump", dump_doc, dump_func},
 	{"next", next_doc, next_func},
 	{"run", run_doc, run_func},
@@ -228,7 +228,7 @@ static int run_command(struct debug_state *ds, const char *cmd_name)
 
 	/* Is the input an alias? */
 	cmp = (strlen(cmd_name) > 1) ? cmp_by_name : cmp_by_alias;
-	
+
 	/* Search the command. */
 	for (cmd = ds->cmds; cmd->name != NULL; cmd++) {
 		if ((cmp) (cmd_name, cmd->name)) {
@@ -254,7 +254,7 @@ int debug_code(struct vm *vm, struct code *code)
 		int res = ask("sem> ", cmd_name, sizeof(cmd_name));
 		if (res < 0) {
 			break;
-		} 
+		}
 		if (strcmp(cmd_name, "") == 0) {
 			continue;
 		}
