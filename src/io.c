@@ -6,7 +6,7 @@
 void ask(const char *question, char *answer, int answer_size)
 {
 	fputs(question, stdout);
-	fgets(answer, sizeof(answer_size), stdin);
+	fgets(answer, answer_size, stdin);
 	answer[strlen(answer) - 1] = 0;
 }
 
