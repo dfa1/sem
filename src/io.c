@@ -2,12 +2,16 @@
 #include <string.h>
 #include "sem.h"
 
-// drop \n 
-void ask(const char *question, char *answer, int answer_size)
+// Display a prompt, read from stdin, dropping \n before returning the user input. Return -1 on EOF.  
+int ask(const char *question, char *answer, int answer_size)
 {
 	fputs(question, stdout);
-	fgets(answer, answer_size, stdin);
+	char *res = fgets(answer, answer_size, stdin);
+	if (res == NULL) {
+		return -1;
+	}
 	answer[strlen(answer) - 1] = 0;
+	return 0;
 }
 
 int ask_yes_no(const char *question)

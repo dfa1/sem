@@ -209,7 +209,9 @@ int eval_code(struct vm *vm, struct code *code)
 
 				char answer[1024];
 				char *ep;
-				ask("", answer, sizeof(answer));
+				if (ask("", answer, sizeof(answer)) < 0) {
+					DIE("EOF during read");
+				}
 				errno = 0;
 				q = strtol(answer, &ep, 10);
 
