@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <assert.h>
 #include "sem.h"
 #include "scanner.h"
 
@@ -363,24 +364,25 @@ struct code *compile_code(const char *filename)
 	return code;
 }
 
-void code_destroy(struct code *c)
+void code_destroy(struct code *code)
 {
-	struct instr *o = c->head;
+	assert(code != NULL);
+	struct instr *i = code->head;
 	struct instr *t;
 
-	while (o != NULL) {
-		t = o->next;
+	while (i != NULL) {
+		t = i->next;
 
 		/* Free the string, if needed. */
-		if (o->strv != NULL) {
-			free(o->strv);
+		if (i->strv != NULL) {
+			free(i->strv);
 		}
 
 		/* Free this node. */
-		free(o);
-		o = t;
+		free(i);
+		i = t;
 	}
 
-	free(c->jumps);
-	free(c);
+	free(code->jumps);
+	free(code);
 }

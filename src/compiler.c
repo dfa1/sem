@@ -96,6 +96,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <assert.h>
 #include "sem.h"
 #include "scanner.h"
 
@@ -128,7 +129,7 @@ static void emit(struct code *, int, int, char *);
 
 
 /* Line 189 of yacc.c  */
-#line 132 "compiler.c"
+#line 133 "compiler.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -191,7 +192,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 195 "compiler.c"
+#line 196 "compiler.c"
 
 #ifdef short
 # undef short
@@ -491,11 +492,11 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    98,    98,   102,   105,   110,   111,   115,   115,   116,
-     116,   117,   121,   122,   123,   127,   133,   136,   142,   145,
-     148,   151,   154,   157,   163,   167,   170,   173,   176,   179,
-     182,   188,   192,   193,   196,   202,   203,   206,   209,   215,
-     216,   217,   221,   243,   249
+       0,    99,    99,   103,   106,   111,   112,   116,   116,   117,
+     117,   118,   122,   123,   124,   128,   134,   137,   143,   146,
+     149,   152,   155,   158,   164,   168,   171,   174,   177,   180,
+     183,   189,   193,   194,   197,   203,   204,   207,   210,   216,
+     217,   218,   222,   244,   250
 };
 #endif
 
@@ -1456,7 +1457,7 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 98 "compiler.y"
+#line 99 "compiler.y"
     {
     fprintf(stderr, "empty source\n");
     YYABORT;
@@ -1466,28 +1467,28 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 115 "compiler.y"
+#line 116 "compiler.y"
     { emit_op_int(SETLINENO, yyget_lineno(yyscanner)); ;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 116 "compiler.y"
+#line 117 "compiler.y"
     { emit_op_int(SETLINENO, yyget_lineno(yyscanner)); ;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 117 "compiler.y"
+#line 118 "compiler.y"
     { YYABORT; ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 127 "compiler.y"
+#line 128 "compiler.y"
     {
     emit_op(HALT);
 ;}
@@ -1496,7 +1497,7 @@ yyreduce:
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 133 "compiler.y"
+#line 134 "compiler.y"
     {
     emit_op(JUMP);
 ;}
@@ -1505,7 +1506,7 @@ yyreduce:
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 136 "compiler.y"
+#line 137 "compiler.y"
     {
     emit_op(JUMPT);
 ;}
@@ -1514,7 +1515,7 @@ yyreduce:
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 142 "compiler.y"
+#line 143 "compiler.y"
     {
     emit_op(SET);
 ;}
@@ -1523,7 +1524,7 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 145 "compiler.y"
+#line 146 "compiler.y"
     {
     emit_op(WRITE_INT);
 ;}
@@ -1532,7 +1533,7 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 148 "compiler.y"
+#line 149 "compiler.y"
     {
     emit_op_string(WRITE_STR, yyget_text(yyscanner));
 ;}
@@ -1541,7 +1542,7 @@ yyreduce:
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 151 "compiler.y"
+#line 152 "compiler.y"
     {	/* this is an extension */
     emit_op(WRITELN_INT);
 ;}
@@ -1550,7 +1551,7 @@ yyreduce:
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 154 "compiler.y"
+#line 155 "compiler.y"
     {	/* this is an extension */
     emit_op_string(WRITELN_STR, yyget_text(yyscanner));
 ;}
@@ -1559,7 +1560,7 @@ yyreduce:
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 157 "compiler.y"
+#line 158 "compiler.y"
     {
     emit_op(READ);
 ;}
@@ -1568,7 +1569,7 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 167 "compiler.y"
+#line 168 "compiler.y"
     {
     emit_op(EQ);
 ;}
@@ -1577,7 +1578,7 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 170 "compiler.y"
+#line 171 "compiler.y"
     {
     emit_op(NE);
 ;}
@@ -1586,7 +1587,7 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 173 "compiler.y"
+#line 174 "compiler.y"
     {
     emit_op(GT);
 ;}
@@ -1595,7 +1596,7 @@ yyreduce:
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 176 "compiler.y"
+#line 177 "compiler.y"
     {
     emit_op(LT);
 ;}
@@ -1604,7 +1605,7 @@ yyreduce:
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 179 "compiler.y"
+#line 180 "compiler.y"
     {
     emit_op(GE);
 ;}
@@ -1613,7 +1614,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 182 "compiler.y"
+#line 183 "compiler.y"
     {
     emit_op(LE);
 ;}
@@ -1622,7 +1623,7 @@ yyreduce:
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 193 "compiler.y"
+#line 194 "compiler.y"
     {
     emit_op(ADD);
 ;}
@@ -1631,7 +1632,7 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 196 "compiler.y"
+#line 197 "compiler.y"
     {
     emit_op(SUB);
 ;}
@@ -1640,7 +1641,7 @@ yyreduce:
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 203 "compiler.y"
+#line 204 "compiler.y"
     {
     emit_op(MUL);
 ;}
@@ -1649,7 +1650,7 @@ yyreduce:
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 206 "compiler.y"
+#line 207 "compiler.y"
     {		
     emit_op(DIV);
 ;}
@@ -1658,7 +1659,7 @@ yyreduce:
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 209 "compiler.y"
+#line 210 "compiler.y"
     { /* this is an extension */
     emit_op(MOD);
 ;}
@@ -1667,7 +1668,7 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 221 "compiler.y"
+#line 222 "compiler.y"
     {
     long value;
     char *ep;
@@ -1692,7 +1693,7 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 243 "compiler.y"
+#line 244 "compiler.y"
     {
     emit_op(MEM);
 ;}
@@ -1701,7 +1702,7 @@ yyreduce:
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 249 "compiler.y"
+#line 250 "compiler.y"
     {
     emit_op(IP);
 ;}
@@ -1710,7 +1711,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1714 "compiler.c"
+#line 1715 "compiler.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1922,7 +1923,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 253 "compiler.y"
+#line 254 "compiler.y"
 
   /* *INDENT-ON* */
 
@@ -2036,25 +2037,26 @@ struct code *compile_code(const char *filename)
 	return code;
 }
 
-void code_destroy(struct code *c)
+void code_destroy(struct code *code)
 {
-	struct instr *o = c->head;
+	assert(code != NULL);
+	struct instr *i = code->head;
 	struct instr *t;
 
-	while (o != NULL) {
-		t = o->next;
+	while (i != NULL) {
+		t = i->next;
 
 		/* Free the string, if needed. */
-		if (o->strv != NULL) {
-			free(o->strv);
+		if (i->strv != NULL) {
+			free(i->strv);
 		}
 
 		/* Free this node. */
-		free(o);
-		o = t;
+		free(i);
+		i = t;
 	}
 
-	free(c->jumps);
-	free(c);
+	free(code->jumps);
+	free(code);
 }
 
