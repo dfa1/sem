@@ -30,22 +30,22 @@
 #include "scanner.h"
 
 #if defined(WITH_PARSER_DEBUG)
-# define YYDEBUG 	1
+#define YYDEBUG 	1
 #endif
 
 #if defined(WITH_VERBOSE_ERROR)
-# define YYERROR_VERBOSE
+#define YYERROR_VERBOSE
 #endif
 
 // TODO: runtime
-#ifdef WITH_COMPILER_DEBUG 
-# define DPRINTF(...) printf(__VA_ARGS__) 
-#else 
-# define DPRINTF(...)
+#ifdef WITH_COMPILER_DEBUG
+#define DPRINTF(...) printf(__VA_ARGS__)
+#else
+#define DPRINTF(...)
 #endif
 
 #define YYSTYPE 	struct op *
-static void yyerror(void* yyscanner, struct code* code, const char *); 
+static void yyerror(void *yyscanner, struct code *code, const char *);
 #define error(msg) yyerror(yyscanner, code, (msg))
 
 /* Emit an opcode to the list (see Code struct). */
@@ -253,137 +253,134 @@ aip
 %%
   /* *INDENT-ON* */
 
-static void
-yyerror(void *yyscanner, struct code* code, const char *msg)
+static void yyerror(void *yyscanner, struct code *code, const char *msg)
 {
-    (void) code;
-    fprintf(stderr, "sem: %s at line %d near token '%s'\n", msg, yyget_lineno(yyscanner), yyget_text(yyscanner));
+	(void)code;
+	fprintf(stderr, "sem: %s at line %d near token '%s'\n", msg,
+		yyget_lineno(yyscanner), yyget_text(yyscanner));
 }
 
-
-static struct instr *
-op_init(int opcode, int iv, char *sv) {
-  struct instr *op = xmalloc(sizeof(struct instr));
-  op->opcode = opcode;
-  op->intv = iv;
-  op->strv = (sv != NULL) ? xstrdup(sv) : NULL;
-  op->next = NULL;
-  return op;
+static struct instr *op_init(int opcode, int iv, char *sv)
+{
+	struct instr *op = xmalloc(sizeof(struct instr));
+	op->opcode = opcode;
+	op->intv = iv;
+	op->strv = (sv != NULL) ? xstrdup(sv) : NULL;
+	op->next = NULL;
+	return op;
 }
 
-static void
-emit(struct code *code, int opcode, int iv, char *sv)
+static void emit(struct code *code, int opcode, int iv, char *sv)
 {
-  struct instr *op = op_init(opcode, iv, sv);
-  code->code->next = op;
-  code->code = op;
-  
-  if (opcode == SETLINENO) {
-    code->size += 1;
-  }
+	struct instr *op = op_init(opcode, iv, sv);
+	code->code->next = op;
+	code->code = op;
+
+	if (opcode == SETLINENO) {
+		code->size += 1;
+	}
 }
 
-struct code *
-compile_code(const char* filename) 
+struct code *compile_code(const char *filename)
 {
-  FILE *fp;
- 
-  if ((fp = fopen(filename, "r")) == NULL) {
-      fprintf(stderr, "sem: cannot open '%s'\n", filename);
-      return NULL;
-  }
- 
-  struct instr *start = op_init(START, 0, NULL);
-  struct code *code = xmalloc(sizeof(struct code));
-  code->size = 1;
-  code->jumps = NULL;
-  code->head = start; 
-  code->code = start; 
- 
-  yyscan_t scanner;
-  yylex_init(&scanner);
-  yyset_in(fp, scanner); 
- 
+	FILE *fp;
+
+	if ((fp = fopen(filename, "r")) == NULL) {
+		fprintf(stderr, "sem: cannot open '%s'\n", filename);
+		return NULL;
+	}
+
+	struct instr *start = op_init(START, 0, NULL);
+	struct code *code = xmalloc(sizeof(struct code));
+	code->size = 1;
+	code->jumps = NULL;
+	code->head = start;
+	code->code = start;
+
+	yyscan_t scanner;
+	yylex_init(&scanner);
+	yyset_in(fp, scanner);
+
 #if defined(WITH_PARSER_DEBUG)
-  yydebug = 1;
+	yydebug = 1;
 #endif
 
-  int compile_status = yyparse(scanner, code);
-  yylex_destroy(scanner);
-  fclose(fp);
+	int compile_status = yyparse(scanner, code);
+	yylex_destroy(scanner);
+	fclose(fp);
 
-  if (compile_status != 0) {
-    return NULL;
-  }
-  
-  DPRINTF("code size = %d\n", code->size);
-  code->jumps = (struct instr **) xmalloc(code->size * sizeof(void *));  
-   
-  /*
-   * Jump-table generation. It maps the source's lines with
-   * the internal code representation. For example the
-   * internal code representation of:
-   *
-   *   set D[1] + 1, D[0]
-   *
-   * will be:
-   *
-   *   SETLINENO             19
-   *   INT                   1
-   *   MEM
-   *   INT                   1
-   *   ADD
-   *   INT                   0
-   *   MEM
-   *   SET
-   */
-  int j;
-  struct instr *i;
+	if (compile_status != 0) {
+		return NULL;
+	}
 
-  for (j = 0, i = code->head; i != NULL; i = i->next) {
-    DPRINTF("COMPILE: %p (op=%d,intv=%d,strv=%s)\n", i, i->opcode, i->intv, i->strv);
-    if (i->opcode == SETLINENO) {
-      DPRINTF("COMPILE:  line %j jumps to %p\n", j, i);
-      code->jumps[j++] = i;
-    }
-  }
-  
-  /* Add, if needed, a trailing HALT opcode. */
-  struct instr *last_instr = code->code;
-  switch (last_instr->opcode) {
+	DPRINTF("code size = %d\n", code->size);
+	code->jumps = (struct instr **)xmalloc(code->size * sizeof(void *));
+
+	/*
+	 * Jump-table generation. It maps the source's lines with
+	 * the internal code representation. For example the
+	 * internal code representation of:
+	 *
+	 *   set D[1] + 1, D[0]
+	 *
+	 * will be:
+	 *
+	 *   SETLINENO             19
+	 *   INT                   1
+	 *   MEM
+	 *   INT                   1
+	 *   ADD
+	 *   INT                   0
+	 *   MEM
+	 *   SET
+	 */
+	int j;
+	struct instr *i;
+
+	for (j = 0, i = code->head; i != NULL; i = i->next) {
+		DPRINTF("COMPILE: %p (op=%d,intv=%d,strv=%s)\n", i, i->opcode,
+			i->intv, i->strv);
+		if (i->opcode == SETLINENO) {
+			DPRINTF("COMPILE:  line %j jumps to %p\n", j, i);
+			code->jumps[j++] = i;
+		}
+	}
+
+	/* Add, if needed, a trailing HALT opcode. */
+	struct instr *last_instr = code->code;
+	switch (last_instr->opcode) {
 	case HALT:
-        case JUMP:
-        case JUMPT:
-          /* do nothing */
-          break;
-   
-      default:
-        emit_op(HALT);
-	DPRINTF("COMPILE: inserting missing HALT instruction at end");
-  }
-  
-  return code;
+	case JUMP:
+	case JUMPT:
+		/* do nothing */
+		break;
+
+	default:
+		emit_op(HALT);
+		DPRINTF("COMPILE: inserting missing HALT instruction at end");
+	}
+
+	return code;
 }
 
-void
-code_destroy(struct code *c)
+void code_destroy(struct code *c)
 {
-  struct instr *o = c->head;
-  struct instr *t;
+	struct instr *o = c->head;
+	struct instr *t;
 
-  while (o != NULL) {
-	 t = o->next;
+	while (o != NULL) {
+		t = o->next;
 
-	    /* Free the string, if needed. */
-	    if (o->strv != NULL) {
-		free(o->strv);
-            }
+		/* Free the string, if needed. */
+		if (o->strv != NULL) {
+			free(o->strv);
+		}
 
-	    /* Free this node. */
-	    free(o);
-	    o = t;
-    }
+		/* Free this node. */
+		free(o);
+		o = t;
+	}
 
-    free(c->jumps);
-    free(c);
+	free(c->jumps);
+	free(c);
 }

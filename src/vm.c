@@ -26,34 +26,32 @@
 #include <assert.h>
 #include "sem.h"
 
-struct vm *
-vm_init(int memsize, int stacksize)
+struct vm *vm_init(int memsize, int stacksize)
 {
-    assert(memsize > 0);
-    assert(stacksize > 0);
-    struct vm *vm = (struct vm *) xmalloc(sizeof(struct vm));
-    // memory
-    vm->memsize = memsize;
-    vm->mem = xmalloc(sizeof(int) * memsize);
-    memset(vm->mem, 0, sizeof(int) * memsize); 
-    // stack
-    vm->stacksize = stacksize;
-    vm->stack = xmalloc(sizeof(int) * stacksize);
-    memset(vm->stack, 0, sizeof(int) * stacksize);
-    vm->stacktop = vm->stack;
-    // ip
-    vm->ip = NULL;
-    vm->lineno = 1;
-    return vm;
+	assert(memsize > 0);
+	assert(stacksize > 0);
+	struct vm *vm = (struct vm *)xmalloc(sizeof(struct vm));
+	// memory
+	vm->memsize = memsize;
+	vm->mem = xmalloc(sizeof(int) * memsize);
+	memset(vm->mem, 0, sizeof(int) * memsize);
+	// stack
+	vm->stacksize = stacksize;
+	vm->stack = xmalloc(sizeof(int) * stacksize);
+	memset(vm->stack, 0, sizeof(int) * stacksize);
+	vm->stacktop = vm->stack;
+	// ip
+	vm->ip = NULL;
+	vm->lineno = 1;
+	return vm;
 }
 
-void
-vm_destroy(struct vm *vm)
+void vm_destroy(struct vm *vm)
 {
-    assert(vm != NULL);
-    free(vm->mem);
-    free(vm->stack);
-    free(vm);
+	assert(vm != NULL);
+	free(vm->mem);
+	free(vm->stack);
+	free(vm);
 }
 
 /*
@@ -81,16 +79,15 @@ vm_destroy(struct vm *vm)
  *                          |                     | 
  *                          +---------------------+
  */
-int 
-eval_code(struct vm *vm, struct code *code)
+int eval_code(struct vm *vm, struct code *code)
 {
-    int p;		/* first operand                */
-    int q;		/* second operand               */
-    int sts;	/* status                       */
+	int p;			/* first operand                */
+	int q;			/* second operand               */
+	int sts;		/* status                       */
 
-    /* Initialization. */
-    sts = 0;
-    vm->ip = code->head;
+	/* Initialization. */
+	sts = 0;
+	vm->ip = code->head;
 
 // TODO: rename as error
 #define DIE(...)				\
@@ -106,7 +103,7 @@ eval_code(struct vm *vm, struct code *code)
       goto halt;				\
     } while(0)
 
-    /* Stack manipulation macros. */
+	/* Stack manipulation macros. */
 #define TOP()           (*vm->stacktop)
 #define LEVEL()         (vm->stacktop - vm->stack)
 #define EMPTY()         (LEVEL() == 0)
@@ -119,191 +116,194 @@ eval_code(struct vm *vm, struct code *code)
 	    DIE("stack overflow");		\
     } while(0)
 
-    /* Main loop. */
-    for (;;) {
-	/* Instruction fetch. */
-	vm->ip = vm->ip->next;
+	/* Main loop. */
+	for (;;) {
+		/* Instruction fetch. */
+		vm->ip = vm->ip->next;
 
-	/* Instruction execution. */
-	switch (vm->ip->opcode) {
-	case INT:
-	    PUSH(vm->ip->intv);
-	    break;
+		/* Instruction execution. */
+		switch (vm->ip->opcode) {
+		case INT:
+			PUSH(vm->ip->intv);
+			break;
 
-	case SET:
-	    q = POP();
-	    p = POP();
+		case SET:
+			q = POP();
+			p = POP();
 
-	    if (p < 0 || p >= vm->memsize) {
-		DIE("invalid memory address %d for target", p);
-	    }
-	    vm->mem[p] = q;
-	    break;
+			if (p < 0 || p >= vm->memsize) {
+				DIE("invalid memory address %d for target", p);
+			}
+			vm->mem[p] = q;
+			break;
 
-	case MEM:
-	    p = POP();
+		case MEM:
+			p = POP();
 
-	    if (p < 0 || p >= vm->memsize)
-		DIE("invalid memory address %d", p);
+			if (p < 0 || p >= vm->memsize)
+				DIE("invalid memory address %d", p);
 
-	    PUSH(vm->mem[p]);
-	    break;
+			PUSH(vm->mem[p]);
+			break;
 
-	case SETLINENO:
-	    vm->lineno = vm->ip->intv;
-	    break;
+		case SETLINENO:
+			vm->lineno = vm->ip->intv;
+			break;
 
-	case JUMP:
-	    q = POP();
+		case JUMP:
+			q = POP();
 
-	    if (q < 1 || q >= code->size) {
-		DIE("cannot jump to line %d", q);
-	    }
+			if (q < 1 || q >= code->size) {
+				DIE("cannot jump to line %d", q);
+			}
 
-	    vm->ip = code->jumps[q - 1];
-	    break;
+			vm->ip = code->jumps[q - 1];
+			break;
 
-	case JUMPT:
-	    p = POP();
-	    q = POP();
+		case JUMPT:
+			p = POP();
+			q = POP();
 
-	    if (q < 1 || q >= code->size) {
-		DIE("cannot jump to line %d", q);
-            }
+			if (q < 1 || q >= code->size) {
+				DIE("cannot jump to line %d", q);
+			}
 
-	    if (p != 0) {
-		vm->ip = code->jumps[q - 1];
-	    }
-	    break;
+			if (p != 0) {
+				vm->ip = code->jumps[q - 1];
+			}
+			break;
 
-	case HALT:
-	    sts = 0;
-	    goto halt;
+		case HALT:
+			sts = 0;
+			goto halt;
 
-	case IP:
-	    PUSH(vm->lineno + 1);
-	    break;
+		case IP:
+			PUSH(vm->lineno + 1);
+			break;
 
-	case WRITE_INT:
-	    p = POP();
-	    printf("%d", p);
-	    break;
+		case WRITE_INT:
+			p = POP();
+			printf("%d", p);
+			break;
 
-	case WRITE_STR:
-	    printf("%s", vm->ip->strv);
-	    break;
+		case WRITE_STR:
+			printf("%s", vm->ip->strv);
+			break;
 
-	case WRITELN_INT:
-	    p = POP();
-	    printf("%d\n", p);
-	    break;
+		case WRITELN_INT:
+			p = POP();
+			printf("%d\n", p);
+			break;
 
-	case WRITELN_STR:
-	    printf("%s\n", vm->ip->strv);
-	    break;
+		case WRITELN_STR:
+			printf("%s\n", vm->ip->strv);
+			break;
 
-	case READ: {
-	    p = POP();
+		case READ:
+			{
+				p = POP();
 
-	    if (p < 0 || p >= vm->memsize) {
-		DIE("invalid memory address %d for read", p);
-	    }
-	    
-	    char answer[1024];
-   	    char *ep;
-	    ask("", answer, sizeof(answer));
-	errno = 0;
-	q = strtol(answer, &ep, 10);
+				if (p < 0 || p >= vm->memsize) {
+					DIE("invalid memory address %d for read", p);
+				}
 
-	if (errno == ERANGE) {
-	  DIE("invalid integer literal '%s'", answer);
+				char answer[1024];
+				char *ep;
+				ask("", answer, sizeof(answer));
+				errno = 0;
+				q = strtol(answer, &ep, 10);
+
+				if (errno == ERANGE) {
+					DIE("invalid integer literal '%s'",
+					    answer);
+				}
+
+				if (*ep != 0) {
+					DIE("invalid '%c' in integer literal '%s' ", *ep, answer);
+				}
+				vm->mem[p] = q;
+				break;
+			}
+
+		case ADD:	/* p + q */
+			q = POP();
+			p = POP();
+			PUSH(p + q);
+			break;
+
+		case SUB:	/* p - q */
+			q = POP();
+			p = POP();
+			PUSH(p - q);
+			break;
+
+		case MUL:	/* p * q */
+			q = POP();
+			p = POP();
+			PUSH(p * q);
+			break;
+
+		case DIV:	/* p / q */
+			q = POP();
+			p = POP();
+			if (q == 0) {
+				DIE("division by zero");
+			}
+			PUSH(p / q);
+			break;
+
+		case MOD:	/* p % q */
+			q = POP();
+			p = POP();
+			if (q == 0) {
+				DIE("division by zero");
+			}
+			PUSH(p % q);
+			break;
+
+		case EQ:	/* p = q */
+			q = POP();
+			p = POP();
+			PUSH(p == q);
+			break;
+
+		case NE:	/* p != q */
+			q = POP();
+			p = POP();
+			PUSH(p != q);
+			break;
+
+		case GT:	/* p > q */
+			q = POP();
+			p = POP();
+			PUSH(p > q);
+			break;
+
+		case LT:	/* p < q */
+			q = POP();
+			p = POP();
+			PUSH(p < q);
+			break;
+
+		case GE:	/* p >= q */
+			q = POP();
+			p = POP();
+			PUSH(p >= q);
+			break;
+
+		case LE:	/* p <= q */
+			q = POP();
+			p = POP();
+			PUSH(p <= q);
+			break;
+
+		default:
+			DIE("unknown opcode (%d); top is %d", vm->ip->opcode,
+			    TOP());
+		}
 	}
+	/* End main loop. */
 
-	if (*ep != 0) {
-	  DIE("invalid '%c' in integer literal '%s' ", *ep, answer);
-	}
-	    vm->mem[p] = q;
-	    break;
-        }
-
-	case ADD:	/* p + q */
-	  q = POP();			
-	  p = POP();			
-	  PUSH(p + q);
-	  break;
-
-	case SUB:	/* p - q */
-	  q = POP();			
-	  p = POP();			
-	  PUSH(p - q);
-	  break;
-
-	case MUL:	/* p * q */
-	  q = POP();			
-	  p = POP();			
-	  PUSH(p * q);
-	  break;
-
-	case DIV:	/* p / q */
-	  q = POP();			
-	  p = POP();			
-	  if (q == 0) {				
-	    DIE("division by zero");		
-	  }
-	  PUSH(p / q);
-	  break;
-
-	case MOD:	/* p % q */
-	  q = POP();			
-	  p = POP();			
-	  if (q == 0) {				
-	    DIE("division by zero");		
-	  }
-	  PUSH(p % q);
-	  break;
-
-	case EQ:	/* p = q */
-	  q = POP();			
-	  p = POP();			
-	  PUSH(p == q);				
-	  break;
-
-	case NE:	/* p != q */
-	  q = POP();			
-	  p = POP();			
-	  PUSH(p != q);				
-	  break;
-
-	case GT:	/* p > q */
-	  q = POP();			
-	  p = POP();			
-	  PUSH(p > q);				
-	  break;
-
-	case LT:	/* p < q */
-	  q = POP();			
-	  p = POP();			
-	  PUSH(p < q);				
-	  break;
-
-	case GE:	/* p >= q */
-	  q = POP();			
-	  p = POP();			
-	  PUSH(p >= q);				
-	  break;
-
-	case LE:	/* p <= q */
-	  q = POP();			
-	  p = POP();			
-	  PUSH(p <= q);				
-	  break;
-
-	default:
-	    DIE("unknown opcode (%d); top is %d", vm->ip->opcode, TOP());
-	}
-    }
-    /* End main loop. */
-    
-  halt:
-    return sts;
+ halt:
+	return sts;
 }

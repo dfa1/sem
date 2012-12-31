@@ -51,74 +51,80 @@ Options:\n\
   -v : print the version and exit\n\
 \n\
 Report bugs to <davide.angelocola@gmail.com>\n";
-  
-static void 
-usage(int sts) {
-  FILE *target = (sts == EXIT_SUCCESS)? stdout : stderr;
-  fprintf(target, "%s", help);
-  exit(sts);
+
+static void usage(int sts)
+{
+	FILE *target = (sts == EXIT_SUCCESS) ? stdout : stderr;
+	fprintf(target, "%s", help);
+	exit(sts);
 }
 
-int 
-main(int argc, char **argv) {
-    int mem_size = DEFAULT_DATA_SIZE;
-    int stack_size = DEFAULT_STACK_SIZE;
-    int opt = 0;
-    struct option long_options[] = {
-	{ "version", 0, 0, 'v' },
-	{ "help",    0, 0, 'h' },
-	{ NULL,      0, 0, 'm' },
-	{ NULL,      0, 0, 's' },	    
+int main(int argc, char **argv)
+{
+	int mem_size = DEFAULT_DATA_SIZE;
+	int stack_size = DEFAULT_STACK_SIZE;
+	int opt = 0;
+	struct option long_options[] = {
+		{"version", 0, 0, 'v'},
+		{"help", 0, 0, 'h'},
+		{NULL, 0, 0, 'm'},
+		{NULL, 0, 0, 's'},
 
-	/* Sentinel. */
-	{ 0,         0, 0, 0   }
-    };
+		/* Sentinel. */
+		{0, 0, 0, 0}
+	};
 
-    while ((opt = getopt_long(argc, argv, "hm:s:v", long_options, NULL)) 
-	   != EOF) {
-	switch (opt) {
-	case 'h':
-	    usage(EXIT_SUCCESS);
+	while ((opt = getopt_long(argc, argv, "hm:s:v", long_options, NULL))
+	       != EOF) {
+		switch (opt) {
+		case 'h':
+			usage(EXIT_SUCCESS);
 
-	case 'm':
-	  if (sscanf(optarg, "%d", &mem_size) != 1 || mem_size < 1) {
-	    fprintf(stderr, "sem: invalid memory size (%s)\n", optarg);
-	    return EXIT_FAILURE;
-	  }
-	  break;
+		case 'm':
+			if (sscanf(optarg, "%d", &mem_size) != 1
+			    || mem_size < 1) {
+				fprintf(stderr,
+					"sem: invalid memory size (%s)\n",
+					optarg);
+				return EXIT_FAILURE;
+			}
+			break;
 
-	case 's':
-	  if (sscanf(optarg, "%d", &stack_size) != 1 || stack_size < 1) {
-	    fprintf(stderr, "sem: invalid stack size (%s)\n", optarg);
-	    return EXIT_FAILURE;
-	  }
-	  break;
+		case 's':
+			if (sscanf(optarg, "%d", &stack_size) != 1
+			    || stack_size < 1) {
+				fprintf(stderr,
+					"sem: invalid stack size (%s)\n",
+					optarg);
+				return EXIT_FAILURE;
+			}
+			break;
 
-	case 'v':
-	  fprintf(stdout, "%s", license);
-	  return EXIT_SUCCESS;
+		case 'v':
+			fprintf(stdout, "%s", license);
+			return EXIT_SUCCESS;
 
-	default:
-	  usage(EXIT_FAILURE);
+		default:
+			usage(EXIT_FAILURE);
+		}
 	}
-    }
 
-    if (optind >= argc) {
-      fprintf(stderr, "sem: no input\n");
-      return EXIT_FAILURE;
-    }
-   
-    char *filename = argv[optind];
-    struct code *code = compile_code(filename);
-    
-    if (code == NULL) {
-      // error message should be already displayed at this point
-      return EXIT_FAILURE;
-    }
+	if (optind >= argc) {
+		fprintf(stderr, "sem: no input\n");
+		return EXIT_FAILURE;
+	}
 
-    struct vm *vm = vm_init(mem_size, stack_size);
-    int status = eval_code(vm, code);
-    code_destroy(code);
-    vm_destroy(vm);
-    return status;
+	char *filename = argv[optind];
+	struct code *code = compile_code(filename);
+
+	if (code == NULL) {
+		// error message should be already displayed at this point
+		return EXIT_FAILURE;
+	}
+
+	struct vm *vm = vm_init(mem_size, stack_size);
+	int status = eval_code(vm, code);
+	code_destroy(code);
+	vm_destroy(vm);
+	return status;
 }

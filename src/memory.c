@@ -3,36 +3,35 @@
 #include <string.h>
 #include "sem.h"
 
-void *
-xmalloc(const size_t len) 
+void *xmalloc(const size_t len)
 {
-  void *mem = malloc(len);
-  
-  if (mem == NULL) {
-    abort();
-  }
+	void *mem = malloc(len);
 
-  return mem;
+	if (mem == NULL) {
+		abort();
+	}
+
+	return mem;
 }
 
-char * 
-xstrdup(const char *s) {
-  char *dup = strdup(s);
+char *xstrdup(const char *s)
+{
+	char *dup = strdup(s);
 
-  if (dup == NULL) {
-    abort();
-  }
+	if (dup == NULL) {
+		abort();
+	}
 
-  return dup;
+	return dup;
 }
 
 /* example:
  *   drop_first_last_inplace("abcd", 4) -> "bc"
  */
-void
-drop_first_last_inplace(char *str, int len) {
-        for (int i = 0; i < len - 1; i++) {
-           str[i] = str[i + 1];
-        }
-        str[len - 2] = 0;
+void drop_first_last_inplace(char *str, int len)
+{
+	for (int i = 0; i < len - 1; i++) {
+		str[i] = str[i + 1];
+	}
+	str[len - 2] = 0;
 }
