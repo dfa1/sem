@@ -1,5 +1,5 @@
 /*
- * main.c -- The main() and other stuff
+ * main.c -- The main()
  *
  * Copyright (C) 2003-2011  Davide Angelocola <davide.angelocola@gmail.com>
  
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 		{0, 0, 0, 0}
 	};
 
-	while ((opt = getopt_long(argc, argv, "hm:s:v", long_options, NULL))
+	while ((opt = getopt_long(argc, argv, "hm:s:vd", long_options, NULL))
 	       != EOF) {
 		switch (opt) {
 		case 'h':
@@ -131,7 +131,6 @@ int main(int argc, char **argv)
 	}
 
 	struct vm *vm = vm_init(mem_size, stack_size);
-
 	if (debugger) {
 		status = debug_code(vm, code);
 	} else {

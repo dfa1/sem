@@ -20,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include "sem.h"
@@ -44,49 +45,6 @@ enum {
 	QUIT
 };
 
-/* This function expands special characters. */
-char *repr(const char *s)
-{ // TODO: this function is shit
-	register char *p;
-	register int size, i, j = 0;
-
-	/* (size * 2) + 3 is ridiculously large enough :-) */
-	size = strlen(s);
-	p = (char *)xmalloc((size * 2) + 3);
-
-	/* Begin quoting. */
-	*(p + j++) = '\"';
-
-	for (i = 0; i < size; i++) {
-		register char c = *(s + i);
-
-		if (c == '\0')
-			break;
-
-		/* Expands special character while don't touchs the others. */
-		if (c == '\n')
-			*(p + j++) = '\\', *(p + j++) = 'n';
-		else if (c == '\t')
-			*(p + j++) = '\\', *(p + j++) = 't';
-		else if (c == '\r')
-			*(p + j++) = '\\', *(p + j++) = 'r';
-		else if (c == '\v')
-			*(p + j++) = '\\', *(p + j++) = 'v';
-		else if (c == '\f')
-			*(p + j++) = '\\', *(p + j++) = 'f';
-		else if (c == '\b')
-			*(p + j++) = '\\', *(p + j++) = 'b';
-		else if (c == '\a')
-			*(p + j++) = '\\', *(p + j++) = 'a';
-		else
-			*(p + j++) = c;
-	}
-
-	/* End quoting. */
-	*(p + j++) = '\"';
-	*(p + j++) = '\0';
-	return p;
-}
 
 /* 
  * Commands 
@@ -110,29 +68,23 @@ static const char *opstr[] = {	/* TODO: autogenerate these from sem.h */
 
 static int dump_func(struct debug_state *ds)
 {
-/*	register struct instr *o;
-	register struct code *c;
+	struct instr *i;
 
-	for (c = VCD(v), o = CHD(c); o != NULL; o = ONX(o)) {
-		fprintf(stdout, "%-20s\t", *(opstr + OOP(o)));
+	for (i = ds->code->head; i != NULL; i = i->next) {
+		fprintf(stdout, "%-20s\t", opstr[i->opcode]);
 
-		if (OIV(o) != -1) {
-			fprintf(stdout, "%ld", OIV(o));
-			goto outnl;
-		} else if (OSV(o) != NULL) {
-			register char *s;
-
-			s = repr(OSV(o));
-			fprintf(stdout, "%.50s", s);
-			free(s);
-			goto outnl;
+		if (i->intv != -1) {
+			fprintf(stdout, "%d\n", i->intv);
+		} else if (i->strv != NULL) {
+			char *t = expand_special_chars(i->strv);
+			fprintf(stdout, "%.50s\n", t);
+			free(t);
 		} else {
- outnl:
 			fprintf(stdout, "\n");
 			continue;
 		}
 	}
-*/
+
 	return CONTINUE;
 }
 
@@ -141,12 +93,10 @@ static char help_doc[] = "Print this help.";
 
 static int help_func(struct debug_state *ds)
 {
-/*	register struct Cmd *cmd;
-
-	for (cmd = Cmds; cmd->name != NULL; cmd++)
-		fprintf(stdout, "%-20s %-10c %-30s\n", cmd->name,
-			cmd->name[0], cmd->doc);
-*/
+	struct cmd *cmd;
+	for (cmd = ds->cmds; cmd->name != NULL; cmd++) {
+		fprintf(stdout, "%-20s %-10c %-30s\n", cmd->name, cmd->name[0], cmd->doc);
+	}
 	return CONTINUE;
 }
 
@@ -155,22 +105,10 @@ static char ip_doc[] = "Print the instruction pointer.";
 
 static int ip_func(struct debug_state *ds)
 {
-/*	if (with(VF(v), STEP))
+/*	if ((VF(v), STEP))
 		fprintf(stdout, "ip is %ld.\n", VLN(v));
 	else
 		fprintf(stdout, "Nothing to show.\n");
-*/
-	return CONTINUE;
-}
-
-/* list */
-static char list_doc[] = "List the SIMPLESEM source.";
-
-static int list_func(struct debug_state *ds)
-{
-/*	for (int i = 0; i < CSZ(VCD(v)) - 1; i++) {
-		fprintf(stdout, "%-3d %s\n", i + 1, "TODO"); // TODO: source
-	}
 */
 	return CONTINUE;
 }
@@ -184,12 +122,14 @@ static int mem_func(struct debug_state *ds)
 	int j;
 	for (i = 0; i < ds->vm->memsize; i++) {
 		/* Print at most 10 item. */
-		for (j = 0; i < ds->vm->memsize && j < 10; j++)
+		for (j = 0; i < ds->vm->memsize && j < 10; j++) {
 			fprintf(stdout, "%4d ", ds->vm->mem[i++]);
+		}
 
 		/* Fill the line. */
-		for (int k = 10 - j; k >= 0; k--)
+		for (int k = 10 - j; k >= 0; k--) {
 			fprintf(stdout, "     ");
+		}
 
 		/* Append the memory range at the end of the line. */
 		fprintf(stdout, "  %4d - %4d\n", i - j, i);
@@ -253,6 +193,7 @@ static int notimpl_func(struct debug_state *ds)
 }
 
 static struct cmd cmds[] = {	
+	{"dump", dump_doc, dump_func},
 	{"next", next_doc, next_func},
 	{"run", run_doc, run_func},
 	{"memory", mem_doc, mem_func},
@@ -261,6 +202,7 @@ static struct cmd cmds[] = {
 	{"source", notimpl_doc, notimpl_func},
 	{"quit", quit_doc, quit_func},
 	{"trace", notimpl_doc, notimpl_func},
+	{"break", notimpl_doc, notimpl_func},
 	{"help", help_doc, help_func},
 	{NULL, NULL, NULL}
 };
@@ -282,48 +224,41 @@ static int cmp_by_alias(const char *p, const char *q)
 static int run_command(struct debug_state *ds, const char *cmd_name)
 {
 	struct cmd *cmd;
-	int sts = 0;
 	int (*cmp) (const char *, const char *);
 
 	/* Is the input an alias? */
 	cmp = (strlen(cmd_name) > 1) ? cmp_by_name : cmp_by_alias;
-
+	
 	/* Search the command. */
-	for (cmd = cmds; cmd->name != NULL; cmd++) {
+	for (cmd = ds->cmds; cmd->name != NULL; cmd++) {
 		if ((cmp) (cmd_name, cmd->name)) {
-			if (cmd->func != NULL) {
-				sts = (cmd->func) (ds);
-				goto exit;
-			} else {
-				break;
-			}
+			return (cmd->func) (ds);
 		}
 	}
 
 	/* Ooops. */
-	fprintf(stderr, "Undefined command `%s'; Try `help'.\n", cmd_name);
-
- exit:
-	return sts;
+	fprintf(stderr, "Undefined command '%s'; Try 'help'.\n", cmd_name);
+	return CONTINUE;
 }
 
 int debug_code(struct vm *vm, struct code *code)
 {
-	char input[20];
+	char cmd_name[20];
 	struct debug_state ds;
 	struct debug_state *pds = &ds;
 	pds->vm = vm;
 	pds->code = code;
 	pds->cmds = cmds;
-	fprintf(stdout, "Type `help' to get help.\n");
+	fprintf(stdout, "Type 'help' to get help.\n");
 	for (;;) {
-		ask("sem> ", input, sizeof(input));
-
-		if (strcmp(input, "") == 0) {	// TODO: simplify
+		int res = ask("sem> ", cmd_name, sizeof(cmd_name));
+		if (res < 0) {
+			break;
+		} 
+		if (strcmp(cmd_name, "") == 0) {
 			continue;
 		}
-
-		if (run_command(pds, input) == QUIT) {
+		if (run_command(pds, cmd_name) == QUIT) {
 			break;
 		}
 	}

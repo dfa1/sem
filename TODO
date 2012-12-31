@@ -4,6 +4,5 @@ Release 3.0
 - smoke tests, unit tests 
 - FreeBSD/OpenBSD port
 - MacOSX port
-- debugger commands: `trace' and `break'
 - more documentation (examples, man page)
 - sem-mode for GNU emacs 
