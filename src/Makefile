@@ -35,6 +35,6 @@ distclean: clean
 	rm -f compiler.c tokens.h scanner.c
 
 indent:
-	indent -linux compiler.y scanner.l debugger.c vm.c io.c memory.c main.c test_*.c
+	indent -linux sem.h version.h compiler.y scanner.l debugger.c vm.c io.c memory.c main.c test_*.c
 
 .PHONY: all clean distclean run debug valgrind indent test
