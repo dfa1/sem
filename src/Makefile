@@ -16,12 +16,6 @@ $(OBJECTS): sem.h version.h
 sem: $(OBJECTS)
 	$(CC) $(OBJECTS) -o $@
 
-debug: sem
-	./sem -d ../examples/fact.sem
-
-run: sem
-	./sem ../examples/fact.sem
-
 test: test_memory
 	
 test_memory: test_memory.c
@@ -36,5 +30,6 @@ distclean: clean
 
 indent:
 	indent -linux sem.h version.h compiler.y scanner.l debugger.c vm.c io.c memory.c main.c test_*.c
+	rm -f *~ 
 
-.PHONY: all clean distclean run debug valgrind indent test
+.PHONY: all clean distclean run debug indent test
