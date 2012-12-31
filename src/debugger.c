@@ -28,7 +28,7 @@ struct Cmd
 {
     char *name;
     char *doc;
-    int (*cb) (struct VM *);
+    int (*cb) (struct vm *);
 };
 
 PRIVATE struct Cmd *Cmds;
@@ -115,7 +115,7 @@ file2lines(FILE *fp, int n)
 
 /* Re-initialize a VM struct. */
 PRIVATE void
-re(struct VM *v)
+re(struct vm *v)
 {
     register int i;
 
@@ -204,10 +204,10 @@ PRIVATE const char *opstr[] = {	/* TODO: gperf */
 /* *INDENT-ON* */
 
 PRIVATE int
-dumpCmd(struct VM *v)
+dumpCmd(struct vm *v)
 {
-    register struct Op *o;
-    register struct Code *c;
+    register struct instr *o;
+    register struct code *c;
 
     for (c = VCD(v), o = CHD(c); o != NULL; o = ONX(o)) {
 	fprintf(stdout, "%-20s\t", *(opstr + OOP(o)));
@@ -238,7 +238,7 @@ dumpCmd(struct VM *v)
 PRIVATE char helpDoc[] = "Print this help.";
 
 PRIVATE int
-helpCmd(struct VM *v)
+helpCmd(struct vm *v)
 {
     register struct Cmd *cmd;
     UNUSED(v);
@@ -254,7 +254,7 @@ helpCmd(struct VM *v)
 PRIVATE char ipDoc[] = "Print the instruction pointer.";
 
 PRIVATE int
-ipCmd(struct VM *v)
+ipCmd(struct vm *v)
 {
     if (with(VF(v), STEP))
 	fprintf(stdout, "ip is %ld.\n", VLN(v));
@@ -268,7 +268,7 @@ ipCmd(struct VM *v)
 PRIVATE char listDoc[] = "List the SIMPLESEM source.";
 
 PRIVATE int
-listCmd(struct VM *v)
+listCmd(struct vm *v)
 {
     register int i;
 
@@ -282,7 +282,7 @@ listCmd(struct VM *v)
 PRIVATE char memDoc[] = "Dump the memory.";
 
 PRIVATE int
-memCmd(struct VM *v)
+memCmd(struct vm *v)
 {
     register int i, j, k;
 
@@ -306,7 +306,7 @@ memCmd(struct VM *v)
 PRIVATE char nextDoc[] = "Execute next instruction.";
 
 PRIVATE int
-nextCmd(struct VM *v)
+nextCmd(struct vm *v)
 {
     int sts;
 
@@ -346,7 +346,7 @@ nextCmd(struct VM *v)
 PRIVATE char quitDoc[] = "Quit the debugger.";
 
 PRIVATE int
-quitCmd(struct VM *v)
+quitCmd(struct vm *v)
 {
     /* Cannot exit if step mode is on. */
     if (with(VF(v), STEP)) {
@@ -381,7 +381,7 @@ quitCmd(struct VM *v)
 PRIVATE char runDoc[] = "Run the program.";
 
 PRIVATE int
-runCmd(struct VM *v)
+runCmd(struct vm *v)
 {
     if (with(VF(v), STEP)) {
 	int answer;
@@ -406,7 +406,7 @@ runCmd(struct VM *v)
 PRIVATE char warrantyDoc[] = "Show the warranty.";
 
 PRIVATE int
-warrantyCmd(struct VM *v)
+warrantyCmd(struct vm *v)
 {
     const char *warranty = "\
     This program is free software; you can redistribute it and/or modify\n\
@@ -428,7 +428,7 @@ warrantyCmd(struct VM *v)
 PRIVATE char notImplDoc[] = "NOT IMPLEMENTED.";
 
 PRIVATE int
-notImplCmd(struct VM *v)
+notImplCmd(struct vm *v)
 {
     UNUSED(v);
     fprintf(stderr, "Not implemented.\n");
@@ -452,7 +452,7 @@ aliasCmp(const char *p, const char *q)
 }
 
 PRIVATE int
-runCommand(const char *p, struct VM *v)
+runCommand(const char *p, struct vm *v)
 {
     register struct Cmd *cmd;
     register int sts = 0;
@@ -484,13 +484,13 @@ runCommand(const char *p, struct VM *v)
     return sts;
 }
 
-struct CodeInfo {
+struct codeInfo {
   FILE *fp;
   char **lines;
 };
 
 int
-debugCode(struct VM *vm, FILE *fp)
+debugCode(struct vm *vm, FILE *fp)
 {
     /* TODO: gperf */
     static struct Cmd cmds[] = {	

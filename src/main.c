@@ -109,14 +109,14 @@ main(int argc, char **argv) {
     }
    
     char *filename = argv[optind];
-    struct Code *code = compile_code(filename);
+    struct code *code = compile_code(filename);
     
     if (code == NULL) {
       // error message should be already displayed at this point
       return EXIT_FAILURE;
     }
 
-    struct VM *vm = vm_init(mem_size, stack_size);
+    struct vm *vm = vm_init(mem_size, stack_size);
     int status = eval_code(vm, code);
     code_destroy(code);
     vm_destroy(vm);

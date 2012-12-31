@@ -26,12 +26,12 @@
 #include <assert.h>
 #include "sem.h"
 
-struct VM *
+struct vm *
 vm_init(int memsize, int stacksize)
 {
     assert(memsize > 0);
     assert(stacksize > 0);
-    struct VM *vm = (struct VM *) xmalloc(sizeof(struct VM));
+    struct vm *vm = (struct vm *) xmalloc(sizeof(struct vm));
     // memory
     vm->memsize = memsize;
     vm->mem = xmalloc(sizeof(int) * memsize);
@@ -48,7 +48,7 @@ vm_init(int memsize, int stacksize)
 }
 
 void
-vm_destroy(struct VM *vm)
+vm_destroy(struct vm *vm)
 {
     assert(vm != NULL);
     free(vm->mem);
@@ -82,7 +82,7 @@ vm_destroy(struct VM *vm)
  *                          +---------------------+
  */
 int 
-eval_code(struct VM *vm, struct Code *code)
+eval_code(struct vm *vm, struct code *code)
 {
     int p;		/* first operand                */
     int q;		/* second operand               */

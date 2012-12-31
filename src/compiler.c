@@ -115,14 +115,14 @@
 #endif
 
 #define YYSTYPE 	struct op *
-static void yyerror(void* yyscanner, struct Code* code, const char *); 
+static void yyerror(void* yyscanner, struct code* code, const char *); 
 #define error(msg) yyerror(yyscanner, code, (msg))
 
 /* Emit an opcode to the list (see Code struct). */
 #define emit_op(op)            emit(code, (op), -1, NULL)
 #define emit_op_int(op, iv)    emit(code, (op), (iv), NULL);
 #define emit_op_string(op, sv) emit(code, (op), -1, (sv))
-static void emit(struct Code *, int, int, char *);
+static void emit(struct code *, int, int, char *);
 
 /* *INDENT-OFF* */
 
@@ -756,7 +756,7 @@ do {									  \
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void* yyscanner, struct Code *code)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void* yyscanner, struct code *code)
 #else
 static void
 yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner, code)
@@ -764,7 +764,7 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner, code)
     int yytype;
     YYSTYPE const * const yyvaluep;
     void* yyscanner;
-    struct Code *code;
+    struct code *code;
 #endif
 {
   if (!yyvaluep)
@@ -792,7 +792,7 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner, code)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void* yyscanner, struct Code *code)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void* yyscanner, struct code *code)
 #else
 static void
 yy_symbol_print (yyoutput, yytype, yyvaluep, yyscanner, code)
@@ -800,7 +800,7 @@ yy_symbol_print (yyoutput, yytype, yyvaluep, yyscanner, code)
     int yytype;
     YYSTYPE const * const yyvaluep;
     void* yyscanner;
-    struct Code *code;
+    struct code *code;
 #endif
 {
   if (yytype < YYNTOKENS)
@@ -851,14 +851,14 @@ do {								\
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, int yyrule, void* yyscanner, struct Code *code)
+yy_reduce_print (YYSTYPE *yyvsp, int yyrule, void* yyscanner, struct code *code)
 #else
 static void
 yy_reduce_print (yyvsp, yyrule, yyscanner, code)
     YYSTYPE *yyvsp;
     int yyrule;
     void* yyscanner;
-    struct Code *code;
+    struct code *code;
 #endif
 {
   int yynrhs = yyr2[yyrule];
@@ -1131,7 +1131,7 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void* yyscanner, struct Code *code)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void* yyscanner, struct code *code)
 #else
 static void
 yydestruct (yymsg, yytype, yyvaluep, yyscanner, code)
@@ -1139,7 +1139,7 @@ yydestruct (yymsg, yytype, yyvaluep, yyscanner, code)
     int yytype;
     YYSTYPE *yyvaluep;
     void* yyscanner;
-    struct Code *code;
+    struct code *code;
 #endif
 {
   YYUSE (yyvaluep);
@@ -1167,7 +1167,7 @@ int yyparse ();
 #endif
 #else /* ! YYPARSE_PARAM */
 #if defined __STDC__ || defined __cplusplus
-int yyparse (void* yyscanner, struct Code *code);
+int yyparse (void* yyscanner, struct code *code);
 #else
 int yyparse ();
 #endif
@@ -1203,12 +1203,12 @@ yyparse (YYPARSE_PARAM)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 int
-yyparse (void* yyscanner, struct Code *code)
+yyparse (void* yyscanner, struct code *code)
 #else
 int
 yyparse (yyscanner, code)
     void* yyscanner;
-    struct Code *code;
+    struct code *code;
 #endif
 #endif
 {
@@ -1927,16 +1927,16 @@ yyreturn:
   /* *INDENT-ON* */
 
 static void
-yyerror(void *yyscanner, struct Code* code, const char *msg)
+yyerror(void *yyscanner, struct code* code, const char *msg)
 {
     (void) code;
     fprintf(stderr, "sem: %s at line %d near token '%s'\n", msg, yyget_lineno(yyscanner), yyget_text(yyscanner));
 }
 
 
-static struct Op *
+static struct instr *
 op_init(int opcode, int iv, char *sv) {
-  struct Op *op = xmalloc(sizeof(struct Op));
+  struct instr *op = xmalloc(sizeof(struct instr));
   op->opcode = opcode;
   op->intv = iv;
   op->strv = (sv != NULL) ? xstrdup(sv) : NULL;
@@ -1945,9 +1945,9 @@ op_init(int opcode, int iv, char *sv) {
 }
 
 static void
-emit(struct Code *code, int opcode, int iv, char *sv)
+emit(struct code *code, int opcode, int iv, char *sv)
 {
-  struct Op *op = op_init(opcode, iv, sv);
+  struct instr *op = op_init(opcode, iv, sv);
   code->code->next = op;
   code->code = op;
   
@@ -1956,7 +1956,7 @@ emit(struct Code *code, int opcode, int iv, char *sv)
   }
 }
 
-struct Code *
+struct code *
 compile_code(const char* filename) 
 {
   FILE *fp;
@@ -1966,8 +1966,8 @@ compile_code(const char* filename)
       return NULL;
   }
  
-  struct Op *start = op_init(START, 0, NULL);
-  struct Code *code = xmalloc(sizeof(struct Code));
+  struct instr *start = op_init(START, 0, NULL);
+  struct code *code = xmalloc(sizeof(struct code));
   code->size = 1;
   code->jumps = NULL;
   code->head = start; 
@@ -1990,7 +1990,7 @@ compile_code(const char* filename)
   }
   
   DPRINTF("code size = %d\n", code->size);
-  code->jumps = (struct Op **) xmalloc(code->size * sizeof(void *));  
+  code->jumps = (struct instr **) xmalloc(code->size * sizeof(void *));  
    
   /*
    * Jump-table generation. It maps the source's lines with
@@ -2011,7 +2011,7 @@ compile_code(const char* filename)
    *   SET
    */
   int j;
-  struct Op *i;
+  struct instr *i;
 
   for (j = 0, i = code->head; i != NULL; i = i->next) {
     DPRINTF("COMPILE: %p (op=%d,intv=%d,strv=%s)\n", i, i->opcode, i->intv, i->strv);
@@ -2022,7 +2022,7 @@ compile_code(const char* filename)
   }
   
   /* Add, if needed, a trailing HALT opcode. */
-  struct Op *last_instr = code->code;
+  struct instr *last_instr = code->code;
   switch (last_instr->opcode) {
 	case HALT:
         case JUMP:
@@ -2039,10 +2039,10 @@ compile_code(const char* filename)
 }
 
 void
-code_destroy(struct Code *c)
+code_destroy(struct code *c)
 {
-  struct Op *o = c->head;
-  struct Op *t;
+  struct instr *o = c->head;
+  struct instr *t;
 
   while (o != NULL) {
 	 t = o->next;

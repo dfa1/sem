@@ -62,27 +62,24 @@ typedef enum
     HALT
 } op_t;
 
-struct Op // TODO: rename to instr
-{
+struct instr {
   op_t opcode;		/* opcode */
   int intv;		/* integer argument */
   char *strv;		/* string argument */
-  struct Op *next;	/* next opcode */
+  struct instr *next;	/* next opcode */
 };
 
-struct Code
-{
-    struct Op *head;	/* the head */
-    struct Op *code;	/* the code (as linked list) */
+struct code{
+    struct instr *head;	/* the head (in order to avoid O(n) append) */
+    struct instr *code;	/* the code (as linked list) */
     int size;		/* the code size (number of lines) */
-    struct Op **jumps;	/* jumps */
+    struct instr **jumps;	/* jumps */
 };
 
 /* The interpreter. */
-struct VM
-{
+struct vm { 
     /* The Instruction Pointer. */
-    struct Op *ip;
+    struct instr *ip;
     int lineno;  
 
     /*
@@ -109,10 +106,10 @@ struct VM
     int *stacktop;
 };
 
-extern struct Code *compile_code(const char* filename);
-extern void code_destroy(struct Code *);
-extern struct VM *vm_init(int mem_size, int stack_size);
-extern void vm_destroy(struct VM *);
-extern int eval_code(struct VM *, struct Code *);
-extern int debug_code(struct VM *);
+extern struct code* compile_code(const char* filename);
+extern void code_destroy(struct code *code);
+extern struct vm* vm_init(int mem_size, int stack_size);
+extern void vm_destroy(struct vm *vm);
+extern int eval_code(struct vm *vm, struct code *code);
+extern int debug_code(struct vm *vm);
 

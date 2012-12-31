@@ -45,19 +45,19 @@
 #endif
 
 #define YYSTYPE 	struct op *
-static void yyerror(void* yyscanner, struct Code* code, const char *); 
+static void yyerror(void* yyscanner, struct code* code, const char *); 
 #define error(msg) yyerror(yyscanner, code, (msg))
 
 /* Emit an opcode to the list (see Code struct). */
 #define emit_op(op)            emit(code, (op), -1, NULL)
 #define emit_op_int(op, iv)    emit(code, (op), (iv), NULL);
 #define emit_op_string(op, sv) emit(code, (op), -1, (sv))
-static void emit(struct Code *, int, int, char *);
+static void emit(struct code *, int, int, char *);
 
 /* *INDENT-OFF* */
 %}
 %parse-param {void* yyscanner}
-%parse-param {struct Code *code}
+%parse-param {struct code *code}
 %lex-param {void *yyscanner}
 
 /* Keywords. */
@@ -254,16 +254,16 @@ aip
   /* *INDENT-ON* */
 
 static void
-yyerror(void *yyscanner, struct Code* code, const char *msg)
+yyerror(void *yyscanner, struct code* code, const char *msg)
 {
     (void) code;
     fprintf(stderr, "sem: %s at line %d near token '%s'\n", msg, yyget_lineno(yyscanner), yyget_text(yyscanner));
 }
 
 
-static struct Op *
+static struct instr *
 op_init(int opcode, int iv, char *sv) {
-  struct Op *op = xmalloc(sizeof(struct Op));
+  struct instr *op = xmalloc(sizeof(struct instr));
   op->opcode = opcode;
   op->intv = iv;
   op->strv = (sv != NULL) ? xstrdup(sv) : NULL;
@@ -272,9 +272,9 @@ op_init(int opcode, int iv, char *sv) {
 }
 
 static void
-emit(struct Code *code, int opcode, int iv, char *sv)
+emit(struct code *code, int opcode, int iv, char *sv)
 {
-  struct Op *op = op_init(opcode, iv, sv);
+  struct instr *op = op_init(opcode, iv, sv);
   code->code->next = op;
   code->code = op;
   
@@ -283,7 +283,7 @@ emit(struct Code *code, int opcode, int iv, char *sv)
   }
 }
 
-struct Code *
+struct code *
 compile_code(const char* filename) 
 {
   FILE *fp;
@@ -293,8 +293,8 @@ compile_code(const char* filename)
       return NULL;
   }
  
-  struct Op *start = op_init(START, 0, NULL);
-  struct Code *code = xmalloc(sizeof(struct Code));
+  struct instr *start = op_init(START, 0, NULL);
+  struct code *code = xmalloc(sizeof(struct code));
   code->size = 1;
   code->jumps = NULL;
   code->head = start; 
@@ -317,7 +317,7 @@ compile_code(const char* filename)
   }
   
   DPRINTF("code size = %d\n", code->size);
-  code->jumps = (struct Op **) xmalloc(code->size * sizeof(void *));  
+  code->jumps = (struct instr **) xmalloc(code->size * sizeof(void *));  
    
   /*
    * Jump-table generation. It maps the source's lines with
@@ -338,7 +338,7 @@ compile_code(const char* filename)
    *   SET
    */
   int j;
-  struct Op *i;
+  struct instr *i;
 
   for (j = 0, i = code->head; i != NULL; i = i->next) {
     DPRINTF("COMPILE: %p (op=%d,intv=%d,strv=%s)\n", i, i->opcode, i->intv, i->strv);
@@ -349,7 +349,7 @@ compile_code(const char* filename)
   }
   
   /* Add, if needed, a trailing HALT opcode. */
-  struct Op *last_instr = code->code;
+  struct instr *last_instr = code->code;
   switch (last_instr->opcode) {
 	case HALT:
         case JUMP:
@@ -366,10 +366,10 @@ compile_code(const char* filename)
 }
 
 void
-code_destroy(struct Code *c)
+code_destroy(struct code *c)
 {
-  struct Op *o = c->head;
-  struct Op *t;
+  struct instr *o = c->head;
+  struct instr *t;
 
   while (o != NULL) {
 	 t = o->next;
