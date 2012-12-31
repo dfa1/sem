@@ -46,6 +46,7 @@ Usage: sem [options] file\n\
 \n\
 Options:\n\
   -h : print this help message and exit\n\
+  -d : interactive debugger\n\
   -m : set the data memory size (the default is " S(DEFAULT_DATA_SIZE) ")\n\
   -s : set the stack size (the default is " S(DEFAULT_STACK_SIZE) ")\n\
   -v : print the version and exit\n\
@@ -61,12 +62,14 @@ static void usage(int sts)
 
 int main(int argc, char **argv)
 {
+	int debugger = 0;
 	int mem_size = DEFAULT_DATA_SIZE;
 	int stack_size = DEFAULT_STACK_SIZE;
 	int opt = 0;
 	struct option long_options[] = {
 		{"version", 0, 0, 'v'},
 		{"help", 0, 0, 'h'},
+		{"debug", 0, 0, 'd'},
 		{NULL, 0, 0, 'm'},
 		{NULL, 0, 0, 's'},
 
@@ -100,6 +103,10 @@ int main(int argc, char **argv)
 			}
 			break;
 
+		case 'd':
+			debugger = 1;
+			break;
+
 		case 'v':
 			fprintf(stdout, "%s", license);
 			return EXIT_SUCCESS;
@@ -114,6 +121,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
+	int status;
 	char *filename = argv[optind];
 	struct code *code = compile_code(filename);
 
@@ -123,7 +131,12 @@ int main(int argc, char **argv)
 	}
 
 	struct vm *vm = vm_init(mem_size, stack_size);
-	int status = eval_code(vm, code);
+
+	if (debugger) {
+		status = debug_code(vm, code);
+	} else {
+		status = eval_code(vm, code);
+	}
 	code_destroy(code);
 	vm_destroy(vm);
 	return status;

@@ -110,4 +110,4 @@ extern void code_destroy(struct code *code);
 extern struct vm *vm_init(int mem_size, int stack_size);
 extern void vm_destroy(struct vm *vm);
 extern int eval_code(struct vm *vm, struct code *code);
-extern int debug_code(struct vm *vm);
+extern int debug_code(struct vm *vm, struct code *code);

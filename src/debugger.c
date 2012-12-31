@@ -19,18 +19,24 @@
  * 02111-1307, USA.
  */
 
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 #include "sem.h"
 
-#include <ctype.h>		/* for isspace() */
-
-/* Debugger's commands. */
-struct Cmd {
-	char *name;
-	char *doc;
-	int (*cb) (struct vm *);
+struct debug_state {
+	int state;		// TODO: RUNNING, HALTED, STEP, TRACE..
+	struct vm *vm;
+	struct code *code;
+	struct cmd *cmds;
+	char **lines;
 };
 
-PRIVATE struct Cmd *Cmds;
+struct cmd {
+	char *name;
+	char *doc;
+	int (*func) (struct debug_state *);
+};
 
 /* Command's return values. */
 enum {
@@ -39,8 +45,8 @@ enum {
 };
 
 /* This function expands special characters. */
-char *repr(register const char *s)
-{
+char *repr(const char *s)
+{ // TODO: this function is shit
 	register char *p;
 	register int size, i, j = 0;
 
@@ -82,104 +88,16 @@ char *repr(register const char *s)
 	return p;
 }
 
-/* Return an array of strings containing all the line of a file. */
-PRIVATE char **file2lines(FILE * fp, int n)
-{
-	char buf[1024];
-	register char *o, *p, *q, **r;
-	register int i = 0;
-
-	r = (char **)xmalloc(sizeof(char *) * n);
-
-	for (rewind(fp), p = fgets(buf, 1024, fp); !feof(fp) && p != NULL;
-	     p = fgets(buf, 1024, fp)) {
-
-		/* Cut comment, if needed. */
-		q = xstrdup(trim(p));
-		o = strchr(p, '#');
-
-		if (o != NULL)
-			q[strlen(p) - strlen(o)] = '\0';
-
-		/* Store it! */
-		*(r + i++) = q;
-	}
-
-	*(r + i) = NULL;
-	return r;
-}
-
-/* Re-initialize a VM struct. */
-PRIVATE void re(struct vm *v)
-{
-	register int i;
-
-	/* Re-initialize the instruction pointer. */
-	VIP(v) = CHD(VCD(v));
-	VLN(v) = 1;
-
-	/* Re-initialize the memory. */
-	for (i = 0; i < VMS(v); i++)
-		*(VMM(v) + i) = 0;
-
-	/* Re-initialize the stack. */
-	VTP(v) = VST(v);
-
-	for (i = 0; i < VSS(v); i++)
-		*(VST(v) + i) = 0;
-
-	/* Clean flags. */
-	VF(v) = 0;
-}
-
-int ask(const char *question)
-{
-	const char p[20];
-	int answer;
-
-	/* 2004: This piece of code is goto powered! :-) */
-	/* 2011: This piece of code is cursed! ;-(       */
- again:
-	printf("%s", question);
-	fgets(p, sizeof 20, stdin);
-
-	if (p[0] == 'Y' || p[0] == 'y') {
-		if (strlen(p) == 1) {
-			answer = YES;
-			goto exit;
-		} else if (strcasecmp(p, "yes") == 0) {
-			answer = YES;
-			goto exit;
-		} else
-			goto again;
-
-	} else if (p[0] == 'N' || p[0] == 'n') {
-		if (strlen(p) == 1) {
-			answer = NO;
-			goto exit;
-		} else if (strcasecmp(p, "no") == 0) {
-			answer = NO;
-			goto exit;
-		} else
-			goto again;
-
-	} else
-		goto again;
-
- exit:
-	return answer;
-}
-
 /* 
  * Commands 
  * --------
  */
 
 /* dump */
-PRIVATE char dumpDoc[] = "Dump internal code representation.";
+static char dump_doc[] = "Dump internal code representation.";
 
 /* *INDENT-OFF* */
-PRIVATE const char *opstr[] = {	/* TODO: autogenerate these from sem.h */
+static const char *opstr[] = {	/* TODO: autogenerate these from sem.h */
 	"START",	"SET", 		"JUMP", 	"JUMPT",
 	"SETLINENO", 	"INT", 		"READ", 	"WRITE_INT",
 	"WRITE_STR", 	"WRITELN_INT",	"WRITELN_STR",	"MEM", 		
@@ -190,9 +108,9 @@ PRIVATE const char *opstr[] = {	/* TODO: autogenerate these from sem.h */
 };
 /* *INDENT-ON* */
 
-PRIVATE int dumpCmd(struct vm *v)
+static int dump_func(struct debug_state *ds)
 {
-	register struct instr *o;
+/*	register struct instr *o;
 	register struct code *c;
 
 	for (c = VCD(v), o = CHD(c); o != NULL; o = ONX(o)) {
@@ -214,68 +132,66 @@ PRIVATE int dumpCmd(struct vm *v)
 			continue;
 		}
 	}
-
+*/
 	return CONTINUE;
 }
 
 /* help */
-PRIVATE char helpDoc[] = "Print this help.";
+static char help_doc[] = "Print this help.";
 
-PRIVATE int helpCmd(struct vm *v)
+static int help_func(struct debug_state *ds)
 {
-	register struct Cmd *cmd;
-	UNUSED(v);
+/*	register struct Cmd *cmd;
 
 	for (cmd = Cmds; cmd->name != NULL; cmd++)
 		fprintf(stdout, "%-20s %-10c %-30s\n", cmd->name,
 			cmd->name[0], cmd->doc);
-
-	return 0;
+*/
+	return CONTINUE;
 }
 
 /* ip */
-PRIVATE char ipDoc[] = "Print the instruction pointer.";
+static char ip_doc[] = "Print the instruction pointer.";
 
-PRIVATE int ipCmd(struct vm *v)
+static int ip_func(struct debug_state *ds)
 {
-	if (with(VF(v), STEP))
+/*	if (with(VF(v), STEP))
 		fprintf(stdout, "ip is %ld.\n", VLN(v));
 	else
 		fprintf(stdout, "Nothing to show.\n");
-
+*/
 	return CONTINUE;
 }
 
 /* list */
-PRIVATE char listDoc[] = "List the SIMPLESEM source.";
+static char list_doc[] = "List the SIMPLESEM source.";
 
-PRIVATE int listCmd(struct vm *v)
+static int list_func(struct debug_state *ds)
 {
-	register int i;
-
-	for (i = 0; i < CSZ(VCD(v)) - 1; i++)
-		fprintf(stdout, "%-3d %s\n", i + 1, PLI(Parsing)[i]);
-
+/*	for (int i = 0; i < CSZ(VCD(v)) - 1; i++) {
+		fprintf(stdout, "%-3d %s\n", i + 1, "TODO"); // TODO: source
+	}
+*/
 	return CONTINUE;
 }
 
 /* mem */
-PRIVATE char memDoc[] = "Dump the memory.";
+static char mem_doc[] = "Dump the memory.";
 
-PRIVATE int memCmd(struct vm *v)
+static int mem_func(struct debug_state *ds)
 {
-	register int i, j, k;
-
-	for (i = 0; i < VMS(v); i++) {
+	int i;
+	int j;
+	for (i = 0; i < ds->vm->memsize; i++) {
 		/* Print at most 10 item. */
-		for (j = 0; i < VMS(v) && j < 10; j++)
-			fprintf(stdout, "%4ld ", *(VMM(v) + i++));
+		for (j = 0; i < ds->vm->memsize && j < 10; j++)
+			fprintf(stdout, "%4d ", ds->vm->mem[i++]);
 
 		/* Fill the line. */
-		for (k = 10 - j; k >= 0; k--)
+		for (int k = 10 - j; k >= 0; k--)
 			fprintf(stdout, "     ");
 
-		/* Append the range at the end of the line. */
+		/* Append the memory range at the end of the line. */
 		fprintf(stdout, "  %4d - %4d\n", i - j, i);
 	}
 
@@ -283,217 +199,133 @@ PRIVATE int memCmd(struct vm *v)
 }
 
 /* next */
-PRIVATE char nextDoc[] = "Execute next instruction.";
+static char next_doc[] = "Execute next instruction.";
 
-PRIVATE int nextCmd(struct vm *v)
+static int next_func(struct debug_state *ds)
 {
-	int sts;
-
-	/* Going to STEP mode. */
-	if (with(VF(v), STEP))
-		/* void */ ;
-	else {
-		rewind(PFP(Parsing));
-		re(v);
-		set(VF(v), STEP);
-		fprintf(stdout, "Step mode enabled\n");
-	}
+	return CONTINUE;
+}
 
 	/* Print to stdout this line. */
-	fprintf(stdout, "%-3ld %s\n", VLN(v), PLI(Parsing)[VLN(v) - 1]);
+	//fprintf(stdout, "%-3ld %s\n", VLN(v), PLI(Parsing)[VLN(v) - 1]);
 
 	/* Execute it. */
-	sts = evalCode(v);
-
+	//sts = evalCode(v);
+/*
 	if (with(VF(v), HALTED)) {
 		VF(v) = 0;
 		fprintf(stdout, "Debug finished.\n");
 	} else {
-		if (sts == 0)
-			/* void */ ;
-		else {
+		if (sts != 0)
 			VF(v) = 0;
 			fprintf(stderr, "Debug aborted.\n");
 		}
 	}
-
-	return CONTINUE;
-}
+*/
 
 /* quit */
-PRIVATE char quitDoc[] = "Quit the debugger.";
+static char quit_doc[] = "Quit the debugger.";
 
-PRIVATE int quitCmd(struct vm *v)
+static int quit_func(struct debug_state *ds)
 {
 	/* Cannot exit if step mode is on. */
-	if (with(VF(v), STEP)) {
-		int answer;
-
-		answer = ask("The script is running. Exit anyway? (y or n) ");
-
-		if (answer == YES)
-			goto cleanup_and_exit;
-		else
-			return CONTINUE;
-	} else
-		goto cleanup_and_exit;
-
- cleanup_and_exit:		// TODO: really useful?
-	do {
-		register char **p;
-
-		/* Clean. */
-		for (p = PLI(Parsing); *p != NULL; p++)
-			free(*p);
-
-		free(PLI(Parsing));
-	}
-	while (0);
-
-	/* Quit!!! */
+	//answer = ask("The script is running. Exit anyway? (y or n) ");
 	return QUIT;
 }
 
 /* run */
-PRIVATE char runDoc[] = "Run the program.";
+static char run_doc[] = "Run the program.";
 
-PRIVATE int runCmd(struct vm *v)
+static int run_func(struct debug_state *ds)
 {
-	if (with(VF(v), STEP)) {
-		int answer;
-
-		fprintf(stdout, "The debug has been already started.\n");
-		answer = ask("Start it from the beginning? (y or n) ");
-
-		if (answer == YES)
-			goto run;
-		else
-			goto exit;
-	}
-
- run:
-	re(v);
-	(void)evalCode(v);
- exit:
-	return CONTINUE;
-}
-
-/* warranty */
-PRIVATE char warrantyDoc[] = "Show the warranty.";
-
-PRIVATE int warrantyCmd(struct vm *v)
-{
-	const char *warranty = "\
-    This program is free software; you can redistribute it and/or modify\n\
-    it under the terms of the GNU General Public License as published by\n\
-    the Free Software Foundation; either version 2 of the License, or\n\
-    (at your option) any later version.\n\
-\n\
-    This program is distributed in the hope that it will be useful,\n\
-    but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
-    GNU General Public License for more details.\n";
-
-	UNUSED(v);
-	fprintf(stdout, "%s", warranty);
+	//fprintf(stdout, "The debug has been already started.\n");
+	//answer = ask("Start it from the beginning? (y or n) ");
 	return CONTINUE;
 }
 
 /* not implemented */
-PRIVATE char notImplDoc[] = "NOT IMPLEMENTED.";
+static char notimpl_doc[] = "NOT IMPLEMENTED.";
 
-PRIVATE int notImplCmd(struct vm *v)
+static int notimpl_func(struct debug_state *ds)
 {
-	UNUSED(v);
 	fprintf(stderr, "Not implemented.\n");
 	return CONTINUE;
 }
 
+static struct cmd cmds[] = {	
+	{"next", next_doc, next_func},
+	{"run", run_doc, run_func},
+	{"memory", mem_doc, mem_func},
+	{"break", notimpl_doc, notimpl_func},
+	{"ip", ip_doc, ip_func},
+	{"source", notimpl_doc, notimpl_func},
+	{"quit", quit_doc, quit_func},
+	{"trace", notimpl_doc, notimpl_func},
+	{"help", help_doc, help_func},
+	{NULL, NULL, NULL}
+};
+
 /* End of commands. */
 
 /* Compare two strings. */
-PRIVATE int nameCmp(const char *p, const char *q)
+static int cmp_by_name(const char *p, const char *q)
 {
 	return *p == *q && strcmp(p, q) == 0;
 }
 
 /* Compare two characters (passed as strings). */
-PRIVATE int aliasCmp(const char *p, const char *q)
+static int cmp_by_alias(const char *p, const char *q)
 {
 	return *p == *q;
 }
 
-PRIVATE int runCommand(const char *p, struct vm *v)
+static int run_command(struct debug_state *ds, const char *cmd_name)
 {
-	register struct Cmd *cmd;
-	register int sts = 0;
-	register int (*cmp) (const char *, const char *);
+	struct cmd *cmd;
+	int sts = 0;
+	int (*cmp) (const char *, const char *);
 
 	/* Is the input an alias? */
-	if (strlen(p) > 1)
-		cmp = nameCmp;	/* No, it isn't. */
-	else
-		cmp = aliasCmp;	/* Yes Sir, it's an alias! */
+	cmp = (strlen(cmd_name) > 1) ? cmp_by_name : cmp_by_alias;
 
 	/* Search the command. */
-	for (cmd = Cmds; cmd->name != NULL; cmd++) {
-		if ((cmp) (p, cmd->name)) {
-			/* Run it's callback. */
-			if (cmd->cb != NULL) {
-				sts = (cmd->cb) (v);
+	for (cmd = cmds; cmd->name != NULL; cmd++) {
+		if ((cmp) (cmd_name, cmd->name)) {
+			if (cmd->func != NULL) {
+				sts = (cmd->func) (ds);
 				goto exit;
-			} else
+			} else {
 				break;
+			}
 		}
 	}
 
 	/* Ooops. */
-	fprintf(stderr, "Undefined command `%s'; Try `help'.\n", p);
+	fprintf(stderr, "Undefined command `%s'; Try `help'.\n", cmd_name);
 
  exit:
 	return sts;
 }
 
-struct codeInfo {
-	FILE *fp;
-	char **lines;
-};
-
-int debugCode(struct vm *vm, FILE * fp)
+int debug_code(struct vm *vm, struct code *code)
 {
-	/* TODO: gperf */
-	static struct Cmd cmds[] = {
-	/* *INDENT-OFF* */
-	{ "next",       nextDoc,	nextCmd		},	
-	{ "run",        runDoc, 	runCmd		},
-	{ "memory",     memDoc,		memCmd		},
-	{ "break",      notImplDoc,	notImplCmd	},
-	{ "ip",		ipDoc,		ipCmd		},
-	{ "list",	listDoc,	listCmd		},
-	{ "quit",       quitDoc, 	quitCmd		},
-	{ "warranty",   warrantyDoc,    warrantyCmd     },
-	{ "dump",       dumpDoc,        dumpCmd         },
-	{ "trace",      notImplDoc,	notImplCmd	},
-	{ "help",       helpDoc,	helpCmd		},
-	
-	/* Sentinel */
-	{ NULL,         NULL,           NULL            }
-	/* *INDENT-ON* */
-	};
+	char input[20];
+	struct debug_state ds;
+	struct debug_state *pds = &ds;
+	pds->vm = vm;
+	pds->code = code;
+	pds->cmds = cmds;
+	fprintf(stdout, "Type `help' to get help.\n");
+	for (;;) {
+		ask("sem> ", input, sizeof(input));
 
-	Cmds = cmds;
-	char **lines = file2lines(fp, CSZ(VCD(vm)));
-	char s[20];
-	for (fprintf(stdout, "Type `help' to get help.\n");;) {
-
-		printf("sem> ");
-		fgets(s, sizeof s, stdin);
-
-		if (strcmp(s, "") == 0)
+		if (strcmp(input, "") == 0) {	// TODO: simplify
 			continue;
+		}
 
-		if (runCommand(s, v) == 1)
+		if (run_command(pds, input) == QUIT) {
 			break;
+		}
 	}
 
 	return 0;

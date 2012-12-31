@@ -9,7 +9,7 @@ compiler.c: compiler.y
 scanner.c: scanner.l tokens.h
 	flex --header=scanner.h -o $@ $<
 
-OBJECTS=compiler.o scanner.o vm.o io.o memory.o main.o
+OBJECTS=io.o memory.o compiler.o scanner.o vm.o debugger.o main.o
 
 $(OBJECTS): sem.h version.h
 
