@@ -1,7 +1,7 @@
 CC=clang
 CFLAGS=-D_BSD_SOURCE=1 -W -Wall -Wno-unused-parameter -g -std=c99
 
-all: sem
+all: test sem
 
 compiler.c: compiler.y
 	bison --defines=tokens.h -o $@ $<
