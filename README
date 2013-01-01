@@ -56,13 +56,13 @@ How to use misc/sem.vim?
 ------------------------
 
 The file sem.vim is a Vim syntax file. It enables Vim to show parts of 
-the text in another font or color for your .sem files.
+the text in another font or color for your .sem files. It has been tested
+with vim 72.
 
-Copy the sem.vim in /usr/share/vim/vim{version}/syntax. Then edit your
-/usr/share/vim/vim{version}/filetype.vim and add the following lines:
+Copy the file misc/sem.vim in ~/.vim/syntax/sem/sem.vim. Then put the 
+following line in your filetype.vim (~/.vim/filetype.vim)
 
-" SIMPLESEM 
-au BufNewFile,BufRead *.sem                     setf sem
+au! BufNewFile,BufRead *.sem 		setf sem
 
 
 Distribution structure

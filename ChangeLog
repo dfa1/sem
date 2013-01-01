@@ -8,6 +8,8 @@
 		+ no more globals such as yytext
 		+ better naming
 
+	* updated vim syntax file 
+
 	* compilable with llvm/clang
 
 	* ported to FreeBSD
