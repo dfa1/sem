@@ -71,11 +71,12 @@ au! BufNewFile,BufRead *.sem 		setf sem
 Distribution structure
 ----------------------
 
+AUTHORS                 Authors and contributors
 ChangeLog		History of changes
 COPYING			Licensing information
 README			The file you're reading now
-THANKS			Acknowledgments
 TODO	          	To-do list, ideas, bugs
+Makefile                The Makefile
 doc/QUICKREF            Language reference
 examples/comp.sem	Compare two numbers
 examples/fact.sem	The factorial
@@ -95,13 +96,6 @@ src/scanner.c		The lexical scanner (generated from scanner.l)
 src/scanner.h		The lexical scanner interface (generated from scanner.l)
 src/scanner.l		The lexical scanner (GNU flex input)
 src/debugger.c		The debugger 
-
-
-Author
-------
-
-Sem was originally written by Davide Angelocola during 2003. See also THANKS for a 
-list of contributors.
 
 
 Contact Information
