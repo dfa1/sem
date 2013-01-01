@@ -21,9 +21,9 @@ $(OBJECTS): build/%.o: src/%.c
 build/sem: build $(OBJECTS)
 	$(CC) $(OBJECTS) -o $@
 
-test: build/test_memory
+test: build build/test_memory
 	
-build/test_memory: src/test_memory.c
+build/test_memory: src/test_memory.c src/memory.c
 	$(CC) $(CFLAGS) src/test_memory.c src/memory.c -o $@
 	./build/test_memory
 
