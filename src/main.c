@@ -1,7 +1,7 @@
 /*
  * main.c -- The main()
  *
- * Copyright (C) 2003-2011  Davide Angelocola <davide.angelocola@gmail.com>
+ * Copyright (C) 2003-2013  Davide Angelocola <davide.angelocola@gmail.com>
  
  * Sem is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 
 static char license[] = "\r\
 sem " VERSION " -- A SIMPLESEM interpreter\n\
-Copyright (C) 2003-2011 Davide Angelocola <davide.angelocola@gmail.com>\n\
+Copyright (C) 2003-2013 Davide Angelocola <davide.angelocola@gmail.com>\n\
 \n\
 This program is free software, and you are welcome to redistribute\n\
 it and/or modify it under the terms of the GNU General Public License.\n\

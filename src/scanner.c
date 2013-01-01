@@ -508,7 +508,7 @@ static yyconst flex_int32_t yy_rule_can_match_eol[32] =
 /*
  * scanner.l -- the lexical scanner 
  *
- * Copyright (C) 2003-2011 Davide Angelocola <davide.angelocola@gmail.com>
+ * Copyright (C) 2003-2013 Davide Angelocola <davide.angelocola@gmail.com>
  *  
  * Sem is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
