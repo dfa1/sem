@@ -283,7 +283,7 @@ struct code *compile_code(const char *filename)
 		return NULL;
 	}
 
-	struct instr *start = op_init(START, 0, NULL);
+	struct instr *start = op_init(START, -1, NULL);
 	struct code *code = xmalloc(sizeof(struct code));
 	code->size = 1;
 	code->jumps = NULL;
