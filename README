@@ -48,8 +48,8 @@ Building sem:
 This creates an executable `sem'; to install in `/usr/local/bin', first
 become root and then `make install' 
 
-  % make install            # install sem and misc/semd
-  % make uninstall          # remove sem and semd 
+  % make install
+  % make uninstall
 
 
 How to use misc/sem.vim? 
@@ -81,7 +81,6 @@ examples/hello.sem	Hello World, in SIMPLESEM this time
 examples/pow.sem	The power
 examples/rfact.sem	Recursive version of fact.sem
 examples/sum.sem	Sum two numbers
-misc/semd		Just an handy wrapper for sem -d
 misc/sem.vim            VIM syntax file
 src/sem.h		Sem C interface 	
 src/compiler.y		The compiler (GNU bison input)
