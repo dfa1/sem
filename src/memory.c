@@ -4,9 +4,9 @@
 #include <assert.h>
 #include "sem.h"
 
-void *xmalloc(const size_t len)
+void *xmalloc(const size_t size)
 {
-	void *mem = malloc(len);
+	void *mem = malloc(size);
 
 	if (mem == NULL) {
 		abort();
@@ -15,15 +15,11 @@ void *xmalloc(const size_t len)
 	return mem;
 }
 
-char *xstrdup(const char *s)
+char *xstrdup(const char *str)
 {
-	char *dup = strdup(s);
-
-	if (dup == NULL) {
-		abort();
-	}
-
-	return dup;
+	assert(str != NULL);
+	char *dup = xmalloc(strlen(str) + 1);
+	return strcpy(dup, str);
 }
 
 /* example:

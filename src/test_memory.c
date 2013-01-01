@@ -28,9 +28,16 @@ void test_drop_first_last_inplace()
 	assert_str_eq("2345", buf);
 }
 
+void test_xstrdup() 
+{
+	assert_str_eq("hello", xstrdup("hello"));
+}
+
+
 int main()
 {
 	test_repr();
 	test_drop_first_last_inplace();
+	test_xstrdup();
 	return 0;
 }

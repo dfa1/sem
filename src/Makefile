@@ -1,5 +1,5 @@
 CC=clang
-CFLAGS=-D_BSD_SOURCE=1 -W -Wall -Wno-unused-parameter -g -std=c99
+CFLAGS=-W -Wall -Wno-unused-parameter -g -std=c99
 
 all: test sem
 
