@@ -1,8 +1,7 @@
 Release 3.0
 ===========
 
-- smoke tests, unit tests 
-- FreeBSD/OpenBSD port
+- RPM specfile
 - MacOSX port
 - more documentation (examples, man page)
 - sem-mode for GNU emacs 

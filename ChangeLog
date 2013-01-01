@@ -1,12 +1,12 @@
-2013-01-01  Davide Angelocola  <davide.angelocola@gmail.com>
+2013-01-XX  Davide Angelocola  <davide.angelocola@gmail.com>
 
 	* release 3.0
 
-	* dropping autoconf/automake/gnulib
-
-	* simplified internal structure
-
-	* unit testing
+	* cleaner, simpler code:
+		+ removed obscure access macros 
+		+ autoconf/automake/gnulib
+		+ no more globals such as yytext
+		+ better naming
 
 	* compilable with llvm/clang
 
@@ -18,7 +18,7 @@
 
 	* gnulib port; no new features 
 	
-2006-08-31  Davide Angelocola  <davide.angelocola@gmail.com>
+2006-08-31 Davide Angelocola  <davide.angelocola@gmail.com>
 
 	* release 2.0 
 
