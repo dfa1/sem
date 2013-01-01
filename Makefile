@@ -37,8 +37,6 @@ install: build/sem
 	install build/sem ${PREFIX}/bin
 
 indent:
-	cd src
-	indent -linux tokens.h sem.h version.h compiler.y scanner.l debugger.c vm.c io.c memory.c main.c test_*.c
-	rm -f *~ 
+	cd src && indent -linux tokens.h sem.h version.h compiler.y scanner.l debugger.c vm.c io.c memory.c main.c test_*.c
 
 .PHONY: all clean distclean run debug indent test
