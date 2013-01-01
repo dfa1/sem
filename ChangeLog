@@ -1,3 +1,17 @@
+2013-01-01  Davide Angelocola  <davide.angelocola@gmail.com>
+
+	* release 3.0
+
+	* dropping autoconf/automake/gnulib
+
+	* simplified internal structure
+
+	* unit testing
+
+	* compilable with llvm/clang
+
+	* ported to FreeBSD
+
 2009-05-18  Davide Angelocola  <davide.angelocola@gmail.com>
 
 	* release 2.1
@@ -10,7 +24,7 @@
 
 2006-08-25  Davide Angelocola  <davide.angelocola@gmail.com>
 
-	* using autotools; drop oldest Makefile
+	* using autotools; dropping oldest Makefile
 
 2004-10-14  Davide Angelocola  <davide.angelocola@gmail.com>
 
