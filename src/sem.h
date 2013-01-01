@@ -22,8 +22,8 @@
 // memory.c
 extern void *xmalloc(size_t);
 extern char *xstrdup(const char *);
-extern void drop_first_last_inplace(char *str, int str_size);
-extern char *repr(const char *str, char *dest, int dest_size);
+extern char *unquote(const char *str, char *dest, int dest_size);
+extern char *quote(const char *str, char *dest, int dest_size);
 
 // io.c
 extern int ask(const char *question, char *answer, int answer_size);

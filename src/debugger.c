@@ -84,7 +84,7 @@ static int dump_func(struct debug_state *ds)
 			int ridiculously_large_enough = strlen(i->strv) * 3;
 			char tmp[ridiculously_large_enough];
 			fprintf(stdout, "%.50s\n",
-				repr(i->strv, tmp, ridiculously_large_enough));
+				unquote(i->strv, tmp, ridiculously_large_enough));
 		} else {
 			fprintf(stdout, "\n");
 			continue;

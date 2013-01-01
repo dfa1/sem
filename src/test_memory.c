@@ -11,21 +11,22 @@ void assert_str_eq(char *expected, char *got)
 	}
 }
 
-void test_repr()
+void test_quote()
 {
 	char buf[4];
-	assert_str_eq("\"\\n\"", repr("\n", buf, sizeof(buf)));
-	assert_str_eq("\"\\t\"", repr("\t", buf, sizeof(buf)));
-	assert_str_eq("\"a\"", repr("a", buf, sizeof(buf)));
-	assert_str_eq("\"\"", repr("", buf, sizeof(buf)));
-	assert_str_eq("\"ab\"", repr("abcd", buf, sizeof(buf)));
+	assert_str_eq("\n", quote("\"\\n\"", buf, sizeof(buf)));
+	assert_str_eq("a", quote("\"a\"", buf, sizeof(buf)));
+	assert_str_eq("", quote("\"\"", buf, sizeof(buf)));
 }
 
-void test_drop_first_last_inplace()
+void test_unquote()
 {
-	char buf[] = "123456";
-	drop_first_last_inplace(buf, strlen(buf));
-	assert_str_eq("2345", buf);
+	char buf[4];
+	assert_str_eq("\"\\n\"", unquote("\n", buf, sizeof(buf)));
+	assert_str_eq("\"\\t\"", unquote("\t", buf, sizeof(buf)));
+	assert_str_eq("\"a\"", unquote("a", buf, sizeof(buf)));
+	assert_str_eq("\"\"", unquote("", buf, sizeof(buf)));
+	assert_str_eq("\"ab\"", unquote("abcd", buf, sizeof(buf)));
 }
 
 void test_xstrdup()
@@ -35,8 +36,8 @@ void test_xstrdup()
 
 int main()
 {
-	test_repr();
-	test_drop_first_last_inplace();
+	test_quote();
+	test_unquote();
 	test_xstrdup();
 	return 0;
 }

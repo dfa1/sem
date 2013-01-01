@@ -59,7 +59,7 @@ D               [0-9]
 
 	/* Strings. */
 \"([^\\\"]|\\.)*\"      {
-        drop_first_last_inplace(yytext, yyleng);
+        yytext = quote(yytext, yytext, yyleng);
 	return tSTRING;
 }
 	/* Operators. */

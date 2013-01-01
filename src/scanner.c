@@ -917,7 +917,7 @@ case 12:
 YY_RULE_SETUP
 #line 61 "src/scanner.l"
 {
-        drop_first_last_inplace(yytext, yyleng);
+        yytext = quote(yytext, yytext, yyleng);
 	return tSTRING;
 }
 	YY_BREAK

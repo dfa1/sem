@@ -22,22 +22,60 @@ char *xstrdup(const char *str)
 	return strcpy(dup, str);
 }
 
-/* example:
- *   drop_first_last_inplace("abcd", 4) -> "bc"
+/* 
+ * example:
+ *   '"\\n"' -> '\n'
  */
-void drop_first_last_inplace(char *str, int str_size)
+char *quote(const char *str, char *dest, int dest_size)
 {
-	for (int i = 0; i < str_size - 1; i++) {
-		str[i] = str[i + 1];
+	assert(str != NULL);
+	assert(dest != NULL);
+	assert(dest_size >= 1);
+	int src_size = strlen(str);
+	char *p = dest;
+	for (int i = 1; i < dest_size && i < src_size - 1; i++) {
+		if (str[i] == '\\') {
+			char lookahead = str[i + 1];
+			i++;	// consuming two chars
+			switch (lookahead) {
+			case 'n':
+				*p++ = '\n';
+				break;
+			case 't':
+				*p++ = '\t';
+				break;
+			case 'r':
+				*p++ = '\r';
+				break;
+			case 'v':
+				*p++ = '\v';
+				break;
+			case 'f':
+				*p++ = '\f';
+				break;
+			case 'b':
+				*p++ = '\b';
+				break;
+			case 'a':
+				*p++ = '\a';
+				break;
+			default:
+				*p++ = '\\';
+				*p++ = lookahead;
+			}
+		} else {
+			*p++ = str[i];
+		}
 	}
-	str[str_size - 2] = 0;
+	*p = 0;
+	return dest;
 }
 
-/* example:
- *   '\nì -> '"\\n"''
- * NB: the caller is responsible for providing a suitable 'dest' array. 
+/* 
+ * example:
+ *   '\n' -> '"\\n"'
  */
-char *repr(const char *str, char *dest, int dest_size)
+char *unquote(const char *str, char *dest, int dest_size)
 {
 	assert(str != NULL);
 	assert(dest != NULL);
