@@ -83,7 +83,7 @@ static int dump_func(struct debug_state *ds)
 		} else if (i->strv != NULL) {
 			int ridiculously_large_enough = strlen(i->strv) * 2 + 4;
 			char tmp[ridiculously_large_enough];
-			fprintf(stdout, "%.50s\n",
+			fprintf(stdout, "%s\n",
 				unquote(i->strv, tmp, ridiculously_large_enough));
 		} else {
 			fprintf(stdout, "\n");
