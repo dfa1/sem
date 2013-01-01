@@ -81,13 +81,29 @@ void vm_destroy(struct vm *vm)
  */
 int eval_code(struct vm *vm, struct code *code)
 {
+	vm->ip = code->head;
+
+	for (;;) {
+		int sts = eval_code_one_step(vm, code);
+		if (sts < 0) {
+			return sts;
+		}
+
+		if (sts == 1) {
+			return 0;
+		}
+
+	}
+}
+
+// returns 1 on halt
+// returns 0 on success
+// returns < 0 on error
+int eval_code_one_step(struct vm *vm, struct code *code)
+{
 	int p;			/* first operand                */
 	int q;			/* second operand               */
 	int sts;		/* status                       */
-
-	/* Initialization. */
-	sts = 0;
-	vm->ip = code->head;
 
 // TODO: rename as error
 #define DIE(...)				\
@@ -99,7 +115,7 @@ int eval_code(struct vm *vm, struct code *code)
       while (!EMPTY()) {			\
       	fprintf(stderr, " [%d] %d\n", (int) LEVEL(), POP());	\
       }						\
-      sts = 1;					\
+      sts = -1;					\
       goto halt;				\
     } while(0)
 
@@ -116,195 +132,196 @@ int eval_code(struct vm *vm, struct code *code)
 	    DIE("stack overflow");		\
     } while(0)
 
-	/* Main loop. */
-	for (;;) {
-		/* Instruction fetch. */
-		vm->ip = vm->ip->next;
+	/* Initialization. */
+	sts = 0;
 
-		/* Instruction execution. */
-		switch (vm->ip->opcode) {
-		case INT:
-			PUSH(vm->ip->intv);
-			break;
+	/* Instruction fetch. */
+	vm->ip = vm->ip->next;
 
-		case SET:
-			q = POP();
+	/* Instruction execution. */
+	switch (vm->ip->opcode) {
+	case START:
+		break;
+
+	case INT:
+		PUSH(vm->ip->intv);
+		break;
+
+	case SET:
+		q = POP();
+		p = POP();
+
+		if (p < 0 || p >= vm->memsize) {
+			DIE("invalid memory address %d for target", p);
+		}
+		vm->mem[p] = q;
+		break;
+
+	case MEM:
+		p = POP();
+
+		if (p < 0 || p >= vm->memsize)
+			DIE("invalid memory address %d", p);
+
+		PUSH(vm->mem[p]);
+		break;
+
+	case SETLINENO:
+		vm->lineno = vm->ip->intv;
+		break;
+
+	case JUMP:
+		q = POP();
+
+		if (q < 1 || q >= code->size) {
+			DIE("cannot jump to line %d", q);
+		}
+
+		vm->ip = code->jumps[q - 1];
+		break;
+
+	case JUMPT:
+		p = POP();
+		q = POP();
+
+		if (q < 1 || q >= code->size) {
+			DIE("cannot jump to line %d", q);
+		}
+
+		if (p != 0) {
+			vm->ip = code->jumps[q - 1];
+		}
+		break;
+
+	case HALT:
+		sts = 1;
+		goto halt;
+
+	case IP:
+		PUSH(vm->lineno + 1);
+		break;
+
+	case WRITE_INT:
+		p = POP();
+		printf("%d", p);
+		break;
+
+	case WRITE_STR:
+		printf("%s", vm->ip->strv);
+		break;
+
+	case WRITELN_INT:
+		p = POP();
+		printf("%d\n", p);
+		break;
+
+	case WRITELN_STR:
+		printf("%s\n", vm->ip->strv);
+		break;
+
+	case READ:
+		{
 			p = POP();
 
 			if (p < 0 || p >= vm->memsize) {
-				DIE("invalid memory address %d for target", p);
+				DIE("invalid memory address %d for read", p);
+			}
+
+			char answer[1024];
+			char *ep;
+			if (ask("", answer, sizeof(answer)) < 0) {
+				DIE("EOF during read");
+			}
+			errno = 0;
+			q = strtol(answer, &ep, 10);
+
+			if (errno == ERANGE) {
+				DIE("invalid integer literal '%s'", answer);
+			}
+
+			if (*ep != 0) {
+				DIE("invalid '%c' in integer literal '%s' ",
+				    *ep, answer);
 			}
 			vm->mem[p] = q;
 			break;
-
-		case MEM:
-			p = POP();
-
-			if (p < 0 || p >= vm->memsize)
-				DIE("invalid memory address %d", p);
-
-			PUSH(vm->mem[p]);
-			break;
-
-		case SETLINENO:
-			vm->lineno = vm->ip->intv;
-			break;
-
-		case JUMP:
-			q = POP();
-
-			if (q < 1 || q >= code->size) {
-				DIE("cannot jump to line %d", q);
-			}
-
-			vm->ip = code->jumps[q - 1];
-			break;
-
-		case JUMPT:
-			p = POP();
-			q = POP();
-
-			if (q < 1 || q >= code->size) {
-				DIE("cannot jump to line %d", q);
-			}
-
-			if (p != 0) {
-				vm->ip = code->jumps[q - 1];
-			}
-			break;
-
-		case HALT:
-			sts = 0;
-			goto halt;
-
-		case IP:
-			PUSH(vm->lineno + 1);
-			break;
-
-		case WRITE_INT:
-			p = POP();
-			printf("%d", p);
-			break;
-
-		case WRITE_STR:
-			printf("%s", vm->ip->strv);
-			break;
-
-		case WRITELN_INT:
-			p = POP();
-			printf("%d\n", p);
-			break;
-
-		case WRITELN_STR:
-			printf("%s\n", vm->ip->strv);
-			break;
-
-		case READ:
-			{
-				p = POP();
-
-				if (p < 0 || p >= vm->memsize) {
-					DIE("invalid memory address %d for read", p);
-				}
-
-				char answer[1024];
-				char *ep;
-				if (ask("", answer, sizeof(answer)) < 0) {
-					DIE("EOF during read");
-				}
-				errno = 0;
-				q = strtol(answer, &ep, 10);
-
-				if (errno == ERANGE) {
-					DIE("invalid integer literal '%s'",
-					    answer);
-				}
-
-				if (*ep != 0) {
-					DIE("invalid '%c' in integer literal '%s' ", *ep, answer);
-				}
-				vm->mem[p] = q;
-				break;
-			}
-
-		case ADD:	/* p + q */
-			q = POP();
-			p = POP();
-			PUSH(p + q);
-			break;
-
-		case SUB:	/* p - q */
-			q = POP();
-			p = POP();
-			PUSH(p - q);
-			break;
-
-		case MUL:	/* p * q */
-			q = POP();
-			p = POP();
-			PUSH(p * q);
-			break;
-
-		case DIV:	/* p / q */
-			q = POP();
-			p = POP();
-			if (q == 0) {
-				DIE("division by zero");
-			}
-			PUSH(p / q);
-			break;
-
-		case MOD:	/* p % q */
-			q = POP();
-			p = POP();
-			if (q == 0) {
-				DIE("division by zero");
-			}
-			PUSH(p % q);
-			break;
-
-		case EQ:	/* p = q */
-			q = POP();
-			p = POP();
-			PUSH(p == q);
-			break;
-
-		case NE:	/* p != q */
-			q = POP();
-			p = POP();
-			PUSH(p != q);
-			break;
-
-		case GT:	/* p > q */
-			q = POP();
-			p = POP();
-			PUSH(p > q);
-			break;
-
-		case LT:	/* p < q */
-			q = POP();
-			p = POP();
-			PUSH(p < q);
-			break;
-
-		case GE:	/* p >= q */
-			q = POP();
-			p = POP();
-			PUSH(p >= q);
-			break;
-
-		case LE:	/* p <= q */
-			q = POP();
-			p = POP();
-			PUSH(p <= q);
-			break;
-
-		default:
-			DIE("unknown opcode (%d); top is %d", vm->ip->opcode,
-			    TOP());
 		}
+
+	case ADD:		/* p + q */
+		q = POP();
+		p = POP();
+		PUSH(p + q);
+		break;
+
+	case SUB:		/* p - q */
+		q = POP();
+		p = POP();
+		PUSH(p - q);
+		break;
+
+	case MUL:		/* p * q */
+		q = POP();
+		p = POP();
+		PUSH(p * q);
+		break;
+
+	case DIV:		/* p / q */
+		q = POP();
+		p = POP();
+		if (q == 0) {
+			DIE("division by zero");
+		}
+		PUSH(p / q);
+		break;
+
+	case MOD:		/* p % q */
+		q = POP();
+		p = POP();
+		if (q == 0) {
+			DIE("division by zero");
+		}
+		PUSH(p % q);
+		break;
+
+	case EQ:		/* p = q */
+		q = POP();
+		p = POP();
+		PUSH(p == q);
+		break;
+
+	case NE:		/* p != q */
+		q = POP();
+		p = POP();
+		PUSH(p != q);
+		break;
+
+	case GT:		/* p > q */
+		q = POP();
+		p = POP();
+		PUSH(p > q);
+		break;
+
+	case LT:		/* p < q */
+		q = POP();
+		p = POP();
+		PUSH(p < q);
+		break;
+
+	case GE:		/* p >= q */
+		q = POP();
+		p = POP();
+		PUSH(p >= q);
+		break;
+
+	case LE:		/* p <= q */
+		q = POP();
+		p = POP();
+		PUSH(p <= q);
+		break;
+
+	default:
+		DIE("unknown opcode (%d); top is %d", vm->ip->opcode, TOP());
 	}
-	/* End main loop. */
 
  halt:
 	return sts;

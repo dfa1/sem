@@ -89,7 +89,7 @@ misc/sem.vim            VIM syntax file
 src/sem.h		Sem C interface 	
 src/compiler.y		The compiler (GNU bison input)
 src/compiler.c		The compiler (generated from compiler.y)		
-src/tokens.h		Tokens (generated from compiler.y)
+src/tokens.h		Tokens 
 src/vm.c		The interpreter
 src/main.c		The main() 
 src/scanner.c		The lexical scanner (generated from scanner.l)

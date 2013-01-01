@@ -19,11 +19,6 @@
  * 02111-1307, USA.
  */
 
-/* Macros for setting/clearing/getting bits in flags. */
-#define SET(var,flag)          (var) |= (flag)
-#define UNSET(var,flag)        (var) |= ~(flag)
-#define IS_SET(var,flag)         (((var) & (flag)) != 0)
-
 // memory.c
 extern void *xmalloc(size_t);
 extern char *xstrdup(const char *);
@@ -112,4 +107,5 @@ extern void code_destroy(struct code *code);
 extern struct vm *vm_init(int mem_size, int stack_size);
 extern void vm_destroy(struct vm *vm);
 extern int eval_code(struct vm *vm, struct code *code);
+extern int eval_code_one_step(struct vm *vm, struct code *code);
 extern int debug_code(struct vm *vm, struct code *code);

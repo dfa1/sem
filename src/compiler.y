@@ -40,12 +40,12 @@ static void yyerror(yyscan_t yyscanner, struct code *code, const char *);
 static void emit(struct code *, int, int, char *);
 
 // uncomment to enable verbose compiler output 
-//#define DEBUG_COMPILER
+// #define DEBUG_COMPILER
 #ifdef DEBUG_COMPILER
-# define YYDEBUG 1
-# define DPRINTF(...) printf(__VA_ARGS__)
+#define YYDEBUG 1
+#define DPRINTF(...) printf(__VA_ARGS__)
 #else
-# define DPRINTF(...)
+#define DPRINTF(...)
 #endif
 /* *INDENT-OFF* */
 %}

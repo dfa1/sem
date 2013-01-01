@@ -26,13 +26,13 @@
 #include "sem.h"
 #include "version.h"
 
-enum {
-	RUNNING,
-	HALTED,
-};
+typedef enum {
+	RUNNING = 1,
+	HALTED
+} state_t;
 
 struct debug_state {
-	int state;
+	state_t state;
 	struct vm *vm;
 	struct code *code;
 	struct cmd *cmds;
@@ -112,11 +112,11 @@ static char ip_doc[] = "Print the instruction pointer.";
 
 static int ip_func(struct debug_state *ds)
 {
-/*	if ((VF(v), STEP))
-		fprintf(stdout, "ip is %ld.\n", VLN(v));
-	else
-		fprintf(stdout, "Nothing to show.\n");
-*/
+	if (ds->state == RUNNING) {
+		fprintf(stdout, "ip is %p.\n", ds->vm->ip);
+	} else {
+		fprintf(stdout, "Debugger not started.\n");
+	}
 	return CONTINUE;
 }
 
@@ -150,33 +150,35 @@ static char next_doc[] = "Execute next instruction.";
 
 static int next_func(struct debug_state *ds)
 {
-	return CONTINUE;
-}
-
-	/* Print to stdout this line. */
-	//fprintf(stdout, "%-3ld %s\n", VLN(v), PLI(Parsing)[VLN(v) - 1]);
-
-	/* Execute it. */
-	//sts = evalCode(v);
-/*
-	if (with(VF(v), HALTED)) {
-		VF(v) = 0;
-		fprintf(stdout, "Debug finished.\n");
+	if (ds->state == HALTED) {
+		printf("Not in debug.\n");
 	} else {
-		if (sts != 0)
-			VF(v) = 0;
-			fprintf(stderr, "Debug aborted.\n");
+		int sts = eval_code_one_step(ds->vm, ds->code);
+		if (sts < 0) {
+			printf("Program aborted.\n");
+			ds->state = HALTED;
+		}
+		if (sts == 1) {
+			printf("Program ended..\n");
+			ds->state = HALTED;
 		}
 	}
-*/
+	return CONTINUE;
+}
 
 /* quit */
 static char quit_doc[] = "Quit the debugger.";
 
 static int quit_func(struct debug_state *ds)
 {
-	/* Cannot exit if step mode is on. */
-	//answer = ask("The script is running. Exit anyway? (y or n) ");
+	if (ds->state == RUNNING) {
+		int answer =
+		    ask_yes_no
+		    ("Debugger is running a program. Exit anyway? (y or n)");
+		if (!answer) {
+			return CONTINUE;
+		}
+	}
 	return QUIT;
 }
 
@@ -185,8 +187,17 @@ static char run_doc[] = "Run the program.";
 
 static int run_func(struct debug_state *ds)
 {
-	//fprintf(stdout, "The debug has been already started.\n");
-	//answer = ask("Start it from the beginning? (y or n) ");
+	if (ds->state == RUNNING) {
+		int answer =
+		    ask_yes_no
+		    ("Already in debugging. Restart it from the beginning? (y or n)");
+		if (answer) {
+			ds->vm->ip = ds->code->head;
+		}
+	}
+	ds->state = RUNNING;
+	ds->vm->ip = ds->code->head;
+	printf("Started.\n");
 	return CONTINUE;
 }
 
@@ -195,7 +206,7 @@ static char notimpl_doc[] = "NOT IMPLEMENTED.";
 
 static int notimpl_func(struct debug_state *ds)
 {
-	fprintf(stderr, "Not implemented.\n");
+	fprintf(stdout, "Not implemented.\n");
 	return CONTINUE;
 }
 
@@ -253,6 +264,7 @@ int debug_code(struct vm *vm, struct code *code)
 	char cmd_name[20];
 	struct debug_state ds;
 	struct debug_state *pds = &ds;
+	pds->state = HALTED;
 	pds->vm = vm;
 	pds->code = code;
 	pds->cmds = cmds;
