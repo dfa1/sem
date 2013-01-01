@@ -41,7 +41,7 @@ char *repr(const char *str, char *dest, int dest_size)
 {
 	assert(str != NULL);
 	assert(dest != NULL);
-	assert(dest_size >= 3); 
+	assert(dest_size >= 3);
 	char *p = dest;
 	*p++ = '\"';
 	for (int i = 0; i < dest_size - 2 && str[i] != 0; i++) {
