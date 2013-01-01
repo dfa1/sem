@@ -45,11 +45,14 @@ Building sem:
   
   $ make                                
 
-This creates an executable `sem'; to install in `/usr/local/bin', first
-become root and then `make install' 
+This creates an executable 'build/sem'. In order to install it type:
+ 
+  $ make install 
 
-  % make install
-  % make uninstall
+By default installation directory is /usr/local, so 'sem' is installed in /usr/local/bin/sem. 
+It can be changed by specifying a different PREFIX, e.g.:
+
+  $ make install PREFIX=/usr
 
 
 How to use misc/sem.vim? 
@@ -60,7 +63,7 @@ the text in another font or color for your .sem files. It has been tested
 with vim 72.
 
 Copy the file misc/sem.vim in ~/.vim/syntax/sem/sem.vim. Then put the 
-following line in your filetype.vim (~/.vim/filetype.vim)
+following line in your filetype.vim (e.g. ~/.vim/filetype.vim):
 
 au! BufNewFile,BufRead *.sem 		setf sem
 

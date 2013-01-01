@@ -68,7 +68,7 @@
 /* Copy the first part of user declarations.  */
 
 /* Line 189 of yacc.c  */
-#line 2 "compiler.y"
+#line 2 "src/compiler.y"
 
 /* *INDENT-ON* */
 
@@ -129,7 +129,7 @@ static void emit(struct code *, int, int, char *);
 
 
 /* Line 189 of yacc.c  */
-#line 133 "compiler.c"
+#line 133 "src/compiler.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -192,7 +192,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 196 "compiler.c"
+#line 196 "src/compiler.c"
 
 #ifdef short
 # undef short
@@ -1457,7 +1457,7 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 99 "compiler.y"
+#line 99 "src/compiler.y"
     {
     fprintf(stderr, "empty source\n");
     YYABORT;
@@ -1467,28 +1467,28 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 116 "compiler.y"
+#line 116 "src/compiler.y"
     { emit_op_int(SETLINENO, yyget_lineno(yyscanner)); ;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 117 "compiler.y"
+#line 117 "src/compiler.y"
     { emit_op_int(SETLINENO, yyget_lineno(yyscanner)); ;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 118 "compiler.y"
+#line 118 "src/compiler.y"
     { YYABORT; ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 128 "compiler.y"
+#line 128 "src/compiler.y"
     {
     emit_op(HALT);
 ;}
@@ -1497,7 +1497,7 @@ yyreduce:
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 134 "compiler.y"
+#line 134 "src/compiler.y"
     {
     emit_op(JUMP);
 ;}
@@ -1506,7 +1506,7 @@ yyreduce:
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 137 "compiler.y"
+#line 137 "src/compiler.y"
     {
     emit_op(JUMPT);
 ;}
@@ -1515,7 +1515,7 @@ yyreduce:
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 143 "compiler.y"
+#line 143 "src/compiler.y"
     {
     emit_op(SET);
 ;}
@@ -1524,7 +1524,7 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 146 "compiler.y"
+#line 146 "src/compiler.y"
     {
     emit_op(WRITE_INT);
 ;}
@@ -1533,7 +1533,7 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 149 "compiler.y"
+#line 149 "src/compiler.y"
     {
     emit_op_string(WRITE_STR, yyget_text(yyscanner));
 ;}
@@ -1542,7 +1542,7 @@ yyreduce:
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 152 "compiler.y"
+#line 152 "src/compiler.y"
     {	/* this is an extension */
     emit_op(WRITELN_INT);
 ;}
@@ -1551,7 +1551,7 @@ yyreduce:
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 155 "compiler.y"
+#line 155 "src/compiler.y"
     {	/* this is an extension */
     emit_op_string(WRITELN_STR, yyget_text(yyscanner));
 ;}
@@ -1560,7 +1560,7 @@ yyreduce:
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 158 "compiler.y"
+#line 158 "src/compiler.y"
     {
     emit_op(READ);
 ;}
@@ -1569,7 +1569,7 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 168 "compiler.y"
+#line 168 "src/compiler.y"
     {
     emit_op(EQ);
 ;}
@@ -1578,7 +1578,7 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 171 "compiler.y"
+#line 171 "src/compiler.y"
     {
     emit_op(NE);
 ;}
@@ -1587,7 +1587,7 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 174 "compiler.y"
+#line 174 "src/compiler.y"
     {
     emit_op(GT);
 ;}
@@ -1596,7 +1596,7 @@ yyreduce:
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 177 "compiler.y"
+#line 177 "src/compiler.y"
     {
     emit_op(LT);
 ;}
@@ -1605,7 +1605,7 @@ yyreduce:
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 180 "compiler.y"
+#line 180 "src/compiler.y"
     {
     emit_op(GE);
 ;}
@@ -1614,7 +1614,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 183 "compiler.y"
+#line 183 "src/compiler.y"
     {
     emit_op(LE);
 ;}
@@ -1623,7 +1623,7 @@ yyreduce:
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 194 "compiler.y"
+#line 194 "src/compiler.y"
     {
     emit_op(ADD);
 ;}
@@ -1632,7 +1632,7 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 197 "compiler.y"
+#line 197 "src/compiler.y"
     {
     emit_op(SUB);
 ;}
@@ -1641,7 +1641,7 @@ yyreduce:
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 204 "compiler.y"
+#line 204 "src/compiler.y"
     {
     emit_op(MUL);
 ;}
@@ -1650,7 +1650,7 @@ yyreduce:
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 207 "compiler.y"
+#line 207 "src/compiler.y"
     {		
     emit_op(DIV);
 ;}
@@ -1659,7 +1659,7 @@ yyreduce:
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 210 "compiler.y"
+#line 210 "src/compiler.y"
     { /* this is an extension */
     emit_op(MOD);
 ;}
@@ -1668,7 +1668,7 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 222 "compiler.y"
+#line 222 "src/compiler.y"
     {
     long value;
     char *ep;
@@ -1693,7 +1693,7 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 244 "compiler.y"
+#line 244 "src/compiler.y"
     {
     emit_op(MEM);
 ;}
@@ -1702,7 +1702,7 @@ yyreduce:
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 250 "compiler.y"
+#line 250 "src/compiler.y"
     {
     emit_op(IP);
 ;}
@@ -1711,7 +1711,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1715 "compiler.c"
+#line 1715 "src/compiler.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1923,7 +1923,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 254 "compiler.y"
+#line 254 "src/compiler.y"
 
   /* *INDENT-ON* */
 
