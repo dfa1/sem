@@ -30,36 +30,28 @@
 #include "sem.h"
 #include "scanner.h"
 
-#if defined(WITH_PARSER_DEBUG)
-#define YYDEBUG 	1
-#endif
-
-#if defined(WITH_VERBOSE_ERROR)
-#define YYERROR_VERBOSE
-#endif
-
-// TODO: runtime
-#ifdef WITH_COMPILER_DEBUG
-#define DPRINTF(...) printf(__VA_ARGS__)
-#else
-#define DPRINTF(...)
-#endif
-
-#define YYSTYPE 	struct op *
-static void yyerror(void *yyscanner, struct code *code, const char *);
+#define YYSTYPE	struct op *
+static void yyerror(yyscan_t yyscanner, struct code *code, const char *);
 #define error(msg) yyerror(yyscanner, code, (msg))
 
-/* Emit an opcode to the list (see Code struct). */
 #define emit_op(op)            emit(code, (op), -1, NULL)
 #define emit_op_int(op, iv)    emit(code, (op), (iv), NULL);
 #define emit_op_string(op, sv) emit(code, (op), -1, (sv))
 static void emit(struct code *, int, int, char *);
 
+// uncomment to enable verbose compiler output 
+//#define DEBUG_COMPILER
+#ifdef DEBUG_COMPILER
+# define YYDEBUG 1
+# define DPRINTF(...) printf(__VA_ARGS__)
+#else
+# define DPRINTF(...)
+#endif
 /* *INDENT-OFF* */
 %}
-%parse-param {void* yyscanner}
+%parse-param {yyscan_t yyscanner}
 %parse-param {struct code *code}
-%lex-param {void *yyscanner}
+%lex-param {yyscan_t yyscanner}
 
 /* Keywords. */
 %token kSET
@@ -67,7 +59,7 @@ static void emit(struct code *, int, int, char *);
 %token kJUMP
 %token kJUMPT
 
-/* Special and/or unique and/or reserved names. */
+/* Reserved names. */
 %token rD
 %token rIP
 %token rREAD
@@ -97,7 +89,7 @@ static void emit(struct code *, int, int, char *);
 
 input
 : none {
-    fprintf(stderr, "empty source\n");
+    fprintf(stderr, "sem: empty source\n");
     YYABORT;
  }
 | stmts
@@ -254,7 +246,7 @@ aip
 %%
   /* *INDENT-ON* */
 
-static void yyerror(void *yyscanner, struct code *code, const char *msg)
+static void yyerror(yyscan_t yyscanner, struct code *code, const char *msg)
 {
 	(void)code;
 	fprintf(stderr, "sem: %s at line %d near token '%s'\n", msg,
@@ -302,7 +294,7 @@ struct code *compile_code(const char *filename)
 	yylex_init(&scanner);
 	yyset_in(fp, scanner);
 
-#if defined(WITH_PARSER_DEBUG)
+#ifdef DEBUG_COMPILER
 	yydebug = 1;
 #endif
 
@@ -342,7 +334,7 @@ struct code *compile_code(const char *filename)
 		DPRINTF("COMPILE: %p (op=%d,intv=%d,strv=%s)\n", i, i->opcode,
 			i->intv, i->strv);
 		if (i->opcode == SETLINENO) {
-			DPRINTF("COMPILE:  line %j jumps to %p\n", j, i);
+			DPRINTF("COMPILE:  line %d jumps to %p\n", j, i);
 			code->jumps[j++] = i;
 		}
 	}

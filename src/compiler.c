@@ -100,36 +100,28 @@
 #include "sem.h"
 #include "scanner.h"
 
-#if defined(WITH_PARSER_DEBUG)
-#define YYDEBUG 	1
-#endif
-
-#if defined(WITH_VERBOSE_ERROR)
-#define YYERROR_VERBOSE
-#endif
-
-// TODO: runtime
-#ifdef WITH_COMPILER_DEBUG
-#define DPRINTF(...) printf(__VA_ARGS__)
-#else
-#define DPRINTF(...)
-#endif
-
-#define YYSTYPE 	struct op *
-static void yyerror(void *yyscanner, struct code *code, const char *);
+#define YYSTYPE	struct op *
+static void yyerror(yyscan_t yyscanner, struct code *code, const char *);
 #define error(msg) yyerror(yyscanner, code, (msg))
 
-/* Emit an opcode to the list (see Code struct). */
 #define emit_op(op)            emit(code, (op), -1, NULL)
 #define emit_op_int(op, iv)    emit(code, (op), (iv), NULL);
 #define emit_op_string(op, sv) emit(code, (op), -1, (sv))
 static void emit(struct code *, int, int, char *);
 
+// uncomment to enable verbose compiler output 
+//#define DEBUG_COMPILER
+#ifdef DEBUG_COMPILER
+# define YYDEBUG 1
+# define DPRINTF(...) printf(__VA_ARGS__)
+#else
+# define DPRINTF(...)
+#endif
 /* *INDENT-OFF* */
 
 
 /* Line 189 of yacc.c  */
-#line 133 "src/compiler.c"
+#line 125 "src/compiler.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -192,7 +184,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 196 "src/compiler.c"
+#line 188 "src/compiler.c"
 
 #ifdef short
 # undef short
@@ -492,11 +484,11 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    99,    99,   103,   106,   111,   112,   116,   116,   117,
-     117,   118,   122,   123,   124,   128,   134,   137,   143,   146,
-     149,   152,   155,   158,   164,   168,   171,   174,   177,   180,
-     183,   189,   193,   194,   197,   203,   204,   207,   210,   216,
-     217,   218,   222,   244,   250
+       0,    91,    91,    95,    98,   103,   104,   108,   108,   109,
+     109,   110,   114,   115,   116,   120,   126,   129,   135,   138,
+     141,   144,   147,   150,   156,   160,   163,   166,   169,   172,
+     175,   181,   185,   186,   189,   195,   196,   199,   202,   208,
+     209,   210,   214,   236,   242
 };
 #endif
 
@@ -757,14 +749,14 @@ do {									  \
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void* yyscanner, struct code *code)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, yyscan_t yyscanner, struct code *code)
 #else
 static void
 yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner, code)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
-    void* yyscanner;
+    yyscan_t yyscanner;
     struct code *code;
 #endif
 {
@@ -793,14 +785,14 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner, code)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void* yyscanner, struct code *code)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, yyscan_t yyscanner, struct code *code)
 #else
 static void
 yy_symbol_print (yyoutput, yytype, yyvaluep, yyscanner, code)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
-    void* yyscanner;
+    yyscan_t yyscanner;
     struct code *code;
 #endif
 {
@@ -852,13 +844,13 @@ do {								\
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, int yyrule, void* yyscanner, struct code *code)
+yy_reduce_print (YYSTYPE *yyvsp, int yyrule, yyscan_t yyscanner, struct code *code)
 #else
 static void
 yy_reduce_print (yyvsp, yyrule, yyscanner, code)
     YYSTYPE *yyvsp;
     int yyrule;
-    void* yyscanner;
+    yyscan_t yyscanner;
     struct code *code;
 #endif
 {
@@ -1132,14 +1124,14 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void* yyscanner, struct code *code)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, yyscan_t yyscanner, struct code *code)
 #else
 static void
 yydestruct (yymsg, yytype, yyvaluep, yyscanner, code)
     const char *yymsg;
     int yytype;
     YYSTYPE *yyvaluep;
-    void* yyscanner;
+    yyscan_t yyscanner;
     struct code *code;
 #endif
 {
@@ -1168,7 +1160,7 @@ int yyparse ();
 #endif
 #else /* ! YYPARSE_PARAM */
 #if defined __STDC__ || defined __cplusplus
-int yyparse (void* yyscanner, struct code *code);
+int yyparse (yyscan_t yyscanner, struct code *code);
 #else
 int yyparse ();
 #endif
@@ -1204,11 +1196,11 @@ yyparse (YYPARSE_PARAM)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 int
-yyparse (void* yyscanner, struct code *code)
+yyparse (yyscan_t yyscanner, struct code *code)
 #else
 int
 yyparse (yyscanner, code)
-    void* yyscanner;
+    yyscan_t yyscanner;
     struct code *code;
 #endif
 #endif
@@ -1457,9 +1449,9 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 99 "src/compiler.y"
+#line 91 "src/compiler.y"
     {
-    fprintf(stderr, "empty source\n");
+    fprintf(stderr, "sem: empty source\n");
     YYABORT;
  ;}
     break;
@@ -1467,28 +1459,28 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 116 "src/compiler.y"
+#line 108 "src/compiler.y"
     { emit_op_int(SETLINENO, yyget_lineno(yyscanner)); ;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 117 "src/compiler.y"
+#line 109 "src/compiler.y"
     { emit_op_int(SETLINENO, yyget_lineno(yyscanner)); ;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 118 "src/compiler.y"
+#line 110 "src/compiler.y"
     { YYABORT; ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 128 "src/compiler.y"
+#line 120 "src/compiler.y"
     {
     emit_op(HALT);
 ;}
@@ -1497,7 +1489,7 @@ yyreduce:
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 134 "src/compiler.y"
+#line 126 "src/compiler.y"
     {
     emit_op(JUMP);
 ;}
@@ -1506,7 +1498,7 @@ yyreduce:
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 137 "src/compiler.y"
+#line 129 "src/compiler.y"
     {
     emit_op(JUMPT);
 ;}
@@ -1515,7 +1507,7 @@ yyreduce:
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 143 "src/compiler.y"
+#line 135 "src/compiler.y"
     {
     emit_op(SET);
 ;}
@@ -1524,7 +1516,7 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 146 "src/compiler.y"
+#line 138 "src/compiler.y"
     {
     emit_op(WRITE_INT);
 ;}
@@ -1533,7 +1525,7 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 149 "src/compiler.y"
+#line 141 "src/compiler.y"
     {
     emit_op_string(WRITE_STR, yyget_text(yyscanner));
 ;}
@@ -1542,7 +1534,7 @@ yyreduce:
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 152 "src/compiler.y"
+#line 144 "src/compiler.y"
     {	/* this is an extension */
     emit_op(WRITELN_INT);
 ;}
@@ -1551,7 +1543,7 @@ yyreduce:
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 155 "src/compiler.y"
+#line 147 "src/compiler.y"
     {	/* this is an extension */
     emit_op_string(WRITELN_STR, yyget_text(yyscanner));
 ;}
@@ -1560,7 +1552,7 @@ yyreduce:
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 158 "src/compiler.y"
+#line 150 "src/compiler.y"
     {
     emit_op(READ);
 ;}
@@ -1569,7 +1561,7 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 168 "src/compiler.y"
+#line 160 "src/compiler.y"
     {
     emit_op(EQ);
 ;}
@@ -1578,7 +1570,7 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 171 "src/compiler.y"
+#line 163 "src/compiler.y"
     {
     emit_op(NE);
 ;}
@@ -1587,7 +1579,7 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 174 "src/compiler.y"
+#line 166 "src/compiler.y"
     {
     emit_op(GT);
 ;}
@@ -1596,7 +1588,7 @@ yyreduce:
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 177 "src/compiler.y"
+#line 169 "src/compiler.y"
     {
     emit_op(LT);
 ;}
@@ -1605,7 +1597,7 @@ yyreduce:
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 180 "src/compiler.y"
+#line 172 "src/compiler.y"
     {
     emit_op(GE);
 ;}
@@ -1614,7 +1606,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 183 "src/compiler.y"
+#line 175 "src/compiler.y"
     {
     emit_op(LE);
 ;}
@@ -1623,7 +1615,7 @@ yyreduce:
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 194 "src/compiler.y"
+#line 186 "src/compiler.y"
     {
     emit_op(ADD);
 ;}
@@ -1632,7 +1624,7 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 197 "src/compiler.y"
+#line 189 "src/compiler.y"
     {
     emit_op(SUB);
 ;}
@@ -1641,7 +1633,7 @@ yyreduce:
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 204 "src/compiler.y"
+#line 196 "src/compiler.y"
     {
     emit_op(MUL);
 ;}
@@ -1650,7 +1642,7 @@ yyreduce:
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 207 "src/compiler.y"
+#line 199 "src/compiler.y"
     {		
     emit_op(DIV);
 ;}
@@ -1659,7 +1651,7 @@ yyreduce:
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 210 "src/compiler.y"
+#line 202 "src/compiler.y"
     { /* this is an extension */
     emit_op(MOD);
 ;}
@@ -1668,7 +1660,7 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 222 "src/compiler.y"
+#line 214 "src/compiler.y"
     {
     long value;
     char *ep;
@@ -1693,7 +1685,7 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 244 "src/compiler.y"
+#line 236 "src/compiler.y"
     {
     emit_op(MEM);
 ;}
@@ -1702,7 +1694,7 @@ yyreduce:
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 250 "src/compiler.y"
+#line 242 "src/compiler.y"
     {
     emit_op(IP);
 ;}
@@ -1711,7 +1703,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1715 "src/compiler.c"
+#line 1707 "src/compiler.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1923,11 +1915,11 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 254 "src/compiler.y"
+#line 246 "src/compiler.y"
 
   /* *INDENT-ON* */
 
-static void yyerror(void *yyscanner, struct code *code, const char *msg)
+static void yyerror(yyscan_t yyscanner, struct code *code, const char *msg)
 {
 	(void)code;
 	fprintf(stderr, "sem: %s at line %d near token '%s'\n", msg,
@@ -1975,7 +1967,7 @@ struct code *compile_code(const char *filename)
 	yylex_init(&scanner);
 	yyset_in(fp, scanner);
 
-#if defined(WITH_PARSER_DEBUG)
+#ifdef DEBUG_COMPILER
 	yydebug = 1;
 #endif
 
@@ -2015,7 +2007,7 @@ struct code *compile_code(const char *filename)
 		DPRINTF("COMPILE: %p (op=%d,intv=%d,strv=%s)\n", i, i->opcode,
 			i->intv, i->strv);
 		if (i->opcode == SETLINENO) {
-			DPRINTF("COMPILE:  line %j jumps to %p\n", j, i);
+			DPRINTF("COMPILE:  line %d jumps to %p\n", j, i);
 			code->jumps[j++] = i;
 		}
 	}

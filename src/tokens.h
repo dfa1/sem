@@ -1,4 +1,4 @@
-enum yytokentype {
+enum {
 	kSET = 258,
 	kHALT = 259,
 	kJUMP = 260,
