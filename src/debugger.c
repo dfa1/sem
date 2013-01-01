@@ -81,9 +81,9 @@ static int dump_func(struct debug_state *ds)
 		if (i->intv != -1) {	// TODO: -1 is a valid integer
 			fprintf(stdout, "%d\n", i->intv);
 		} else if (i->strv != NULL) {
-			char *t = repr(i->strv);
-			fprintf(stdout, "%.50s\n", t);
-			free(t);
+			int ridiculously_large_enough = strlen(i->strv) * 3;
+			char tmp[ridiculously_large_enough];	
+			fprintf(stdout, "%.50s\n", repr(i->strv, tmp, ridiculously_large_enough));
 		} else {
 			fprintf(stdout, "\n");
 			continue;

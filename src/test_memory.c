@@ -11,14 +11,26 @@ void assert_str_eq(char *expected, char *got)
 	}
 }
 
+void test_repr()
+{
+	char buf[4];
+	assert_str_eq("\"\\n\"", repr("\n", buf, sizeof(buf)));
+	assert_str_eq("\"\\t\"", repr("\t", buf, sizeof(buf)));
+	assert_str_eq("\"a\"", repr("a", buf, sizeof(buf)));
+	assert_str_eq("\"\"", repr("", buf, sizeof(buf)));
+	assert_str_eq("\"ab\"", repr("abcd", buf, sizeof(buf)));
+}
+
+void test_drop_first_last_inplace()
+{
+	char buf[] = "123456";
+	drop_first_last_inplace(buf, strlen(buf));
+	assert_str_eq("2345", buf);
+}
+
 int main()
 {
-	assert_str_eq("\"\\n\"", repr("\n"));
-	assert_str_eq("\"\\t\"", repr("\t"));
-	assert_str_eq("\"a\"", repr("a"));
-
-	char s[] = "1234";
-	drop_first_last_inplace(s, strlen(s));
-	assert_str_eq("23", s);
+	test_repr();
+	test_drop_first_last_inplace();
 	return 0;
 }
