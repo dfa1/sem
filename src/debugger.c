@@ -159,7 +159,7 @@ static int next_func(struct debug_state *ds)
 			ds->state = HALTED;
 		}
 		if (sts == 1) {
-			printf("Program ended..\n");
+			printf("Program ended.\n");
 			ds->state = HALTED;
 		}
 	}
