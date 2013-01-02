@@ -61,13 +61,12 @@ static char dump_doc[] = "Dump internal code representation.";
 
 /* *INDENT-OFF* */
 static const char *opstr[] = {	/* TODO: autogenerate these from sem.h */
-	"START",	"SET", 		"JUMP", 	"JUMPT",
-	"SETLINENO", 	"INT", 		"READ", 	"WRITE_INT",
-	"WRITE_STR", 	"WRITELN_INT",	"WRITELN_STR",	"MEM", 		
-	"ADD", 		"SUB", 		"MUL", 		"DIV", 		
-	"MOD", 		"EQ",		"NE", 		"GT", 		
-	"LT", 		"GE",		"LE", 		"IP",
-	"HALT"
+	"SETLINENO", 	"SET", 		"JUMP", 	"JUMPT",
+	"INT", 		"READ", 	"WRITE_INT",	"WRITE_STR",
+ 	"WRITELN_INT",	"WRITELN_STR",	"MEM", 		"ADD",
+	"SUB", 		"MUL", 		"DIV", 		"MOD",
+	"EQ",		"NE", 		"GT", 		"LT",
+	"GE",		"LE", 		"IP",		"HALT"
 };
 /* *INDENT-ON* */
 
@@ -84,7 +83,8 @@ static int dump_func(struct debug_state *ds)
 			int ridiculously_large_enough = strlen(i->strv) * 2 + 4;
 			char tmp[ridiculously_large_enough];
 			fprintf(stdout, "%s\n",
-				unquote(i->strv, tmp, ridiculously_large_enough));
+				unquote(i->strv, tmp,
+					ridiculously_large_enough));
 		} else {
 			fprintf(stdout, "\n");
 			continue;
@@ -127,7 +127,7 @@ static int mem_func(struct debug_state *ds)
 {
 	int i;
 	int j;
-	for (i = 0; i < ds->vm->memsize; i++) {
+	for (i = 0; i < ds->vm->memsize; i++) {	// TODO: screaming for refactoring 
 		/* Print at most 10 item. */
 		for (j = 0; i < ds->vm->memsize && j < 10; j++) {
 			fprintf(stdout, "%4d ", ds->vm->mem[i++]);

@@ -135,14 +135,8 @@ int eval_code_one_step(struct vm *vm, struct code *code)
 	/* Initialization. */
 	sts = 0;
 
-	/* Instruction fetch. */
-	vm->ip = vm->ip->next;
-
 	/* Instruction execution. */
 	switch (vm->ip->opcode) {
-	case START:
-		break;
-
 	case INT:
 		PUSH(vm->ip->intv);
 		break;
@@ -324,5 +318,8 @@ int eval_code_one_step(struct vm *vm, struct code *code)
 	}
 
  halt:
+	/* Next instruction fetch. */
+	vm->ip = vm->ip->next;
+
 	return sts;
 }

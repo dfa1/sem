@@ -105,10 +105,15 @@ stmts
 ;
 
 stmt    
-: { emit_op_int(SETLINENO, yyget_lineno(yyscanner)); } tNEWLINE
-| { emit_op_int(SETLINENO, yyget_lineno(yyscanner)); } simple_stmt tNEWLINE
+: newline
+| simple_stmt newline
 | error { YYABORT; }
 ;
+
+newline
+: tNEWLINE {
+    emit_op_int(SETLINENO, yyget_lineno(yyscanner)); 
+};
 
 simple_stmt
 : halt_stmt
@@ -283,7 +288,7 @@ struct code *compile_code(const char *filename)
 		return NULL;
 	}
 
-	struct instr *start = op_init(START, -1, NULL);
+	struct instr *start = op_init(SETLINENO, 1, NULL);
 	struct code *code = xmalloc(sizeof(struct code));
 	code->size = 1;
 	code->jumps = NULL;

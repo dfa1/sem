@@ -31,11 +31,10 @@ extern int ask_yes_no(const char *question);
 
 /* Opcodes. */
 typedef enum {
-	START = 0,
+	SETLINENO,
 	SET,
 	JUMP,
 	JUMPT,
-	SETLINENO,
 	INT,
 	READ,
 	WRITE_INT,
