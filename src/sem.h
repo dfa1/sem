@@ -65,10 +65,10 @@ struct instr {
 };
 
 struct code {
-	struct instr *head;	/* the head (in order to avoid O(n) append) */
-	struct instr *code;	/* the code (as linked list) */
-	int size;		/* the code size (number of lines) */
-	struct instr **jumps;	/* jumps */
+	struct instr *head;	/* the head */
+	struct instr *code;	/* the code as linked list; it grows as compiler emits opcodes */
+	int size;		/* the code size as number of lines */
+	struct instr **jumps;	/* jump table */
 };
 
 /* The interpreter. */
@@ -92,9 +92,7 @@ struct vm {
 	 * ====================
 	 *
 	 * The stack is a fixed size, which means there's a limit on
-	 * the nesting allowed in expressions. A more sophisticated
-	 * system could let it grow dynamically but at this point is
-	 * useless. 
+	 * the nesting allowed in expressions.
 	 */
 	int *stack;
 	int stacksize;
