@@ -1,72 +1,8 @@
 Sem, an abstract semantic processor
 ===================================
 
-This is sem 2.1. Enjoy it! :)
-
-
-Copyright notice
-----------------
-
-Copyright (C) 2003-2011 Davide Angelocola <davide.angelocola@gmail.com>
- 
-
-License information
--------------------
-
-This program is free software, released under the GNU Public License, which 
-gives you, from the user point of view, a great degree of liberty, which 
-proprietary software just doesn't.
-
-Follows a little list of the advantages free software has:
-  o  it's free!
-  o  the complete source code is available
-  o  you are allowed to copy, modify and redistribute. For more info
-     about this subject refer to the LICENSE
-
-
-What's news in this version?
-----------------------------
-
-See the CHANGES for information on new features and other user 
-visible/invisible changes.
-
-
-Install instructions
---------------------
-
-Requirements:
-
-- gcc
-- bison
-- flex
-- make
-- autoconf
-- automake
-- libtool
-- gnulib
-
-To start building type the following commands:
-
-  $ gnulib-tool --update
-
-  $ autoreconf
-  
-  $ ./configure
-
-  $ make                                # build sem 
-
-This creates an executable `sem'; to install in `/usr/local/bin', first
-become root and then `make install' 
-
-[ Become root if necessary ] %
-make install # install sem and misc/semd
-
-  [ Become root if necessary ]
-  % make uninstall                      # remove sem and semd 
-
-
-What's sem anyway?
-------------------
+What's sem?
+-----------
 
 Sem is an interpreter and a debugger for the SIMPLESEM language.   
 
@@ -82,27 +18,66 @@ processor."
                               John Wiley & Sons                  
 
 
+
+License information
+-------------------
+
+This program is free software, released under the GNU Public License, which 
+gives you, from the user point of view, a great degree of liberty, which 
+proprietary software just doesn't.
+
+Follows a little list of the advantages free software has:
+  o  it's free;
+  o  the complete source code is available;
+  o  you are allowed to copy, modify and redistribute. For more info
+     about this subject refer to the COPYING file.
+
+
+Install instructions
+--------------------
+
+Requirements:
+
+- C99 compiler (such as gcc or clang)
+- make
+
+Building sem:
+  
+  $ make                                
+
+This creates an executable 'build/sem'. In order to install it type:
+ 
+  $ make install 
+
+By default installation directory is /usr/local, so 'sem' is installed in /usr/local/bin/sem. 
+It can be changed by specifying a different PREFIX, e.g.:
+
+  $ make install PREFIX=/usr
+
+
 How to use misc/sem.vim? 
 ------------------------
 
 The file sem.vim is a Vim syntax file. It enables Vim to show parts of 
-the text in another font or color for your .sem files.
+the text in another font or color for your .sem files. It has been tested
+with vim 72.
 
-Copy the sem.vim in /usr/share/vim/vim{version}/syntax. Then edit your
-/usr/share/vim/vim{version}/filetype.vim and add the following lines:
+Copy the file misc/sem.vim in ~/.vim/syntax/sem/sem.vim. Then put the 
+following line in your filetype.vim (e.g. ~/.vim/filetype.vim):
 
-" SIMPLESEM 
-au BufNewFile,BufRead *.sem                     setf sem
+au! BufNewFile,BufRead *.sem 		setf sem
 
 
 Distribution structure
 ----------------------
 
+AUTHORS                 Authors and contributors
 ChangeLog		History of changes
 COPYING			Licensing information
 README			The file you're reading now
-THANKS			Acknowledgments
 TODO	          	To-do list, ideas, bugs
+Makefile                The Makefile
+doc/QUICKREF            Language reference
 examples/comp.sem	Compare two numbers
 examples/fact.sem	The factorial
 examples/gcd.sem	Greatest Common Divisor
@@ -110,28 +85,17 @@ examples/hello.sem	Hello World, in SIMPLESEM this time
 examples/pow.sem	The power
 examples/rfact.sem	Recursive version of fact.sem
 examples/sum.sem	Sum two numbers
-misc/semd		Just an handy wrapper for sem -d
 misc/sem.vim            VIM syntax file
-src/compile.y		The compiler (GNU bison input)
-src/compile.c		The compiler (generated from compile.y)		
-src/debug.c		The debugger 
-src/eval.c		The interpreter
-src/main.c		The main() and other stuff
-src/scan.c		The lexical scanner (generated from scan.l)
-src/scan.l		The lexical scanner (GNU flex input)
-src/sem.h		Just an handy header 	
-src/compile.h		Tokens 
-gnulib/*                gnulib sources
-m4/*                    ditto
-
-skip autoconf/automake/libtool/gnulib build files
-
-
-Author
-------
-
-Sem was originally written by Davide Angelocola. See also THANKS for a 
-list of contributors.
+src/sem.h		Sem C interface 	
+src/compiler.y		The compiler (GNU bison input)
+src/compiler.c		The compiler (generated from compiler.y)		
+src/tokens.h		Tokens 
+src/vm.c		The interpreter
+src/main.c		The main() 
+src/scanner.c		The lexical scanner (generated from scanner.l)
+src/scanner.h		The lexical scanner interface (generated from scanner.l)
+src/scanner.l		The lexical scanner (GNU flex input)
+src/debugger.c		The debugger 
 
 
 Contact Information
@@ -141,8 +105,5 @@ Email:
   davide.angelocola@gmail.com
 
 URL:
-  http://www.humaorie.com
-
-That's all folks!
--- Davide
+  http://bitbucket.org/dfa/sem
 

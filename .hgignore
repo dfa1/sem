@@ -1,30 +1,5 @@
-# use glob syntax.
 syntax: glob
 *.o
-*.lo
-.deps
 *~
-Makefile
-Makefile.in
-aclocal.m4
-autom4te.cache
-config.log
-config.status
-configure
-depcomp
-doc/Makefile
-doc/Makefile.in
-examples/Makefile
-examples/Makefile.in
-install-sh
-misc/Makefile
-misc/Makefile.in
-missing
-src/Makefile
-src/Makefile.in
-src/config.h
-src/scan.c
-src/sem
-src/stamp-h1
-ylwrap
+build
 

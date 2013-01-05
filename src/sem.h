@@ -1,7 +1,7 @@
 /*
- * sem.h -- Just an handy header
+ * sem.h 
  *
- * Copyright (C) 2003-2011 Davide Angelocola <davide.angelocola@gmail.com>
+ * Copyright (C) 2003-2013 Davide Angelocola <davide.angelocola@gmail.com>
  *
  * Sem is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,205 +19,92 @@
  * 02111-1307, USA.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+// memory.c
+extern void *xmalloc(size_t);
+extern char *xstrdup(const char *);
+extern char *unquote(const char *str, char *dest, int dest_size);
+extern char *quote(const char *str, char *dest, int dest_size);
 
-/* gnulib */
-#include "trim.h"
-#include "readline.h"
-
-/* 
- *       THE LESSER-KNOWN PROGRAMMING LANGUAGES #10: SIMPLE
- *
- * SIMPLE is an acronym for Sheer Idiot's Monopurpose Programming Language
- * Environment.  This language, developed at the Hanover College for
- * Technological Misfits, was designed to make it impossible to write code
- * with errors in it.  The statements are, therefore, confined to BEGIN,
- * END and STOP.  No matter how you arrange the statements, you can't make
- * a syntax error.  Programs written in SIMPLE do nothing useful.  Thus
- * they achieve the results of programs written in other languages without
- * the tedious, frustrating process of testing and debugging.
- */
-
-/* Features */
-
-/* 
- * If the Bison grammar (compile.y) compiles properly but doesn't do
- * what you want when it runs, the `yydebug' parser-trace feature can
- * help you figure out why. Define the macro `WITH_PARSER_DEBUG'
- * before you compile sem. This is compliant with POSIX Yacc.
- */
-/* #define WITH_PARSER_DEBUG */
-
-/* This enables a more precise parsing error messages. */
-/* #define WITH_VERBOSE_ERROR */
-
-/* Symbols visibility. */
-#define PUBLIC
-#define PRIVATE	static
-#define IMPORT	extern
-
-/* Hide GCC attributes if aren't available. */
-#if !defined(__GNUC__) || __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 7)
-# define ATTRIBUTE(x)
-#else
-# define ATTRIBUTE(x) __attribute__(x)
-#endif
-
-/* Macros for setting/clearing/getting bits in flags. */
-#define set(var,flag)          (var) |= (flag)
-#define clear(var,flag)        (var) |= ~(flag)
-#define with(var,flag)         (((var) & (flag)) != 0)
+// io.c
+extern int ask(const char *question, char *answer, int answer_size);
+extern int ask_yes_no(const char *question);
+extern int fetch_line_from_file(const char *filename, int lineno, char *dest, int dest_size);
 
 /* Opcodes. */
-typedef enum
-{
-    START = 0,
-    SET,
-    JUMP,
-    JUMPT,
-    SETLINENO,
-    INT,
-    READ,
-    WRITE_INT,
-    WRITE_STR,
-    WRITELN_INT,
-    WRITELN_STR,
-    MEM,
-    ADD,
-    SUB,
-    MUL,
-    DIV,
-    MOD,
-    EQ,
-    NE,
-    GT,
-    LT,
-    GE,
-    LE,
-    IP,
-    HALT
-} op_t;
+typedef enum {
+	SETLINENO,
+	SET,
+	JUMP,
+	JUMPT,
+	INT,
+	READ,
+	WRITE_INT,
+	WRITE_STR,
+	WRITELN_INT,
+	WRITELN_STR,
+	MEM,
+	ADD,
+	SUB,
+	MUL,
+	DIV,
+	MOD,
+	EQ,
+	NE,
+	GT,
+	LT,
+	GE,
+	LE,
+	IP,
+	HALT
+} opcode_t;
 
-/* Structures */
-struct Op
-{
-op_t opcode:8;		/* opcode (as a bit field) */
-    long intv;		/* integer argument */
-    char *strv;		/* string argument */
-    struct Op *next;	/* next opcode */
-} ATTRIBUTE((packed));
-
-/* struct Op access macros. */
-#define OOP(o)	((o)->opcode)
-#define OIV(o)	((o)->intv)
-#define OSV(o)	((o)->strv)
-#define ONX(o)	((o)->next)
-
-struct Code
-{
-    struct Op *head;	/* the head */
-    struct Op *code;	/* the code (as linked list) */
-    int size;		/* the code size (number of lines) */
-    struct Op **jumps;	/* jumps (as linked list) */
+struct instr {
+	opcode_t opcode;	/* opcode */
+	int intv;		/* integer argument */
+	char *strv;		/* string argument */
+	struct instr *next;	/* next opcode */
 };
 
-/* struct Code access macros. */
-#define CHD(c)	((c)->head)
-#define CCD(c)	((c)->code)
-#define CSZ(c)  ((c)->size)
-#define CJM(c)  ((c)->jumps)
-
-struct Parsing
-{
-    char *filename;		/* the input */
-    FILE *fp;		/* the stream */
-    char **lines;		/* the file */
-    char *token;		/* the current token */
-    int lineno;		/* line number */
-    int offset;		/* offset of the current line */
-    char string[1024];	/* latest string token */
-    char *string_p;		/* pointer to string */
+struct code {
+	struct instr *head;	/* the head */
+	struct instr *code;	/* the code as linked list; it grows as compiler emits opcodes */
+	int size;		/* the code size as number of lines */
+	struct instr **jumps;	/* jump table */
+	char *filename;
 };
-
-/* struct Parsing access macros. */
-#define PFL(p)	((p)->filename)
-#define PFP(p)	((p)->fp)
-#define PLI(p)	((p)->lines)
-#define PTK(p)	((p)->token)
-#define PLN(p)	((p)->lineno)
-#define POF(p)	((p)->offset)
-#define PST(p)	((p)->string)
-#define PSP(p)	((p)->string_p)
-
-/* Global parsing structure. */
-IMPORT struct Parsing *Parsing;
-
-/* Init/Fini the compiler. */
-IMPORT int initCompiler(const char *);
-IMPORT void finiCompiler(struct Code *);
-
-/* Compile a SIMPLESEM source file. */
-IMPORT struct Code *compileSource(void);
 
 /* The interpreter. */
-struct VM
-{
-    struct Code *code;
+struct vm {
+	/* The Instruction Pointer. */
+	struct instr *ip;
+	int lineno;
 
-    /* The Instruction Pointer. */
-    struct Op *ip;
-    long lineno;
+	/*
+	 * The data memory
+	 * ===============
+	 *
+	 * This is the data memory (D). Data memory's addresses start
+	 * at 0 and it can be used /only/ to store/retrieve integers.
+	 */
+	int *mem;
+	int memsize;
 
-    /*
-     * The data memory
-     * ===============
-     *
-     * This is the data memory (D). Data memory's addresses start
-     * at 0 and it can be used /only/ to store/retrieve integers.
-     * The memory size can changed via -m option.
-     */
-    long *mem;
-    int memsize;
-
-    /*
-     * The evaluation stack
-     * ====================
-     *
-     * The stack is a fixed size, which means there's a limit on
-     * the nesting allowed in expressions. A more sophisticated
-     * system could let it grow dynamically but at this point is
-     * useless. The stack size can be changed via -s option.
-     */
-    long *stack;
-    int stacksize;
-    long *stacktop;
-
-    /* Flags */
-#define	STEP	1 << 0		/* Eval step by step.           */
-#define TRACE 	1 << 1		/* Dump opcode execution.       */
-#define HALTED  1 << 2		/* Terminated.                  */
-    int flags;
+	/*
+	 * The evaluation stack
+	 * ====================
+	 *
+	 * The stack is a fixed size, which means there's a limit on
+	 * the nesting allowed in expressions.
+	 */
+	int *stack;
+	int stacksize;
+	int *stacktop;
 };
 
-/* struct VM access macros. */
-#define VCD(v)	((v)->code)
-#define VIP(v)	((v)->ip)
-#define VMM(v)	((v)->mem)
-#define VMS(v)	((v)->memsize)
-#define VST(v)	((v)->stack)
-#define VSS(v)	((v)->stacksize)
-#define VTP(v)	((v)->stacktop)
-#define VLN(v)	((v)->lineno)
-#define VF(v)	((v)->flags)
-
-IMPORT struct VM *initVM(struct Code *, int, int);
-IMPORT void finiVM(struct VM *);
-
-/* The interpreter. */
-IMPORT int evalCode(struct VM *);
-
-/* The debugger. */
-IMPORT int debugCode(struct VM *);
-
+extern struct code *compile_code(const char *filename);
+extern void code_destroy(struct code *code);
+extern struct vm *vm_init(int mem_size, int stack_size);
+extern void vm_destroy(struct vm *vm);
+extern int eval_code(struct vm *vm, struct code *code);
+extern int eval_code_one_step(struct vm *vm, struct code *code);
+extern int debug_code(struct vm *vm, struct code *code);

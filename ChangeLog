@@ -1,16 +1,32 @@
+2013-01-XX  Davide Angelocola  <davide.angelocola@gmail.com>
+
+	* release 3.0
+
+	* cleaner, simpler code:
+		+ removed obscure access macros 
+		+ autoconf/automake/gnulib
+		+ no more globals such as yytext
+		+ better naming
+
+	* updated vim syntax file 
+
+	* compilable with llvm/clang
+
+	* ported to FreeBSD
+
 2009-05-18  Davide Angelocola  <davide.angelocola@gmail.com>
 
 	* release 2.1
 
 	* gnulib port; no new features 
 	
-2006-08-31  Davide Angelocola  <davide.angelocola@gmail.com>
+2006-08-31 Davide Angelocola  <davide.angelocola@gmail.com>
 
 	* release 2.0 
 
 2006-08-25  Davide Angelocola  <davide.angelocola@gmail.com>
 
-	* using autotools; drop oldest Makefile
+	* using autotools; dropping oldest Makefile
 
 2004-10-14  Davide Angelocola  <davide.angelocola@gmail.com>
 

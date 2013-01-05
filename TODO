@@ -1,13 +1,7 @@
+Release 3.0
+===========
 
-- BUG: integer overflow checking doesn't works
-- debugger commands: `trace' and `break'
-- strtol() and strtod() checks are weak
-- improve error messages
-- optionally use boehm-gc
-- try using GNU gperf for keywords
-- a script that autogerates opstr in debug.c 
-- unit testing: autotest 
-- sem-mode for GNU emacs 
+- RPM specfile
+- MacOSX port
 - more documentation (examples, man page)
-- some other cool features. Do you have any ideas on how to 
-  improve this program?
+- sem-mode for GNU emacs 
