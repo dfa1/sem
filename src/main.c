@@ -29,7 +29,7 @@
 #define S(s) STRINGIFY(s)
 #define STRINGIFY(s) #s
 #define DEFAULT_DATA_SIZE 64
-#define DEFAULT_STACK_SIZE 32
+#define DEFAULT_STACK_SIZE 16
 
 static char license[] = "\r\
 sem " VERSION " -- A SIMPLESEM interpreter\n\

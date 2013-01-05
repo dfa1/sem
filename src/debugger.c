@@ -175,6 +175,18 @@ static int mem_func(struct debug_state *ds)
 	return CONTINUE;
 }
 
+/* stack */
+static char stack_doc[] = "Dump the stack.";
+
+static int stack_func(struct debug_state *ds)
+{
+	for (int i = 0; i < ds->vm->stacksize; i++) {
+		int is_top = ds->vm->stack + i == ds->vm->stacktop;
+		printf("%02d value=%d %s\n", i, ds->vm->stack[i], is_top?"<< TOP": "");  
+	}
+	return CONTINUE;
+}
+
 /* next */
 static char next_doc[] = "Execute next instruction.";
 
@@ -185,7 +197,7 @@ static int next_func(struct debug_state *ds)
 	} else {
 		struct instr* ip = ds->vm->ip;
 		int opcode = ip->opcode;
-		printf("%d %s (int=%d,str=%s)\n",  opcode, opstr[opcode], ip->intv, ip->strv);
+		printf("%d %s (int=%d,str=%s)\n", opcode, opstr[opcode], ip->intv, ip->strv);
 		int sts = eval_code_one_step(ds->vm, ds->code);
 		if (sts < 0) {
 			printf("Program aborted.\n");
@@ -248,8 +260,9 @@ static struct cmd cmds[] = {
 	{"next", next_doc, next_func},
 	{"run", run_doc, run_func},
 	{"memory", mem_doc, mem_func},
+	{"stack", stack_doc, stack_func},
 	{"ip", ip_doc, ip_func},
-	{"list", list, list_func},
+	{"list", list_doc, list_func},
 	{"quit", quit_doc, quit_func},
 	{"help", help_doc, help_func},
 	{"break", notimpl_doc, notimpl_func},
