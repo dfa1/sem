@@ -130,7 +130,7 @@ static int ip_func(struct debug_state *ds)
 }
 
 /* list */
-static char list_doc[] = "List program source";
+static char list_doc[] = "List program source.";
 
 static int list_func(struct debug_state *ds) {
 	FILE *fp = fopen(ds->code->filename, "r");
@@ -248,14 +248,11 @@ static struct cmd cmds[] = {
 	{"next", next_doc, next_func},
 	{"run", run_doc, run_func},
 	{"memory", mem_doc, mem_func},
-	{"break", notimpl_doc, notimpl_func},
 	{"ip", ip_doc, ip_func},
-	{"list", list_doc, list_func},
-	{"source", notimpl_doc, notimpl_func},
+	{"list", list, list_func},
 	{"quit", quit_doc, quit_func},
-	{"trace", notimpl_doc, notimpl_func},
-	{"break", notimpl_doc, notimpl_func},
 	{"help", help_doc, help_func},
+	{"break", notimpl_doc, notimpl_func},
 	{NULL, NULL, NULL}
 };
 
