@@ -183,6 +183,9 @@ static int next_func(struct debug_state *ds)
 	if (ds->state == HALTED) {
 		printf("Not in debug.\n");
 	} else {
+		struct instr* ip = ds->vm->ip;
+		int opcode = ip->opcode;
+		printf("%d %s (int=%d,str=%s)\n",  opcode, opstr[opcode], ip->intv, ip->strv);
 		int sts = eval_code_one_step(ds->vm, ds->code);
 		if (sts < 0) {
 			printf("Program aborted.\n");
