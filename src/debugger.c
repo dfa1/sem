@@ -36,7 +36,7 @@ struct debug_state {
 	struct vm *vm;
 	struct code *code;
 	struct cmd *cmds;
-	char **lines;
+	char *filename;
 };
 
 struct cmd {
@@ -113,12 +113,42 @@ static char ip_doc[] = "Print the instruction pointer.";
 static int ip_func(struct debug_state *ds)
 {
 	if (ds->state == RUNNING) {
-		fprintf(stdout, "ip is %p.\n", ds->vm->ip);
+		char line[1000];
+		int lineno = ds->vm->lineno;
+		char* filename = ds->code->filename;
+		if (fetch_line_from_file(filename, lineno, line, sizeof(line)) < 0) {
+			printf("cannot fetch line %d from file %s\n", lineno, filename); 
+		} else {
+			int opcode = ds->vm->ip->opcode;
+			printf("op = %d %s.\n",  opcode, opstr[opcode]);
+			printf("%d %s", lineno, line);
+		}
 	} else {
-		fprintf(stdout, "Debugger not started.\n");
+		printf("Debugger not started.\n");
 	}
 	return CONTINUE;
 }
+
+/* list */
+static char list_doc[] = "List program source";
+
+static int list_func(struct debug_state *ds) {
+	FILE *fp = fopen(ds->code->filename, "r");
+
+	if (fp == NULL) {
+		printf("Failed to open file.\n");
+		return CONTINUE;
+	}
+
+	int lineno = 1;
+	char line[1000];
+	while (fgets(line, sizeof(line), fp) != NULL) {
+		printf("%d %s", lineno++, line); 
+	}
+	fclose(fp);
+	return CONTINUE;
+}
+
 
 /* mem */
 static char mem_doc[] = "Dump the memory.";
@@ -217,6 +247,7 @@ static struct cmd cmds[] = {
 	{"memory", mem_doc, mem_func},
 	{"break", notimpl_doc, notimpl_func},
 	{"ip", ip_doc, ip_func},
+	{"list", list_doc, list_func},
 	{"source", notimpl_doc, notimpl_func},
 	{"quit", quit_doc, quit_func},
 	{"trace", notimpl_doc, notimpl_func},

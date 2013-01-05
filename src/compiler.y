@@ -294,6 +294,7 @@ struct code *compile_code(const char *filename)
 	code->jumps = NULL;
 	code->head = start;
 	code->code = start;
+	code->filename = xstrdup(filename);
 
 	yyscan_t scanner;
 	yylex_init(&scanner);
@@ -380,6 +381,7 @@ void code_destroy(struct code *code)
 		i = t;
 	}
 
+	free(code->filename);
 	free(code->jumps);
 	free(code);
 }

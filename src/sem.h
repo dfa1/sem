@@ -28,6 +28,7 @@ extern char *quote(const char *str, char *dest, int dest_size);
 // io.c
 extern int ask(const char *question, char *answer, int answer_size);
 extern int ask_yes_no(const char *question);
+extern int fetch_line_from_file(const char *filename, int lineno, char *dest, int dest_size);
 
 /* Opcodes. */
 typedef enum {
@@ -69,6 +70,7 @@ struct code {
 	struct instr *code;	/* the code as linked list; it grows as compiler emits opcodes */
 	int size;		/* the code size as number of lines */
 	struct instr **jumps;	/* jump table */
+	char *filename;
 };
 
 /* The interpreter. */
