@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include "sem.h"
-#include "version.h"
+#include "config.h"
 
 #define S(s) STRINGIFY(s)
 #define STRINGIFY(s) #s
@@ -32,7 +32,7 @@
 #define DEFAULT_STACK_SIZE 16
 
 static char license[] = "\r\
-sem " VERSION " -- A SIMPLESEM interpreter\n\
+sem " PACKAGE_VERSION " -- A SIMPLESEM interpreter\n\
 Copyright (C) 2003-2013 Davide Angelocola <davide.angelocola@gmail.com>\n\
 \n\
 This program is free software, and you are welcome to redistribute\n\

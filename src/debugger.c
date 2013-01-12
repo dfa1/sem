@@ -18,13 +18,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include "sem.h"
-#include "version.h"
+#include "config.h"
 
 typedef enum {
 	RUNNING = 1,
@@ -312,7 +311,7 @@ int debug_code(struct vm *vm, struct code *code)
 	pds->vm = vm;
 	pds->code = code;
 	pds->cmds = cmds;
-	fprintf(stdout, "sem %s -- Debugger \n", VERSION);
+	fprintf(stdout, "sem %s -- Debugger \n", PACKAGE_VERSION);
 	fprintf(stdout, "Type 'help' to list available commands.\n");
 	for (;;) {
 		int res = ask("sem> ", cmd_name, sizeof(cmd_name));
