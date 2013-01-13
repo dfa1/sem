@@ -5,7 +5,6 @@ AC_CONFIG_HEADER([src/config.h])
 AM_INIT_AUTOMAKE([no-dependencies foreign 1.9 -Wall])
 AC_PROG_CC
 AC_PROG_RANLIB
-AM_PROG_AR
 AM_PROG_LEX
 AC_PROG_YACC
 AC_CONFIG_FILES([
