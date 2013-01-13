@@ -21,3 +21,6 @@ test_memory_SOURCES = test_memory.c
 test_memory_LDADD = libsem.a
 
 TESTS = test_memory
+
+indent:
+	indent -linux *.[chyl]

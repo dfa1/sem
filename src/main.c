@@ -54,9 +54,8 @@ Report bugs to <%s>\n";
 static void usage(int sts)
 {
 	FILE *target = (sts == EXIT_SUCCESS) ? stdout : stderr;
-	fprintf(target, help_template, 
-		DEFAULT_STACK_SIZE, DEFAULT_DATA_SIZE, PACKAGE_BUGREPORT
-	);
+	fprintf(target, help_template,
+		DEFAULT_STACK_SIZE, DEFAULT_DATA_SIZE, PACKAGE_BUGREPORT);
 	exit(sts);
 }
 

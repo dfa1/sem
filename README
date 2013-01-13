@@ -36,9 +36,6 @@ Follows a little list of the advantages free software has:
 Build instructions
 ------------------
 
-
-
-
 Requirements:
 
 - C99 compiler (such as gcc or clang)
@@ -61,6 +58,7 @@ Developers need also:
 - GNU automake (tested with version 1.12.4) 
 - GNU bison (tested with version 2.5.1) 
 - GNU flex (tested with verstion 2.5.37)
+- GNU indent (tested with 2.2.10)
 
 
 How to use misc/sem.vim? 
@@ -79,13 +77,12 @@ au! BufNewFile,BufRead *.sem 		setf sem
 Distribution structure
 ----------------------
 
-AUTHORS                 Authors and contributors
-ChangeLog		History of changes
-COPYING			Licensing information
-README			The file you're reading now
+AUTHORS             Authors and contributors
+ChangeLog		    History of changes
+COPYING			    Licensing information
+README			    The file you're reading now
 TODO	          	To-do list, ideas, bugs
-Makefile                The Makefile
-doc/QUICKREF            Language reference
+doc/QUICKREF        Language reference
 examples/comp.sem	Compare two numbers
 examples/fact.sem	The factorial
 examples/gcd.sem	Greatest Common Divisor
@@ -93,13 +90,13 @@ examples/hello.sem	Hello World, in SIMPLESEM this time
 examples/pow.sem	The power
 examples/rfact.sem	Recursive version of fact.sem
 examples/sum.sem	Sum two numbers
-misc/sem.vim            VIM syntax file
-src/sem.h		Sem C interface 	
+misc/sem.vim        VIM syntax file
+src/sem.h		    Sem C interface 	
 src/compiler.y		The compiler (GNU bison input)
 src/compiler.c		The compiler (generated from compiler.y)		
 src/tokens.h		Tokens 
-src/vm.c		The interpreter
-src/main.c		The main() 
+src/vm.c		    The interpreter
+src/main.c		    The main() 
 src/scanner.c		The lexical scanner (generated from scanner.l)
 src/scanner.h		The lexical scanner interface (generated from scanner.l)
 src/scanner.l		The lexical scanner (GNU flex input)

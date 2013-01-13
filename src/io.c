@@ -29,7 +29,9 @@ int ask_yes_no(const char *question)
 	while (1);
 }
 
-int fetch_line_from_file(const char *filename, int lineno, char *dest, int dest_size) {
+int fetch_line_from_file(const char *filename, int lineno, char *dest,
+			 int dest_size)
+{
 	FILE *fp = fopen(filename, "r");
 	if (fp == NULL) {
 		return -1;
@@ -40,7 +42,7 @@ int fetch_line_from_file(const char *filename, int lineno, char *dest, int dest_
 		if (res == NULL) {
 			fclose(fp);
 			return -1;
-		}	
+		}
 	}
 	fclose(fp);
 	return 0;

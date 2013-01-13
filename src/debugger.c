@@ -114,12 +114,14 @@ static int ip_func(struct debug_state *ds)
 	if (ds->state == RUNNING) {
 		char line[1000];
 		int lineno = ds->vm->lineno;
-		char* filename = ds->code->filename;
-		if (fetch_line_from_file(filename, lineno, line, sizeof(line)) < 0) {
-			printf("cannot fetch line %d from file %s\n", lineno, filename); 
+		char *filename = ds->code->filename;
+		if (fetch_line_from_file(filename, lineno, line, sizeof(line)) <
+		    0) {
+			printf("cannot fetch line %d from file %s\n", lineno,
+			       filename);
 		} else {
 			int opcode = ds->vm->ip->opcode;
-			printf("op = %d %s.\n",  opcode, opstr[opcode]);
+			printf("op = %d %s.\n", opcode, opstr[opcode]);
 			printf("%d %s", lineno, line);
 		}
 	} else {
@@ -131,7 +133,8 @@ static int ip_func(struct debug_state *ds)
 /* list */
 static char list_doc[] = "List program source.";
 
-static int list_func(struct debug_state *ds) {
+static int list_func(struct debug_state *ds)
+{
 	FILE *fp = fopen(ds->code->filename, "r");
 
 	if (fp == NULL) {
@@ -142,12 +145,11 @@ static int list_func(struct debug_state *ds) {
 	int lineno = 1;
 	char line[1000];
 	while (fgets(line, sizeof(line), fp) != NULL) {
-		printf("%d %s", lineno++, line); 
+		printf("%d %s", lineno++, line);
 	}
 	fclose(fp);
 	return CONTINUE;
 }
-
 
 /* mem */
 static char mem_doc[] = "Dump the memory.";
@@ -181,7 +183,8 @@ static int stack_func(struct debug_state *ds)
 {
 	for (int i = 0; i < ds->vm->stacksize; i++) {
 		int is_top = ds->vm->stack + i == ds->vm->stacktop;
-		printf("%02d value=%d %s\n", i, ds->vm->stack[i], is_top?"<< TOP": "");  
+		printf("%02d value=%d %s\n", i, ds->vm->stack[i],
+		       is_top ? "<< TOP" : "");
 	}
 	return CONTINUE;
 }
@@ -194,9 +197,10 @@ static int next_func(struct debug_state *ds)
 	if (ds->state == HALTED) {
 		printf("Not in debug.\n");
 	} else {
-		struct instr* ip = ds->vm->ip;
+		struct instr *ip = ds->vm->ip;
 		int opcode = ip->opcode;
-		printf("%d %s (int=%d,str=%s)\n", opcode, opstr[opcode], ip->intv, ip->strv);
+		printf("%d %s (int=%d,str=%s)\n", opcode, opstr[opcode],
+		       ip->intv, ip->strv);
 		int sts = eval_code_one_step(ds->vm, ds->code);
 		if (sts < 0) {
 			printf("Program aborted.\n");
