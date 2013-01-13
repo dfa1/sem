@@ -10,6 +10,9 @@ AM_PROG_LEX
 AC_PROG_YACC
 AC_CONFIG_FILES([
 Makefile
+doc/Makefile
+examples/Makefile
+misc/Makefile
 src/Makefile
 ])
 AC_OUTPUT
