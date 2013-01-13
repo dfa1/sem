@@ -1,5 +1,4 @@
 AM_CFLAGS = -std=c99
-AM_LFLAGS = --header-file=scanner.h
 
 noinst_LIBRARIES = libsem.a
 libsem_a_SOURCES = \
@@ -10,8 +9,8 @@ libsem_a_SOURCES = \
 	memory.c   \
 	vm.c
 
-EXTRA_DIST = sem.h tokens.h 
-DISTCLEANFILES = scanner.h scanner.c compiler.c 
+EXTRA_DIST = sem.h tokens.h scanner.h
+DISTCLEANFILES = scanner.c compiler.c 
 
 bin_PROGRAMS = sem
 sem_SOURCES = main.c 
