@@ -24,7 +24,7 @@
  */
 
 #include "sem.h"
-#include "compiler.h"
+#include "tokens.h"
 
 /* *INDENT-OFF* */
 %}

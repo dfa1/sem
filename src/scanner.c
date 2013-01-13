@@ -518,7 +518,7 @@ static yyconst flex_int32_t yy_rule_can_match_eol[32] =
  */
 
 #include "sem.h"
-#include "compiler.h"
+#include "tokens.h"
 
 /* *INDENT-OFF* */
 /* Character classes. */
