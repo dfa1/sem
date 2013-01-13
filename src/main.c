@@ -26,14 +26,12 @@
 #include "sem.h"
 #include "config.h"
 
-#define S(s) STRINGIFY(s)
-#define STRINGIFY(s) #s
 #define DEFAULT_DATA_SIZE 64
 #define DEFAULT_STACK_SIZE 16
 
 static char license[] = "\r\
 sem " PACKAGE_VERSION " -- A SIMPLESEM interpreter\n\
-Copyright (C) 2003-2013 Davide Angelocola <davide.angelocola@gmail.com>\n\
+Copyright (C) 2003-2013 Davide Angelocola\n\
 \n\
 This program is free software, and you are welcome to redistribute\n\
 it and/or modify it under the terms of the GNU General Public License.\n\
@@ -41,22 +39,24 @@ There is ABSOLUTELY NO WARRANTY for this program.\n\
 \n\
 See the COPYING filefor more details.\n";
 
-static char help[] = "\r\
+static char help_template[] = "\r\
 Usage: sem [options] file\n\
 \n\
 Options:\n\
   -h : print this help message and exit\n\
   -d : interactive debugger\n\
-  -m : set the data memory size (the default is " S(DEFAULT_DATA_SIZE) ")\n\
-  -s : set the stack size (the default is " S(DEFAULT_STACK_SIZE) ")\n\
+  -m : set the data memory size (the default is %d)\n\
+  -s : set the stack size (the default is %d)\n\
   -v : print the version and exit\n\
 \n\
-Report bugs to <davide.angelocola@gmail.com>\n";
+Report bugs to <%s>\n";
 
 static void usage(int sts)
 {
 	FILE *target = (sts == EXIT_SUCCESS) ? stdout : stderr;
-	fprintf(target, "%s", help);
+	fprintf(target, help_template, 
+		DEFAULT_STACK_SIZE, DEFAULT_DATA_SIZE, PACKAGE_BUGREPORT
+	);
 	exit(sts);
 }
 
