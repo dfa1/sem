@@ -33,8 +33,11 @@ Follows a little list of the advantages free software has:
      about this subject refer to the COPYING file.
 
 
-Install instructions
---------------------
+Build instructions
+------------------
+
+
+
 
 Requirements:
 
@@ -42,17 +45,22 @@ Requirements:
 - make
 
 Building sem:
-  
+
+  $ ./configure  
   $ make                                
 
-This creates an executable 'build/sem'. In order to install it type:
+This creates an executable 'src/sem'. In order to install it type:
  
   $ make install 
 
 By default installation directory is /usr/local, so 'sem' is installed in /usr/local/bin/sem. 
-It can be changed by specifying a different PREFIX, e.g.:
 
-  $ make install PREFIX=/usr
+Developers need also:
+
+- GNU autoconf (tested with version 2.69)
+- GNU automake (tested with version 1.12.4) 
+- GNU bison (tested with version 2.5.1) 
+- GNU flex (tested with verstion 2.5.37)
 
 
 How to use misc/sem.vim? 
