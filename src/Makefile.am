@@ -10,10 +10,16 @@ libsem_a_SOURCES=\
 	memory.c		\
 	vm.c		\
 	scanner.l 
+
+
 EXTRA_DIST = sem.h compiler.h scanner.h 
 DISTCLEANFILES = scanner.h scanner.c compiler.h compiler.c 
 bin_PROGRAMS = sem
 sem_SOURCES = main.c 
 sem_LDADD = libsem.a
 
+noinst_PROGRAMS = test_memory
+test_memory_SOURCES = test_memory.c 
+test_memory_LDADD = libsem.a
 
+TESTS = test_memory
