@@ -1,5 +1,5 @@
 AC_PREREQ(2.60)
-AC_INIT(sem, 3.0, davide.angelocola@gmail.com)
+AC_INIT(sem, 3.1, davide.angelocola@gmail.com)
 AC_CONFIG_SRCDIR([src/sem.h])
 AC_CONFIG_HEADER([src/config.h])
 AM_INIT_AUTOMAKE([no-dependencies foreign 1.9 -Wall])
