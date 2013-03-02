@@ -68,7 +68,7 @@ void vm_destroy(struct vm *vm)
  *  +-------+
  *      |     
  *      | <-----------------+
- *      |                   |                    DIE
+ *      |                   |                    ERROR
  *      |                   |           +-------------------> sts is 1
  *      |                   |           |
  *  +-------+           +-------+       |      +------+
@@ -105,8 +105,7 @@ int eval_code_one_step(struct vm *vm, struct code *code)
 	int q;			/* second operand               */
 	int sts;		/* status                       */
 
-// TODO: rename as error
-#define DIE(...)				\
+#define ERROR(...)				\
     do {					\
       fprintf(stderr, "sem: " __VA_ARGS__);	\
       fprintf(stderr, "\n");			\
@@ -129,7 +128,7 @@ int eval_code_one_step(struct vm *vm, struct code *code)
 	if (LEVEL() < vm->stacksize)		\
 	    *vm->stacktop++ = (x);		\
 	else					\
-	    DIE("stack overflow");		\
+	    ERROR("stack overflow");		\
     } while(0)
 
 	/* Initialization. */
@@ -146,7 +145,7 @@ int eval_code_one_step(struct vm *vm, struct code *code)
 		p = POP();
 
 		if (p < 0 || p >= vm->memsize) {
-			DIE("invalid memory address %d for target", p);
+			ERROR("invalid memory address %d for target", p);
 		}
 		vm->mem[p] = q;
 		break;
@@ -155,7 +154,7 @@ int eval_code_one_step(struct vm *vm, struct code *code)
 		p = POP();
 
 		if (p < 0 || p >= vm->memsize)
-			DIE("invalid memory address %d", p);
+			ERROR("invalid memory address %d", p);
 
 		PUSH(vm->mem[p]);
 		break;
@@ -168,7 +167,7 @@ int eval_code_one_step(struct vm *vm, struct code *code)
 		q = POP();
 
 		if (q < 1 || q >= code->size) {
-			DIE("cannot jump to line %d", q);
+			ERROR("cannot jump to line %d", q);
 		}
 
 		vm->ip = code->jumps[q - 1];
@@ -179,7 +178,7 @@ int eval_code_one_step(struct vm *vm, struct code *code)
 		q = POP();
 
 		if (q < 1 || q >= code->size) {
-			DIE("cannot jump to line %d", q);
+			ERROR("cannot jump to line %d", q);
 		}
 
 		if (p != 0) {
@@ -218,23 +217,23 @@ int eval_code_one_step(struct vm *vm, struct code *code)
 			p = POP();
 
 			if (p < 0 || p >= vm->memsize) {
-				DIE("invalid memory address %d for read", p);
+				ERROR("invalid memory address %d for read", p);
 			}
 
 			char answer[1024];
 			char *ep;
 			if (ask("", answer, sizeof(answer)) < 0) {
-				DIE("EOF during read");
+				ERROR("EOF during read");
 			}
 			errno = 0;
 			q = strtol(answer, &ep, 10);
 
 			if (errno == ERANGE) {
-				DIE("invalid integer literal '%s'", answer);
+				ERROR("invalid integer literal '%s'", answer);
 			}
 
 			if (*ep != 0) {
-				DIE("invalid '%c' in integer literal '%s' ",
+				ERROR("invalid '%c' in integer literal '%s' ",
 				    *ep, answer);
 			}
 			vm->mem[p] = q;
@@ -263,7 +262,7 @@ int eval_code_one_step(struct vm *vm, struct code *code)
 		q = POP();
 		p = POP();
 		if (q == 0) {
-			DIE("division by zero");
+			ERROR("division by zero");
 		}
 		PUSH(p / q);
 		break;
@@ -272,7 +271,7 @@ int eval_code_one_step(struct vm *vm, struct code *code)
 		q = POP();
 		p = POP();
 		if (q == 0) {
-			DIE("division by zero");
+			ERROR("division by zero");
 		}
 		PUSH(p % q);
 		break;
@@ -314,7 +313,7 @@ int eval_code_one_step(struct vm *vm, struct code *code)
 		break;
 
 	default:
-		DIE("unknown opcode (%d); top is %d", vm->ip->opcode, TOP());
+		ERROR("unknown opcode (%d); top is %d", vm->ip->opcode, TOP());
 	}
 
  halt:
