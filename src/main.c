@@ -26,6 +26,10 @@
 #include "sem.h"
 #include "config.h"
 
+#if __STDC_VERSION__ < 202311L
+#error "C23 support required. Please compile with -std=c23"
+#endif
+
 constexpr size_t MAX_DATA_SIZE = 1024;
 constexpr size_t MAX_STACK_SIZE = 1024 ;
 constexpr size_t DEFAULT_DATA_SIZE = 64;
@@ -82,7 +86,7 @@ int main(const int argc, char *argv[]) {
 				usage(EXIT_SUCCESS);
 
 			case 'm':
-				if (sscanf(optarg, "%d", &mem_size) != 1 || mem_size > 1024) {
+				if (sscanf(optarg, "%d", &mem_size) != 1 || mem_size > MAX_DATA_SIZE) {
 					fprintf(stderr,
 							"sem: invalid memory size (%s)\n",
 							optarg);
@@ -91,7 +95,7 @@ int main(const int argc, char *argv[]) {
 				break;
 
 			case 's':
-				if (sscanf(optarg, "%d", &stack_size) != 1 || stack_size > 1024) {
+				if (sscanf(optarg, "%d", &stack_size) != 1 || stack_size > MAX_STACK_SIZE) {
 					fprintf(stderr,
 					        "sem: invalid stack size (%s)\n",
 					        optarg);
