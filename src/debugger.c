@@ -316,7 +316,7 @@ int debug_code(struct vm *vm, struct code *code)
 	fprintf(stdout, "sem %s -- Debugger \n", PACKAGE_VERSION);
 	fprintf(stdout, "Type 'help' to list available commands.\n");
 	for (;;) {
-		int res = ask("sem> ", cmd_name, sizeof(cmd_name));
+		const int res = ask("sem> ", cmd_name, sizeof(cmd_name));
 		if (res < 0) {
 			break;
 		}
