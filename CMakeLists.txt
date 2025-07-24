@@ -49,8 +49,14 @@ add_executable(sem
 )
 
 # Include directories
-target_include_directories(sem PRIVATE
-        ${CMAKE_CURRENT_BINARY_DIR}  # for generated .h files
-        ${CMAKE_SOURCE_DIR}/src  # for defs.h or others
-)
+target_include_directories(sem PRIVATE include)
+
+# testing support
+enable_testing()
+include(CTest)
+
+add_executable(UnitTests tests/test_memory.c src/memory.c)
+target_include_directories(UnitTests PRIVATE include)
+
+add_test(NAME RunUnitTests COMMAND UnitTests)
 
