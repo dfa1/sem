@@ -1,10 +1,9 @@
 Release 3.0
 ===========
 
-- RPM specfile
-- more documentation (examples, man page)
 - sem-mode for GNU emacs
-- add unit tests with cmake
+- more documentation (examples, man page)
 - replace fgets() with getline()
 - replace scanf() with strtol()
 - reduce macros in vm.c (like POP and PUSH)
+- add function to read a number in io.c
