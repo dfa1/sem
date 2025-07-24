@@ -1,3 +1,5 @@
+#pragma once
+
 enum yytokentype {
 	kSET = 258,
 	kHALT = 259,

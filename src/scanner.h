@@ -1,3 +1,5 @@
+#pragma once
+
 typedef void *yyscan_t;
 
 extern int yylex_init(yyscan_t * scanner);

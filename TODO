@@ -2,6 +2,7 @@ Release 3.0
 ===========
 
 - RPM specfile
-- MacOSX port
 - more documentation (examples, man page)
 - sem-mode for GNU emacs 
+- restore libsem.a
+- add unit tests with cmake
