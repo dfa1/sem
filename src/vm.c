@@ -26,7 +26,7 @@
 #include <assert.h>
 #include "sem.h"
 
-struct vm *vm_init(int memsize, int stacksize) {
+struct vm *vm_init(size_t memsize, size_t stacksize) {
 	assert(memsize > 0);
 	assert(stacksize > 0);
 	struct vm *vm = (struct vm *) xmalloc(sizeof(struct vm));

@@ -26,12 +26,12 @@ char *xstrdup(const char *str)
  * example:
  *   '"\\n"' -> '\n'
  */
-char *quote(const char *str, char *dest, int dest_size)
+char *quote(const char *str, char *dest, size_t dest_size)
 {
 	assert(str != NULL);
 	assert(dest != NULL);
 	assert(dest_size >= 1);
-	int src_size = strlen(str);
+	const size_t src_size = strlen(str);
 	char *p = dest;
 	for (int i = 1; i < dest_size && i < src_size - 1; i++) {
 		if (str[i] == '\\') {
@@ -75,7 +75,7 @@ char *quote(const char *str, char *dest, int dest_size)
  * example:
  *   '\n' -> '"\\n"'
  */
-char *unquote(const char *str, char *dest, int dest_size)
+char *unquote(const char *str, char *dest, size_t dest_size)
 {
 	assert(str != NULL);
 	assert(dest != NULL);
