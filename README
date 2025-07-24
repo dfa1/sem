@@ -38,28 +38,8 @@ Build instructions
 
 Requirements:
 
-- C99 compiler (such as gcc or clang)
-- make
-
-Building sem:
-
-  $ ./configure  
-  $ make                                
-
-This creates an executable 'src/sem'. In order to install it type:
- 
-  $ make install 
-
-By default installation directory is /usr/local, so 'sem' is installed in /usr/local/bin/sem. 
-
-Developers need also:
-
-- GNU autoconf (tested with version 2.69)
-- GNU automake (tested with version 1.12.4) 
-- GNU bison (tested with version 2.5.1) 
-- GNU flex (tested with version 2.5.37)
-- GNU indent (tested with 2.2.10)
-
+- C99 compiler
+- cmake
 
 How to use misc/sem.vim? 
 ------------------------
@@ -101,7 +81,6 @@ src/scanner.c       The lexical scanner (generated from scanner.l)
 src/scanner.h       The lexical scanner interface
 src/scanner.l       The lexical scanner (GNU flex input)
 src/main.c          The main() for interpreter and debugger
-
 
 Contact Information
 -------------------
