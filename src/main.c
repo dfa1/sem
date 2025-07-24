@@ -51,16 +51,14 @@ Options:\n\
 \n\
 Report bugs to <%s>\n";
 
-static void usage(int sts)
-{
+static void usage(int sts) {
 	FILE *target = (sts == EXIT_SUCCESS) ? stdout : stderr;
 	fprintf(target, help_template,
-		DEFAULT_STACK_SIZE, DEFAULT_DATA_SIZE, PACKAGE_BUGREPORT);
+	        DEFAULT_STACK_SIZE, DEFAULT_DATA_SIZE, PACKAGE_BUGREPORT);
 	exit(sts);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 	int debugger = 0;
 	int mem_size = DEFAULT_DATA_SIZE;
 	int stack_size = DEFAULT_STACK_SIZE;
@@ -79,39 +77,39 @@ int main(int argc, char **argv)
 	while ((opt = getopt_long(argc, argv, "hm:s:vd", long_options, NULL))
 	       != EOF) {
 		switch (opt) {
-		case 'h':
-			usage(EXIT_SUCCESS);
+			case 'h':
+				usage(EXIT_SUCCESS);
 
-		case 'm':
-			if (sscanf(optarg, "%d", &mem_size) != 1
-			    || mem_size < 1) {
-				fprintf(stderr,
-					"sem: invalid memory size (%s)\n",
-					optarg);
-				return EXIT_FAILURE;
-			}
-			break;
+			case 'm':
+				if (sscanf(optarg, "%d", &mem_size) != 1
+				    || mem_size < 1) {
+					fprintf(stderr,
+					        "sem: invalid memory size (%s)\n",
+					        optarg);
+					return EXIT_FAILURE;
+				}
+				break;
 
-		case 's':
-			if (sscanf(optarg, "%d", &stack_size) != 1
-			    || stack_size < 1) {
-				fprintf(stderr,
-					"sem: invalid stack size (%s)\n",
-					optarg);
-				return EXIT_FAILURE;
-			}
-			break;
+			case 's':
+				if (sscanf(optarg, "%d", &stack_size) != 1
+				    || stack_size < 1) {
+					fprintf(stderr,
+					        "sem: invalid stack size (%s)\n",
+					        optarg);
+					return EXIT_FAILURE;
+				}
+				break;
 
-		case 'd':
-			debugger = 1;
-			break;
+			case 'd':
+				debugger = 1;
+				break;
 
-		case 'v':
-			fprintf(stdout, "%s", license);
-			return EXIT_SUCCESS;
+			case 'v':
+				fprintf(stdout, "%s", license);
+				return EXIT_SUCCESS;
 
-		default:
-			usage(EXIT_FAILURE);
+			default:
+				usage(EXIT_FAILURE);
 		}
 	}
 
