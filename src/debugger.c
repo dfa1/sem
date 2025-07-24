@@ -77,14 +77,14 @@ static int dump_func(struct debug_state *ds)
 		if (i->intv != -1) {	// TODO: -1 is a valid integer
 			fprintf(stdout, "%d\n", i->intv);
 		} else if (i->strv != NULL) {
-			int ridiculously_large_enough = strlen(i->strv) * 2 + 4;
+			// TODO: use getline?
+			const size_t ridiculously_large_enough = strlen(i->strv) * 2 + 4;
 			char tmp[ridiculously_large_enough];
 			fprintf(stdout, "%s\n",
 				unquote(i->strv, tmp,
 					ridiculously_large_enough));
 		} else {
 			fprintf(stdout, "\n");
-			continue;
 		}
 	}
 
@@ -111,7 +111,7 @@ static int ip_func(struct debug_state *ds)
 {
 	if (ds->state == RUNNING) {
 		char line[1000];
-		int lineno = ds->vm->lineno;
+		const int lineno = ds->vm->lineno;
 		char *filename = ds->code->filename;
 		if (fetch_line_from_file(filename, lineno, line, sizeof(line)) <
 		    0) {
@@ -154,9 +154,8 @@ static char mem_doc[] = "Dump the memory.";
 
 static int mem_func(struct debug_state *ds)
 {
-	int i;
-	int j;
-	for (i = 0; i < ds->vm->memsize; i++) {	// TODO: screaming for refactoring 
+	for (int i = 0; i < ds->vm->memsize; i++) {	// TODO: screaming for refactoring
+		int j;
 		/* Print at most 10 item. */
 		for (j = 0; i < ds->vm->memsize && j < 10; j++) {
 			fprintf(stdout, "%4d ", ds->vm->mem[i++]);
@@ -180,7 +179,7 @@ static char stack_doc[] = "Dump the stack.";
 static int stack_func(struct debug_state *ds)
 {
 	for (int i = 0; i < ds->vm->stacksize; i++) {
-		int is_top = ds->vm->stack + i == ds->vm->stacktop;
+		const size_t is_top = ds->vm->stack + i == ds->vm->stacktop;
 		printf("%02d value=%d %s\n", i, ds->vm->stack[i],
 		       is_top ? "<< TOP" : "");
 	}
@@ -195,11 +194,11 @@ static int next_func(struct debug_state *ds)
 	if (ds->state == HALTED) {
 		printf("Not in debug.\n");
 	} else {
-		struct instr *ip = ds->vm->ip;
-		int opcode = ip->opcode;
+		const struct instr *ip = ds->vm->ip;
+		const opcode_t opcode = ip->opcode;
 		printf("%d %s (int=%d,str=%s)\n", opcode, opstr[opcode],
 		       ip->intv, ip->strv);
-		int sts = eval_code_one_step(ds->vm, ds->code);
+		const int sts = eval_code_one_step(ds->vm, ds->code);
 		if (sts < 0) {
 			printf("Program aborted.\n");
 			ds->state = HALTED;
@@ -218,9 +217,7 @@ static char quit_doc[] = "Quit the debugger.";
 static int quit_func(struct debug_state *ds)
 {
 	if (ds->state == RUNNING) {
-		int answer =
-		    ask_yes_no
-		    ("Debugger is running a program. Exit anyway? (y or n)");
+		const int answer =ask_yes_no("Debugger is running a program. Exit anyway? (y or n)");
 		if (!answer) {
 			return CONTINUE;
 		}
@@ -234,9 +231,7 @@ static char run_doc[] = "Run the program.";
 static int run_func(struct debug_state *ds)
 {
 	if (ds->state == RUNNING) {
-		int answer =
-		    ask_yes_no
-		    ("Already in debugging. Restart it from the beginning? (y or n)");
+		const int answer = ask_yes_no("Already in debugging. Restart it from the beginning? (y or n)");
 		if (answer) {
 			ds->vm->ip = ds->code->head;
 		}
@@ -286,14 +281,13 @@ static int cmp_by_alias(const char *p, const char *q)
 
 static int run_command(struct debug_state *ds, const char *cmd_name)
 {
-	struct cmd *cmd;
 	int (*cmp) (const char *, const char *);
 
 	/* Is the input an alias? */
 	cmp = (strlen(cmd_name) > 1) ? cmp_by_name : cmp_by_alias;
 
 	/* Search the command. */
-	for (cmd = ds->cmds; cmd->name != NULL; cmd++) {
+	for (struct cmd *cmd = ds->cmds; cmd->name != NULL; cmd++) {
 		if ((cmp) (cmd_name, cmd->name)) {
 			return (cmd->func) (ds);
 		}

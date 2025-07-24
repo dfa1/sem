@@ -75,7 +75,7 @@ char *quote(const char *str, char *dest, size_t dest_size)
  * example:
  *   '\n' -> '"\\n"'
  */
-char *unquote(const char *str, char *dest, size_t dest_size)
+char *unquote(const char *str, char *dest, const size_t dest_size)
 {
 	assert(str != NULL);
 	assert(dest != NULL);

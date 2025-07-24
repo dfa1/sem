@@ -55,7 +55,7 @@ void vm_destroy(struct vm *vm) {
 /*
  * This interpreter (or virtual machine) uses an operand stack to
  * supply parameters operations, and to receive results back from
- * them. All the the instructions (opcodes) take operands from the the
+ * them. All the instructions (opcodes) take operands from the
  * stack, operate on them, and return results to the top of the stack.
  *
  * The operand stack follows the last-in first-out (LIFO) methodology
