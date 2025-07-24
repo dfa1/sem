@@ -26,8 +26,8 @@
 #include "sem.h"
 #include "config.h"
 
-#define DEFAULT_DATA_SIZE 64
-#define DEFAULT_STACK_SIZE 16
+constexpr size_t DEFAULT_DATA_SIZE = 64;
+constexpr size_t DEFAULT_STACK_SIZE = DEFAULT_DATA_SIZE / 4;
 
 static char license[] = "\r\
 sem " PACKAGE_VERSION " -- A SIMPLESEM interpreter\n\
@@ -45,25 +45,24 @@ Usage: sem [options] file\n\
 Options:\n\
   -h : print this help message and exit\n\
   -d : interactive debugger\n\
-  -m : set the data memory size (the default is %d)\n\
-  -s : set the stack size (the default is %d)\n\
+  -m : set the data memory size (the default is %zu)\n\
+  -s : set the stack size (the default is %u)\n\
   -v : print the version and exit\n\
 \n\
 Report bugs to <%s>\n";
 
-static void usage(int sts) {
+static void usage(const int sts) {
 	FILE *target = (sts == EXIT_SUCCESS) ? stdout : stderr;
-	fprintf(target, help_template,
-	        DEFAULT_STACK_SIZE, DEFAULT_DATA_SIZE, PACKAGE_BUGREPORT);
+	fprintf(target, help_template, DEFAULT_STACK_SIZE, DEFAULT_DATA_SIZE, PACKAGE_BUGREPORT);
 	exit(sts);
 }
 
-int main(int argc, char **argv) {
+int main(const int argc, char *argv[]) {
+	constexpr size_t mem_size = DEFAULT_DATA_SIZE;
+	constexpr size_t stack_size = DEFAULT_STACK_SIZE;
 	int debugger = 0;
-	int mem_size = DEFAULT_DATA_SIZE;
-	int stack_size = DEFAULT_STACK_SIZE;
 	int opt = 0;
-	struct option long_options[] = {
+	const struct option long_options[] = {
 		{"version", 0, nullptr, 'v'},
 		{"help", 0, nullptr, 'h'},
 		{"debug", 0, nullptr, 'd'},
