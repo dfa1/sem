@@ -26,8 +26,10 @@
 #include "sem.h"
 #include "config.h"
 
+constexpr size_t MAX_DATA_SIZE = 1024;
+constexpr size_t MAX_STACK_SIZE = 1024 ;
 constexpr size_t DEFAULT_DATA_SIZE = 64;
-constexpr size_t DEFAULT_STACK_SIZE = DEFAULT_DATA_SIZE / 4;
+constexpr size_t DEFAULT_STACK_SIZE = 64;
 
 static char license[] = "\r\
 sem " PACKAGE_VERSION " -- A SIMPLESEM interpreter\n\
@@ -58,8 +60,8 @@ static void usage(const int sts) {
 }
 
 int main(const int argc, char *argv[]) {
-	constexpr size_t mem_size = DEFAULT_DATA_SIZE;
-	constexpr size_t stack_size = DEFAULT_STACK_SIZE;
+	size_t mem_size = DEFAULT_DATA_SIZE;
+	size_t stack_size = DEFAULT_STACK_SIZE;
 	int debugger = 0;
 	int opt = 0;
 	const struct option long_options[] = {
@@ -80,18 +82,16 @@ int main(const int argc, char *argv[]) {
 				usage(EXIT_SUCCESS);
 
 			case 'm':
-				if (sscanf(optarg, "%d", &mem_size) != 1
-				    || mem_size < 1) {
+				if (sscanf(optarg, "%d", &mem_size) != 1 || mem_size > 1024) {
 					fprintf(stderr,
-					        "sem: invalid memory size (%s)\n",
-					        optarg);
+							"sem: invalid memory size (%s)\n",
+							optarg);
 					return EXIT_FAILURE;
 				}
 				break;
 
 			case 's':
-				if (sscanf(optarg, "%d", &stack_size) != 1
-				    || stack_size < 1) {
+				if (sscanf(optarg, "%d", &stack_size) != 1 || stack_size > 1024) {
 					fprintf(stderr,
 					        "sem: invalid stack size (%s)\n",
 					        optarg);
@@ -118,14 +118,13 @@ int main(const int argc, char *argv[]) {
 	}
 
 	int status;
-	char *filename = argv[optind];
+	const char *filename = argv[optind];
 	struct code *code = compile_code(filename);
 
 	if (code == nullptr) {
 		// error message should be already displayed at this point
 		return EXIT_FAILURE;
 	}
-
 	struct vm *vm = vm_init(mem_size, stack_size);
 	if (debugger) {
 		status = debug_code(vm, code);
