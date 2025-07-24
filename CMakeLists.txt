@@ -1,6 +1,28 @@
 cmake_minimum_required(VERSION 3.10)
 project(sem C)
 
+# Enable maximum warnings
+if (CMAKE_C_COMPILER_ID MATCHES "Clang" OR CMAKE_C_COMPILER_ID MATCHES "AppleClang")
+    add_compile_options(
+            -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wundef
+            -Wcast-align -Wstrict-prototypes -Wwrite-strings
+            -Wmissing-prototypes -Wold-style-definition
+            -Wfloat-equal -Waggregate-return -Wswitch-enum
+            -Wunreachable-code -Wformat=2 -Wnull-dereference
+            -Wdouble-promotion -Wvla -Wno-unused-parameter
+    )
+elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(
+            -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wundef
+            -Wcast-align -Wstrict-prototypes -Wwrite-strings
+            -Wmissing-prototypes -Wold-style-definition
+            -Wfloat-equal -Waggregate-return -Wswitch-enum
+            -Wunreachable-code -Wformat=2 -Wnull-dereference
+            -Wdouble-promotion -Wvla -Wno-unused-parameter
+    )
+endif()
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 # Find Flex and Bison
 find_package(FLEX REQUIRED)
 find_package(BISON REQUIRED)
@@ -26,3 +48,4 @@ target_include_directories(sem PRIVATE
         ${CMAKE_CURRENT_BINARY_DIR}  # for generated .h files
         ${CMAKE_SOURCE_DIR}/src  # for defs.h or others
 )
+
