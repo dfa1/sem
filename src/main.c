@@ -64,17 +64,17 @@ int main(int argc, char **argv) {
 	int stack_size = DEFAULT_STACK_SIZE;
 	int opt = 0;
 	struct option long_options[] = {
-		{"version", 0, 0, 'v'},
-		{"help", 0, 0, 'h'},
-		{"debug", 0, 0, 'd'},
-		{NULL, 0, 0, 'm'},
-		{NULL, 0, 0, 's'},
+		{"version", 0, nullptr, 'v'},
+		{"help", 0, nullptr, 'h'},
+		{"debug", 0, nullptr, 'd'},
+		{nullptr, 0, nullptr, 'm'},
+		{nullptr, 0, nullptr, 's'},
 
 		/* Sentinel. */
-		{0, 0, 0, 0}
+		{nullptr, 0, nullptr, 0}
 	};
 
-	while ((opt = getopt_long(argc, argv, "hm:s:vd", long_options, NULL))
+	while ((opt = getopt_long(argc, argv, "hm:s:vd", long_options, nullptr))
 	       != EOF) {
 		switch (opt) {
 			case 'h':
@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
 	char *filename = argv[optind];
 	struct code *code = compile_code(filename);
 
-	if (code == NULL) {
+	if (code == nullptr) {
 		// error message should be already displayed at this point
 		return EXIT_FAILURE;
 	}
