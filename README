@@ -57,7 +57,7 @@ Developers need also:
 - GNU autoconf (tested with version 2.69)
 - GNU automake (tested with version 1.12.4) 
 - GNU bison (tested with version 2.5.1) 
-- GNU flex (tested with verstion 2.5.37)
+- GNU flex (tested with version 2.5.37)
 - GNU indent (tested with 2.2.10)
 
 
@@ -110,5 +110,5 @@ Email:
   davide.angelocola@gmail.com
 
 URL:
-  http://bitbucket.org/dfa/sem
+  http://github.com/dfa1/sem
 
