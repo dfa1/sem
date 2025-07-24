@@ -26,9 +26,9 @@ extern void *xmalloc(size_t);
 
 extern char *xstrdup(const char *);
 
-extern char *unquote(const char *str, char *dest, int dest_size);
+extern char *unquote(const char *str, char *dest, size_t dest_size);
 
-extern char *quote(const char *str, char *dest, int dest_size);
+extern char *quote(const char *str, char *dest, size_t dest_size);
 
 // io.c
 extern int ask(const char *question, char *answer, int answer_size);
@@ -36,7 +36,7 @@ extern int ask(const char *question, char *answer, int answer_size);
 extern int ask_yes_no(const char *question);
 
 extern int fetch_line_from_file(const char *filename, int lineno, char *dest,
-                                int dest_size);
+size_t dest_size);
 
 /* Opcodes. */
 typedef enum {
@@ -76,7 +76,7 @@ struct instr {
 struct code {
 	struct instr *head; /* the head */
 	struct instr *code; /* the code as linked list; it grows as compiler emits opcodes */
-	int size; /* the code size as number of lines */
+	size_t size; /* the code size as number of lines */
 	struct instr **jumps; /* jump table */
 	char *filename;
 };
@@ -95,7 +95,7 @@ struct vm {
 	 * at 0 and it can be used /only/ to store/retrieve integers.
 	 */
 	int *mem;
-	int memsize;
+	size_t memsize;
 
 	/*
 	 * The evaluation stack
@@ -105,7 +105,7 @@ struct vm {
 	 * the nesting allowed in expressions.
 	 */
 	int *stack;
-	int stacksize;
+	size_t stacksize;
 	int *stacktop;
 };
 
@@ -113,7 +113,7 @@ extern struct code *compile_code(const char *filename);
 
 extern void code_destroy(struct code *code);
 
-extern struct vm *vm_init(int mem_size, int stack_size);
+extern struct vm *vm_init(size_t mem_size, size_t stack_size);
 
 extern void vm_destroy(struct vm *vm);
 
