@@ -38,7 +38,7 @@ Build instructions
 
 Requirements:
 
-- C99 compiler
+- C23 compiler
 - cmake
 
 How to use misc/sem.vim? 

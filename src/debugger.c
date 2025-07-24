@@ -48,8 +48,8 @@ enum {
 	QUIT
 };
 
-/* 
- * Commands 
+/*
+ * Commands
  * --------
  */
 
@@ -118,7 +118,7 @@ static int ip_func(struct debug_state *ds)
 			printf("cannot fetch line %d from file %s\n", lineno,
 			       filename);
 		} else {
-			int opcode = ds->vm->ip->opcode;
+			opcode_t opcode = ds->vm->ip->opcode;
 			printf("op = %d %s.\n", opcode, opstr[opcode]);
 			printf("%d %s", lineno, line);
 		}
@@ -262,7 +262,7 @@ static struct cmd cmds[] = {
 	{"quit", quit_doc, quit_func},
 	{"help", help_doc, help_func},
 	{"break", notimpl_doc, notimpl_func},
-	{NULL, NULL, NULL}
+	{nullptr, nullptr, nullptr}
 };
 
 /* End of commands. */

@@ -26,9 +26,7 @@
 #include <assert.h>
 #include "sem.h"
 
-struct vm *vm_init(size_t memsize, size_t stacksize) {
-	assert(memsize > 0);
-	assert(stacksize > 0);
+struct vm *vm_init(const size_t memsize, const size_t stacksize) {
 	struct vm *vm = (struct vm *) xmalloc(sizeof(struct vm));
 	// memory
 	vm->memsize = memsize;
@@ -40,7 +38,7 @@ struct vm *vm_init(size_t memsize, size_t stacksize) {
 	memset(vm->stack, 0, sizeof(int) * stacksize);
 	vm->stacktop = vm->stack;
 	// ip
-	vm->ip = NULL;
+	vm->ip = nullptr;
 	vm->lineno = 1;
 	return vm;
 }
@@ -81,7 +79,7 @@ int eval_code(struct vm *vm, struct code *code) {
 	vm->ip = code->head;
 
 	for (;;) {
-		int sts = eval_code_one_step(vm, code);
+		const int sts = eval_code_one_step(vm, code);
 		if (sts < 0) {
 			return sts;
 		}
