@@ -9,7 +9,7 @@ syn keyword semRegister   read write writeln
 " comments
 syn match   semComment 	"#.*$"
 
-" contants 
+" constants
 syn keyword semConstant D ip	
  
 " strings
