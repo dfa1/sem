@@ -26,10 +26,6 @@
 #include "sem.h"
 #include "config.h"
 
-#if __STDC_VERSION__ < 202311L
-#error "C23 support required. Please compile with -std=c23"
-#endif
-
 constexpr size_t MAX_DATA_SIZE = 1024;
 constexpr size_t MAX_STACK_SIZE = 1024 ;
 constexpr size_t DEFAULT_DATA_SIZE = 64;
