@@ -23,15 +23,20 @@
 
 // memory.c
 extern void *xmalloc(size_t);
+
 extern char *xstrdup(const char *);
+
 extern char *unquote(const char *str, char *dest, int dest_size);
+
 extern char *quote(const char *str, char *dest, int dest_size);
 
 // io.c
 extern int ask(const char *question, char *answer, int answer_size);
+
 extern int ask_yes_no(const char *question);
+
 extern int fetch_line_from_file(const char *filename, int lineno, char *dest,
-				int dest_size);
+                                int dest_size);
 
 /* Opcodes. */
 typedef enum {
@@ -62,17 +67,17 @@ typedef enum {
 } opcode_t;
 
 struct instr {
-	opcode_t opcode;	/* opcode */
-	int intv;		/* integer argument */
-	char *strv;		/* string argument */
-	struct instr *next;	/* next opcode */
+	opcode_t opcode; /* opcode */
+	int intv; /* integer argument */
+	char *strv; /* string argument */
+	struct instr *next; /* next opcode */
 };
 
 struct code {
-	struct instr *head;	/* the head */
-	struct instr *code;	/* the code as linked list; it grows as compiler emits opcodes */
-	int size;		/* the code size as number of lines */
-	struct instr **jumps;	/* jump table */
+	struct instr *head; /* the head */
+	struct instr *code; /* the code as linked list; it grows as compiler emits opcodes */
+	int size; /* the code size as number of lines */
+	struct instr **jumps; /* jump table */
 	char *filename;
 };
 
@@ -105,9 +110,15 @@ struct vm {
 };
 
 extern struct code *compile_code(const char *filename);
+
 extern void code_destroy(struct code *code);
+
 extern struct vm *vm_init(int mem_size, int stack_size);
+
 extern void vm_destroy(struct vm *vm);
+
 extern int eval_code(struct vm *vm, struct code *code);
+
 extern int eval_code_one_step(struct vm *vm, struct code *code);
+
 extern int debug_code(struct vm *vm, struct code *code);
