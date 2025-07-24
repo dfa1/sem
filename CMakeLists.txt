@@ -11,9 +11,9 @@ BISON_TARGET(Compiler src/compiler.y ${CMAKE_CURRENT_BINARY_DIR}/parser.tab.c CO
 ADD_FLEX_BISON_DEPENDENCY(Scanner Compiler)
 
 # Add executable
-add_executable(myproject_exec
-        ${FLEX_Lexer_OUTPUTS}
-        ${BISON_Parser_OUTPUTS}
+add_executable(sem
+        ${FLEX_Scanner_OUTPUTS}
+        ${BISON_Compiler_OUTPUTS}
         src/debugger.c
         src/io.c
         src/memory.c
@@ -22,7 +22,7 @@ add_executable(myproject_exec
 )
 
 # Include directories
-target_include_directories(myproject_exec PRIVATE
+target_include_directories(sem PRIVATE
         ${CMAKE_CURRENT_BINARY_DIR}  # for generated .h files
-        ${CMAKE_SOURCE_DIR}/include  # for defs.h or others
+        ${CMAKE_SOURCE_DIR}/src  # for defs.h or others
 )

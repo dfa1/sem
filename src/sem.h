@@ -19,6 +19,8 @@
  * 02111-1307, USA.
  */
 
+#pragma once
+
 // memory.c
 extern void *xmalloc(size_t);
 extern char *xstrdup(const char *);
