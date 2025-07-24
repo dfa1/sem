@@ -5,7 +5,7 @@
 // Display a prompt, read from stdin, dropping \n before returning the user input. Return -1 on EOF.  
 int ask(const char *question, char *answer, int answer_size) {
 	fputs(question, stdout);
-	char *res = fgets(answer, answer_size, stdin);
+	const char *res = fgets(answer, answer_size, stdin);
 	if (res == NULL) {
 		return -1;
 	}
@@ -20,21 +20,23 @@ int ask_yes_no(const char *question) {
 		ask(question, answer, sizeof(answer));
 		if (strcmp(p, "yes") == 0 || strcmp(p, "y") == 0) {
 			return 1;
-		} else if (strcmp(p, "no") == 0 || strcmp(p, "n") == 0) {
+		}
+		if (strcmp(p, "no") == 0 || strcmp(p, "n") == 0) {
 			return 0;
 		}
 	} while (1);
 }
 
+// TODO: opening every time the file to get the n-th line is dumb
 int fetch_line_from_file(const char *filename, const int lineno, char *dest,
-                         const size_t dest_size) {
+                         const int dest_size) {
 	FILE *fp = fopen(filename, "r");
 	if (fp == NULL) {
 		return -1;
 	}
 	int i = 0;
 	while (i++ < lineno) {
-		char *res = fgets(dest, dest_size, fp);
+		const char *res = fgets(dest, dest_size, fp);
 		if (res == NULL) {
 			fclose(fp);
 			return -1;

@@ -35,8 +35,7 @@ extern int ask(const char *question, char *answer, int answer_size);
 
 extern int ask_yes_no(const char *question);
 
-extern int fetch_line_from_file(const char *filename, int lineno, char *dest,
-size_t dest_size);
+extern int fetch_line_from_file(const char *filename, int lineno, char *dest, int dest_size);
 
 /* Opcodes. */
 typedef enum {
