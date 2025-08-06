@@ -32,6 +32,8 @@ void test_unquote()
 void test_xstrdup()
 {
 	assert_str_eq("hello", xstrdup("hello"));
+	assert_str_eq("", xstrdup(""));
+	assert_str_eq("a", xstrdup("aa"));
 }
 
 int main()

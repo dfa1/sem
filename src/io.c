@@ -6,7 +6,7 @@
 int ask(const char *question, char *answer, int answer_size) {
 	fputs(question, stdout);
 	const char *res = fgets(answer, answer_size, stdin);
-	if (res == NULL) {
+	if (res == nullptr) {
 		return -1;
 	}
 	answer[strlen(answer) - 1] = 0;
@@ -27,17 +27,16 @@ int ask_yes_no(const char *question) {
 	} while (1);
 }
 
-// TODO: opening every time the file to get the n-th line is dumb
 int fetch_line_from_file(const char *filename, const int lineno, char *dest,
                          const int dest_size) {
 	FILE *fp = fopen(filename, "r");
-	if (fp == NULL) {
+	if (fp == nullptr) {
 		return -1;
 	}
 	int i = 0;
 	while (i++ < lineno) {
 		const char *res = fgets(dest, dest_size, fp);
-		if (res == NULL) {
+		if (res == nullptr) {
 			fclose(fp);
 			return -1;
 		}

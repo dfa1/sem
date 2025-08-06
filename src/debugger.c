@@ -69,15 +69,12 @@ static const char *opstr[] = {	/* TODO: autogenerate these from sem.h */
 
 static int dump_func(struct debug_state *ds)
 {
-	struct instr *i;
-
-	for (i = ds->code->head; i != NULL; i = i->next) {
+	for (struct instr *i = ds->code->head; i != NULL; i = i->next) {
 		fprintf(stdout, "%-20s\t", opstr[i->opcode]);
 
-		if (i->intv != -1) {	// TODO: -1 is a valid integer
+		if (i->intv != -1) {
 			fprintf(stdout, "%d\n", i->intv);
 		} else if (i->strv != NULL) {
-			// TODO: use getline?
 			const size_t ridiculously_large_enough = strlen(i->strv) * 2 + 4;
 			char tmp[ridiculously_large_enough];
 			fprintf(stdout, "%s\n",
@@ -96,8 +93,7 @@ static char help_doc[] = "Print this help.";
 
 static int help_func(struct debug_state *ds)
 {
-	struct cmd *cmd;
-	for (cmd = ds->cmds; cmd->name != NULL; cmd++) {
+	for (struct cmd *cmd = ds->cmds; cmd->name != NULL; cmd++) {
 		fprintf(stdout, "%-20s %-10c %-30s\n", cmd->name, cmd->name[0],
 			cmd->doc);
 	}
@@ -112,9 +108,8 @@ static int ip_func(struct debug_state *ds)
 	if (ds->state == RUNNING) {
 		char line[1000];
 		const int lineno = ds->vm->lineno;
-		char *filename = ds->code->filename;
-		if (fetch_line_from_file(filename, lineno, line, sizeof(line)) <
-		    0) {
+		const char *filename = ds->code->filename;
+		if (fetch_line_from_file(filename, lineno, line, sizeof(line)) < 0) {
 			printf("cannot fetch line %d from file %s\n", lineno,
 			       filename);
 		} else {
@@ -135,7 +130,7 @@ static int list_func(struct debug_state *ds)
 {
 	FILE *fp = fopen(ds->code->filename, "r");
 
-	if (fp == NULL) {
+	if (fp == nullptr) {
 		printf("Failed to open file.\n");
 		return CONTINUE;
 	}

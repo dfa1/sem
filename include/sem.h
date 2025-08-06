@@ -91,7 +91,7 @@ struct vm {
 	 * ===============
 	 *
 	 * This is the data memory (D). Data memory's addresses start
-	 * at 0 and it can be used /only/ to store/retrieve integers.
+	 * at 0 and, it can be used /only/ to store/retrieve integers.
 	 */
 	int *mem;
 	size_t memsize;

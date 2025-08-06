@@ -8,7 +8,7 @@ void *xmalloc(const size_t size)
 {
 	void *mem = malloc(size);
 
-	if (mem == NULL) {
+	if (mem == nullptr) {
 		abort();
 	}
 
@@ -17,7 +17,7 @@ void *xmalloc(const size_t size)
 
 char *xstrdup(const char *str)
 {
-	assert(str != NULL);
+	assert(str != nullptr);
 	char *dup = xmalloc(strlen(str) + 1);
 	return strcpy(dup, str);
 }
@@ -28,14 +28,14 @@ char *xstrdup(const char *str)
  */
 char *quote(const char *str, char *dest, size_t dest_size)
 {
-	assert(str != NULL);
-	assert(dest != NULL);
+	assert(str != nullptr);
+	assert(dest != nullptr);
 	assert(dest_size >= 1);
 	const size_t src_size = strlen(str);
 	char *p = dest;
 	for (int i = 1; i < dest_size && i < src_size - 1; i++) {
 		if (str[i] == '\\') {
-			char lookahead = str[i + 1];
+			const char lookahead = str[i + 1];
 			i++;	// consuming two chars
 			switch (lookahead) {
 			case 'n':
@@ -77,8 +77,8 @@ char *quote(const char *str, char *dest, size_t dest_size)
  */
 char *unquote(const char *str, char *dest, const size_t dest_size)
 {
-	assert(str != NULL);
-	assert(dest != NULL);
+	assert(str != nullptr);
+	assert(dest != nullptr);
 	assert(dest_size >= 3);
 	char *p = dest;
 	*p++ = '\"';
